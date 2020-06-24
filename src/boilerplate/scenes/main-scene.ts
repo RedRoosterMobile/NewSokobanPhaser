@@ -1,6 +1,6 @@
 /**
- * @author       Digitsensitive <digit.sensitivee@gmail.com>
- * @copyright    2018 - 2019 digitsensitive
+ * @author       RedRoosterMobile
+ * @copyright    2020 - 2099 da red rocking rooster
  * @license      {@link https://github.com/digitsensitive/phaser3-typescript/blob/master/LICENSE.md | MIT License}
  */
 
@@ -10,6 +10,40 @@
 // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/tilemaps/csv/grid.csv
 
 
+
+/*
+
+
+
+sample level
+
+#   = wall = 2
+' ' = empty = 0
+.   = target = 1
+
+$ = box = dynamic
+c = car = dynamic
+
+mod:
+########
+#c  @  #
+## $   #
+# . $  #
+# .  $ #
+##. ####
+##  ####
+########
+
+########
+####@  #
+## $   #
+# . $  #
+# .  $ #
+##. ####
+##  ####
+########
+
+*/
 
 
 
@@ -32,7 +66,8 @@ export class MainScene extends Phaser.Scene {
   preload(): void {
     this.load.image('tiles', [ 'assets/drawtiles1.png', 'assets/drawtiles1_n.png' ]);
     this.load.image('car', 'assets/car90.png');
-    this.load.tilemapCSV('map', 'assets/grid.csv');
+    //this.load.tilemapCSV('map', 'assets/grid.csv');
+    this.load.tilemapCSV('map', 'assets/sokoban_01.csv');
   }
 
   create(): void {
