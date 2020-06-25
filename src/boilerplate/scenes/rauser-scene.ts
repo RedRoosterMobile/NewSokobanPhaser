@@ -30,11 +30,13 @@ export class RauserScene extends Phaser.Scene {
         this.load.image('planeBody', 'assets/rauser/plane_body.png');
         this.load.image('planePhysics', 'assets/rauser/plane_transparent.png');
         this.load.image('planeWings', 'assets/rauser/plane_wings.png');
+        this.load.atlas("boostSprites", 'assets/rauser/boost.png', 'assets/rauser/boost.json');
 
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
     }
     create():void {
         //this.background = this.add.image(400, 300, "background").setScale(1.7);
+
 
         // @ts-ignore
         let worldSizeX:number = parseInt(this.game.config.width) * 4;

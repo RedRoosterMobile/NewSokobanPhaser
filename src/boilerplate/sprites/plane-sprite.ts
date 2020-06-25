@@ -21,6 +21,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   rightWing: Phaser.GameObjects.Image;
   leftWing: Phaser.GameObjects.Image;
   planeBody: Phaser.GameObjects.Image;
+  boost: Phaser.GameObjects.Sprite;
+  blockOtherAnimations = false;
 
   constructor(scene:Phaser.Scene,x:number,y:number) {
     super(scene,x,y,null);
@@ -51,6 +53,10 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
     this.wings = this.scene.add.image(0,0,'planeWings');
     this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
+    this.boost = this.scene.add.sprite(x, y, "boostSprites", 0);
+    this.boost.setOrigin(0,0);
+
+    this.createAnims();
 
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
     // this shit cointainer does not work at all... what's it good for if I have to do everything manually anyway???
@@ -60,16 +66,54 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     // this.plane.addChild(game.make.sprite(-50, -50, 'mummy'));
   }
 
+  createAnims():void{
+
+    this.scene.anims.create({
+      key: "boost",
+      repeat: -1,
+      frameRate: 30,
+      frames: this.scene.anims.generateFrameNames("boostSprites", {
+        prefix: "boost_",
+        suffix: ".png",
+        start: 1,
+        end: 4,
+        zeroPad: 2
+      })
+    });
+  }
+  animateIfNecessary = (animationName, animatedSprite, frameRate = 20) => {
+
+      if (
+        animatedSprite.anims.isPlaying &&
+        animatedSprite.anims.currentAnim.key === animationName
+      ) {
+        // you are already playing .. play on..
+      } else if (animatedSprite.anims.isPlaying) {
+        // something else is playing
+        animatedSprite.play(animationName);
+      } else {
+        // nothing else is playing
+        animatedSprite.play(animationName);
+      }
+
+  };
+
   updatePlane():void {
     // thrust
     if (this.cursors.up.isDown) {
         // @ts-ignore
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
         this.updateWings();
+        this.boost.setVisible(true);
+        this.animateIfNecessary('boost',this.boost,60)
+
+
         // @ts-ignore
         //this.scene.physics.velocityFromRotation(this.leftWing.rotation, 300*2, this.plane.body.acceleration);
     }
     else {
+
+        this.boost.setVisible(false);
         this.plane.setAcceleration(0);
         this.updateWings();
     }
@@ -98,61 +142,53 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.planeBody.setAngle(this.plane.angle);
     this.planeBody.setX(this.plane.x);
     this.planeBody.setY(this.plane.y);
+    this.boost.setAngle(this.plane.angle+90);
+    this.boost.setX(this.plane.x);
+    this.boost.setY(this.plane.y+this.boost.height/2);
+
     this.updateWingsScale();
   }
 
   updateWingsScale():void {
-    // somehow only do this when left button is pressed but x-vector is positive
-    // or when right button is pressed and x-vector is negative
-    //console.log(this.plane.body.velocity);
-
-/*
+    // da orignial scale effect from luftrausers
     const scaleFactor = Math.abs(Math.sin(this.plane.rotation))*1;
-
-    if (this.cursors.up.isDown && this.cursors.left.isDown && this.plane.body.velocity.x > 0) {
-      this.wings.setScale(Phaser.Math.Clamp(1*scaleFactor,0.5,1),1);
-    } else if (this.cursors.up.isDown && this.cursors.right.isDown && this.plane.body.velocity.x < 0) {
-      this.wings.setScale(Phaser.Math.Clamp(1*scaleFactor,0.5,1),1);
-    } else {
-
-      //this.wings.scaleY = 1;
-
-
-    }
-    */
-
-
+    this.wings.scaleY = Phaser.Math.Clamp(1*scaleFactor,0.1,1);
+    // TODO:
+    /*
     // @ts-ignore
-    const secretSauce = (Math.abs(this.plane.body.acceleration.x) > Math.abs(this.plane.body.velocity.x));
+    const secretSauce = 0<(Math.abs(this.plane.body.acceleration.x) - Math.abs(this.plane.body.velocity.x));
 
     const isPlaneTurning = secretSauce;
     if (this.cursors.space.isDown) {
       // @ts-ignore
-      console.log( this.plane.body);
+      console.log( this.plane.rotation);
     }
     const tweenTime:number = 100;
     const easing = 'Sine.easeInOut';
     if (isPlaneTurning) {
       const scaleFactor = Math.abs(Math.sin(this.plane.rotation))*1;
+      this.wings.scaleX= Phaser.Math.Clamp(1*scaleFactor,0.5,1);
 
       // TODO: find an easing function that works
       this.scene.tweens.add({
         targets: this.wings,
         scaleX: Phaser.Math.Clamp(1*scaleFactor,0.5,1),
-        duration: tweenTime,
+        duration: tweenTime/10,
         repeat: 1,
         easing:easing
     });
     } else {
-      this.wings.setScale(1);
-      /*this.scene.tweens.add({
+      //this.wings.setScale(1);
+      this.scene.tweens.add({
         targets: this.wings,
         scaleX: 1,
-        duration: 0,
+        duration: tweenTime,
         repeat: 1,
         easing:easing
-    });*/
+    });
     }
+    */
+
   }
 
 

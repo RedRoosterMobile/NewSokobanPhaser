@@ -1,0 +1,30 @@
+{
+"frames": {
+	"boost_01.png": {
+		"frame": {"x":72, "y":0, "w":64, "h":167},
+		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":167},
+		"sourceSize": {"w":64,"h":167}
+	},
+	"boost_02.png": {
+		"frame": {"x":137, "y":0, "w":48, "h":162},
+		"spriteSourceSize": {"x":0,"y":0,"w":48,"h":162},
+		"sourceSize": {"w":48,"h":162}
+	},
+	"boost_03.png": {
+		"frame": {"x":186, "y":0, "w":40, "h":143},
+		"spriteSourceSize": {"x":0,"y":0,"w":40,"h":143},
+		"sourceSize": {"w":40,"h":143}
+	},
+	"boost_04.png": {
+		"frame": {"x":0, "y":0, "w":71, "h":163},
+		"spriteSourceSize": {"x":0,"y":0,"w":71,"h":163},
+		"sourceSize": {"w":71,"h":163}
+	}
+
+},
+"meta": {
+	"image": "boost.png",
+	"size": {"w": 227, "h": 168},
+	"scale": "1"
+}
+}
