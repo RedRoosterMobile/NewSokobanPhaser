@@ -125,9 +125,13 @@ this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: 
 
         let bullet3: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
         if (bullet3) {
-            console.log('schiessbefehl! 3');
+            const en = this.enemies.getFirstAlive();
+            if (en) {
+                bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
+            }
             // @ts-ignore
-            bullet3.fireAtTarget(this.planeObj.plane, {x:this.planeObj.plane.body.acceleration.y,y:this.planeObj.plane.body.acceleration.x});
+
+            //bullet3.fireAtTarget(this.planeObj.plane, {x:this.planeObj.plane.body.acceleration.y,y:this.planeObj.plane.body.acceleration.x});
         }
 
     });
