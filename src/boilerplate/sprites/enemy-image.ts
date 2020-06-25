@@ -8,6 +8,7 @@ export class Enemy extends Phaser.GameObjects.Image  {
   ySpeed=0;
   direction=0
   hp = 10
+  target: Enemy;
 
   sound:Phaser.Sound.BaseSound;
 
@@ -91,9 +92,15 @@ export class Enemy extends Phaser.GameObjects.Image  {
         this.rotation = shooter.rotation; // angle bullet with shooters rotation
         this.born = 0; // Time since new bullet spawned
   }
+  setTarget(target): void {
+    this.target = target;
+  }
 
   // Updates the position of the bullet each cycle
   update(time:number, delta:number):void {
+    if (this.target) {
+      this.scene.physics.accelerateToObject(this, this.target, 600, 300, 300);
+    }
     /*
       this.x += this.xSpeed * delta;
       this.y += this.ySpeed * delta;

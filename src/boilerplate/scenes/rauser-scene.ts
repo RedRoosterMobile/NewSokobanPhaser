@@ -154,6 +154,8 @@ this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: 
         let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
         anEnemy.x = Phaser.Math.Between(0,worldSizeX);
         anEnemy.y = Phaser.Math.Between(0,worldSizeY);
+        anEnemy.setTarget(this.planeObj.plane);
+
         //anEnemy.x = worldSizeX/2;
         //anEnemy.y = worldSizeY/2;
         console.log('creating enemy at ',anEnemy.x, anEnemy.y );
