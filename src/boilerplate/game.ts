@@ -6,14 +6,31 @@
 
 import "phaser";
 import { MainScene } from "./scenes/main-scene";
+import { RauserScene } from "./scenes/rauser-scene";
 
 // main game configuration
-const config: Phaser.Types.Core.GameConfig = {
+/*const config: Phaser.Types.Core.GameConfig = {
   width: 800,
   height: 600,
   type: Phaser.AUTO,
   parent: "game",
   scene: MainScene
+};*/
+
+// rauser game configuration
+const config: Phaser.Types.Core.GameConfig = {
+  width: 800,
+  height: 600,
+  type: Phaser.AUTO,
+  parent: "game",
+  scene: RauserScene,
+  physics: {
+    default: 'arcade',
+    arcade: {
+        fps: 60,
+        gravity: { y: 100 }
+    }
+  }
 };
 
 export class Game extends Phaser.Game {

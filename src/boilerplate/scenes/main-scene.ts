@@ -12,17 +12,16 @@
 
 
 /*
-
+https://www.crazygames.com/blog/2018/10/24/Sokoban-Series-Part-3-Handling-Input/
 
 
 sample level
 
-#   = wall = 2
-' ' = empty = 0
+#   = wall   = 2
+' ' = empty  = 0
 .   = target = 1
-
-$ = box = dynamic
-c = car = dynamic
+$   = box    = 4
+@   = player = 5
 
 mod:
 ########
@@ -55,6 +54,7 @@ export class MainScene extends Phaser.Scene {
   light: Phaser.GameObjects.Light;
   layer: Phaser.Tilemaps.DynamicTilemapLayer;
   player: Phaser.GameObjects.Image;
+  box: Phaser.GameObjects.Image;
   offsets = [];
 
   constructor() {
@@ -64,8 +64,9 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.load.image('tiles', [ 'assets/drawtiles1.png', 'assets/drawtiles1_n.png' ]);
+    this.load.image('tiles', [ 'assets/drawtiles1_4.png', 'assets/drawtiles1_n_4.png' ]);
     this.load.image('car', 'assets/car90.png');
+    this.load.image('box', 'assets/car90.png');
     //this.load.tilemapCSV('map', 'assets/grid.csv');
     this.load.tilemapCSV('map', 'assets/sokoban_01.csv');
   }
@@ -75,10 +76,19 @@ export class MainScene extends Phaser.Scene {
     var map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
 
     var tileset = map.addTilesetImage('tiles', null, 32, 32, 1, 2);
+    console.log(tileset);
 
     this.layer = map.createDynamicLayer(0, tileset, 0, 0).setPipeline('Light2D');
 
-    this.player = this.add.image(32+16, 32+16, 'car');
+
+    this.layer.forEachTile( (tile) => {
+      if (tile.index === 5) {
+        this.player = this.add.image(tile.pixelX+16, tile.pixelY+16, 'car');
+      } else if (tile.index === 4) {
+        this.box = this.add.image(tile.pixelX+16, tile.pixelY+16, 'box').setTint(0x1188FF);
+      }
+    })
+    
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -101,6 +111,13 @@ export class MainScene extends Phaser.Scene {
     this.offsets = [ 0.1, 0.3, 0.5, 0.7 ];
   }
 
+
+  animate = (player:Phaser.GameObjects.Image, x:number,y:number,angle:number) => {
+    this.player.x ;
+    this.player.y = this.player.y + y;
+    this.player.angle = angle;
+  }
+
   update(): void {
     if (this.input.keyboard.checkDown(this.cursors.left, 100))
     {
@@ -114,6 +131,8 @@ export class MainScene extends Phaser.Scene {
         {
           this.player.x -= 32;
           this.player.angle = 180;
+          //this.anims.add()
+          //this.animate(this.player,-32,this.player.y,180);
         }
     }
     else if (this.input.keyboard.checkDown(this.cursors.right, 100))
