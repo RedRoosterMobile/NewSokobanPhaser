@@ -52,7 +52,7 @@ export class RauserScene extends Phaser.Scene {
             worldSizeX/2,
             worldSizeY
         );
-        this.cameras.main.setZoom(0.1);
+        this.cameras.main.setZoom(0.5);
 
         this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 

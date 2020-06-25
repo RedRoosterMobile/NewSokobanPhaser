@@ -12,7 +12,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   plane:   Phaser.Physics.Arcade.Image;
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   renderContainer:   Phaser.GameObjects.Container;
-  graphics: Phaser.GameObjects.Graphics;
+  leftWing: Phaser.GameObjects.Graphics;
+  rightWing: Phaser.GameObjects.Graphics;
 
   constructor(scene:Phaser.Scene,x:number,y:number) {
     super(scene,x,y,null);
@@ -45,13 +46,15 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
 
 
-    this.graphics = this.scene.add.graphics();
+    this.leftWing = this.scene.add.graphics();
+    this.leftWing.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+    this.leftWing.fillRect(0, 0, 50, 50);
+    this.rightWing = this.scene.add.graphics();
+    this.rightWing.fillGradientStyle(0xff00ff, 0xff0000, 0xffff00, 0xffff00, 1);
+    this.rightWing.fillRect(0, 0, 50, -50);
 
-    this.graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
-    this.graphics.fillRect(0, 0, 50, 50);
 
-
-    this.renderContainer = this.scene.add.container(0, 0, [this.plane, this.graphics]);
+    this.renderContainer = this.scene.add.container(0, 0, [this.plane, this.leftWing]);
     //this.container = new Container(this.scene , x , y , [this.plane, graphics]);
 
     // this.plane.addChild(game.make.sprite(-50, -50, 'mummy'));
@@ -60,35 +63,40 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
 
   updatePlane():void {
-
-    //const scaleFactor = Math.abs(Math.sin(this.plane.rotation));
-    // TODO: use this for wings later on
-    //this.plane.setScale(1*scaleFactor);
     // thrust
     if (this.cursors.up.isDown) {
-      // @ts-ignore
-      this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
-  }
-  else {
-      this.plane.setAcceleration(0);
-  }
+        // @ts-ignore
+        this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
+    }
+    else {
+        this.plane.setAcceleration(0);
+    }
 
-  // steer
-  if (this.cursors.left.isDown) {
-      this.plane.setAngularVelocity(-300);
-  }
-  else if (this.cursors.right.isDown) {
-      this.plane.setAngularVelocity(300);
-  }
-  else {
-      this.plane.setAngularVelocity(0);
-  }
-  this.graphics.x = this.plane.x;
-  this.graphics.y = this.plane.y;
-  this.graphics.angle = this.plane.angle;
+    // steer
+    if (this.cursors.left.isDown) {
+        this.plane.setAngularVelocity(-300);
+    }
+    else if (this.cursors.right.isDown) {
+        this.plane.setAngularVelocity(300);
+    }
+    else {
+        this.plane.setAngularVelocity(0);
+    }
+    this.leftWing.x = this.plane.x;
+    this.leftWing.y = this.plane.y;
+    this.leftWing.angle = this.plane.angle;
+    this.rightWing.x = this.plane.x;
+    this.rightWing.y = this.plane.y;
+    this.rightWing.angle = this.plane.angle;
 
-  // @ts-ignore
-  //this.text.setText('Speed: ' + this.plane.body.speed);
+
+    // @ts-ignore
+    //this.text.setText('Speed: ' + this.plane.body.speed);
+
+    const scaleFactor = Math.abs(Math.sin(this.plane.rotation));
+    // TODO: use this for wings later on
+    this.leftWing.setScale(1*scaleFactor);
+    this.rightWing.setScale(1*scaleFactor);
   }
 
 
