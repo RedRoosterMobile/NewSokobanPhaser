@@ -5,6 +5,8 @@
 // - engine sound. Rip this and add more bass (Wings of Fury) https://www.youtube.com/watch?v=ZZSwdqg6VE4
 // - bullet sound: flak from Wings of Fury (Bassy as hell!)
 
+//- intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
+
 import { Tilemaps } from "phaser";
 
 

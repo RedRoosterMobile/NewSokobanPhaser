@@ -2,6 +2,7 @@ import { Tilemaps } from "phaser";
 
 import {Plane} from './../sprites/plane-sprite';
 import {Bullet} from './../sprites/bullet-image';
+import {Enemy} from './../sprites/enemy-image';
 
 /*
 TODO:
@@ -15,6 +16,10 @@ TODO:
 - ships
 */
 
+var gameSettings = {
+    maxEnemies: 2
+};
+
 export class RauserScene extends Phaser.Scene {
     private phaserSprite: Phaser.GameObjects.Sprite;
     // plane: Phaser.Physics.Arcade.Image;
@@ -24,6 +29,7 @@ export class RauserScene extends Phaser.Scene {
     dasBoot: Phaser.GameObjects.Image;
     enemyBullets: Phaser.Physics.Arcade.Group;
     playerBullets: Phaser.Physics.Arcade.Group;
+    enemies:Phaser.Physics.Arcade.Group
 
 
     preload(): void {
@@ -31,6 +37,8 @@ export class RauserScene extends Phaser.Scene {
         // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/ship.png
         this.load.image('bullet', 'assets/rauser/bullets.png');
         this.load.image('player', 'assets/rauser/plane1.png');
+
+        this.load.image('enemy', 'assets/car90.png');
 
         this.load.image('planeBody', 'assets/rauser/plane_body.png');
         this.load.image('planePhysics', 'assets/rauser/plane_transparent.png');
@@ -40,11 +48,23 @@ export class RauserScene extends Phaser.Scene {
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
 
         this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
+        this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
     }
 
     create():void {
-        //this.background = this.add.image(400, 300, "background").setScale(1.7);
+        // this.background = this.add.image(400, 300, "background").setScale(1.7);
+        //this.sound.add("sndGameMusic").play();
+        const soundConfig = {
+            mute: false,
+            volume: 0.5,
+            rate: 1,
+            detune: 0,
+            seek: 0,
+            loop: true,
+            delay: 0
+          };
 
+        //this.sound.play('sndGameMusic',soundConfig);
 
         // @ts-ignore
         let worldSizeX:number = parseInt(this.game.config.width) * 4;
@@ -57,6 +77,7 @@ export class RauserScene extends Phaser.Scene {
         const graphics = this.add.graphics();
         graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
         graphics.fillRect(0, 0, worldSizeX, worldSizeY);
+
         //this.add.tileSprite(0, 0, 800*2, 600*2, 'background');
         this.dasBoot = this.add.image(worldSizeX/2, worldSizeY, "dasboot").setOrigin(0.5,1).setScale(10);
 
@@ -67,15 +88,22 @@ export class RauserScene extends Phaser.Scene {
             worldSizeX/2,
             worldSizeY
         );
-        this.cameras.main.setZoom(0.5);
+        this.cameras.main.setZoom(0.4);
 
         this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 
+        this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
         this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
+// Add 2 groups for Bullet objects
+this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
 
- // Add 2 groups for Bullet objects
- this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
- this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+        this.physics.add.collider(this.playerBullets, this.enemies, ()=>{
+            console.log('hit me baby one more time');
+        });
+
+
+
 
     // Fires bullet from player on left click of mouse
     this.input.on('pointerdown',  (pointer, time, lastFired)=> {
@@ -100,7 +128,6 @@ export class RauserScene extends Phaser.Scene {
             console.log('schiessbefehl! 3');
             // @ts-ignore
             bullet3.fireAtTarget(this.planeObj.plane, {x:this.planeObj.plane.body.acceleration.y,y:this.planeObj.plane.body.acceleration.x});
-            //this.physics.add.collider(enemy, bullet, enemyHitCallback);
         }
 
     });
@@ -109,8 +136,24 @@ export class RauserScene extends Phaser.Scene {
 
 
 
+
+
   update():void {
     this.planeObj.updatePlane();
+
+    if (this.enemies.getLength()<gameSettings.maxEnemies) {
+
+        // @ts-ignore
+        let worldSizeX:number = parseInt(this.game.config.width) * 4;
+        // @ts-ignore
+        let worldSizeY:number = parseInt(this.game.config.height) * 4;
+        let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
+        anEnemy.x = Phaser.Math.Between(0,worldSizeX);
+        anEnemy.y = Phaser.Math.Between(0,worldSizeY);
+        //anEnemy.x = worldSizeX/2;
+        //anEnemy.y = worldSizeY/2;
+        console.log('creating enemy at ',anEnemy.x, anEnemy.y );
+    }
     // @ts-ignore
     this.text.setText('Speed: ' + this.planeObj.plane.body.speed);
   }
