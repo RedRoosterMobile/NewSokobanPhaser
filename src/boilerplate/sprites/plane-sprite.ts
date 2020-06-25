@@ -50,17 +50,20 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.plane.setDrag(0.99);
     this.plane.setMaxVelocity(600);
     this.plane.setAngle(-90);
+    this.setOrigin(0,0);
 
     this.wings = this.scene.add.image(0,0,'planeWings');
     this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
-    this.boost = this.scene.add.sprite(x, y, "boostSprites", 0);
-    this.boost.setOrigin(0,0);
+    this.boost = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
+    this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost]);
+    this.boost.setOrigin(0.5,0);
+    this.boost.setAngle(90);
 
     this.createAnims();
 
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
     // this shit cointainer does not work at all... what's it good for if I have to do everything manually anyway???
-    //this.renderContainer = this.scene.add.container(0, 0, [this.plane, this.wings]);
+
     //this.container = new Container(this.scene , x , y , [this.plane, graphics]);
 
     // this.plane.addChild(game.make.sprite(-50, -50, 'mummy'));
@@ -136,6 +139,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     //this.text.setText('Speed: ' + this.plane.body.speed);
   }
   updateWings():void {
+    /*
     this.wings.setAngle(this.plane.angle);
     this.wings.setX(this.plane.x)
     this.wings.setY(this.plane.y);
@@ -145,6 +149,13 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.boost.setAngle(this.plane.angle+90);
     this.boost.setX(this.plane.x);
     this.boost.setY(this.plane.y+this.boost.height/2);
+    */
+   this.renderContainer.setAngle(this.plane.angle);
+   this.renderContainer.setX(this.plane.x);
+   this.renderContainer.setY(this.plane.y);
+   //this.boost.setAngle(this.plane.angle+90);
+   //this.boost.setX(-80);
+  //this.boost.setY(0);
 
     this.updateWingsScale();
   }
