@@ -1,6 +1,7 @@
 import { Tilemaps } from "phaser";
 
 import {Plane} from './../sprites/plane-sprite';
+import {Bullet} from './../sprites/bullet-image';
 
 /*
 TODO:
@@ -20,6 +21,9 @@ export class RauserScene extends Phaser.Scene {
     text: Phaser.GameObjects.Text;
     background: Phaser.GameObjects.Image;
     dasBoot: Phaser.GameObjects.Image;
+    enemyBullets: Phaser.Physics.Arcade.Group;
+    playerBullets: Phaser.Physics.Arcade.Group;
+
 
     preload(): void {
         // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/bullets.png
@@ -34,6 +38,7 @@ export class RauserScene extends Phaser.Scene {
 
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
     }
+
     create():void {
         //this.background = this.add.image(400, 300, "background").setScale(1.7);
 
@@ -64,7 +69,27 @@ export class RauserScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 
         this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
+
+ // Add 2 groups for Bullet objects
+ this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+ this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+
+    // Fires bullet from player on left click of mouse
+    this.input.on('pointerdown',  (pointer, time, lastFired)=> {
+
+        // Get bullet from bullets group
+        let bullet:Bullet = this.playerBullets.get().setActive(true).setVisible(true);
+        console.log('pointerdown', bullet);
+        if (bullet) {
+            console.log('shciess');
+            bullet.fire(this.planeObj.plane, pointer);
+            //this.physics.add.collider(enemy, bullet, enemyHitCallback);
+        }
+    });
     }
+
+
+
 
   update():void {
     this.planeObj.updatePlane();

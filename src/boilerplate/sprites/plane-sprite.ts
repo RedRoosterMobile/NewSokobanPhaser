@@ -55,6 +55,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.wings = this.scene.add.image(0,0,'planeWings');
     this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
     this.boost = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
+
+    //  Add some sprites - positions are relative to the Container x/y
     this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost]);
     this.boost.setOrigin(0.5,0);
     this.boost.setAngle(90);
