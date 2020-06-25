@@ -1,8 +1,9 @@
 import { Tilemaps } from "phaser";
 
+import {Plane} from './../sprites/plane-sprite';
+
 /*
 TODO:
-- no/less gravity when flying sideways (because of updrift, depending on speed)
 - camera follow OK... ish
 - parallax - background (clouds)
 - pooled bullets
@@ -14,8 +15,8 @@ TODO:
 
 export class RauserScene extends Phaser.Scene {
     private phaserSprite: Phaser.GameObjects.Sprite;
-    cursors:Phaser.Types.Input.Keyboard.CursorKeys;
-    plane: Phaser.Physics.Arcade.Image;
+    // plane: Phaser.Physics.Arcade.Image;
+    planeObj: Plane;
     text: Phaser.GameObjects.Text;
     background: Phaser.GameObjects.Image;
     dasBoot: Phaser.GameObjects.Image;
@@ -44,64 +45,25 @@ export class RauserScene extends Phaser.Scene {
         //this.add.tileSprite(0, 0, 800*2, 600*2, 'background');
         this.dasBoot = this.add.image(worldSizeX/2, worldSizeY, "dasboot").setOrigin(0.5,1).setScale(10);
 
-        this.plane = this.physics.add.image(worldSizeX/2, worldSizeY, 'player');
-        this.plane.setBounce(1, 0.2);
-        this.plane.setCollideWorldBounds(true);
         const worldView = this.cameras.main.worldView;
 
-        this.cameras.main.startFollow(this.plane, true,  0.09, 0.09);
-        // zoom out
-        this.cameras.main.setZoom(0.5);
-        this.plane.setDamping(true);
-        this.plane.setDrag(0.99);
-        this.plane.setMaxVelocity(400);
-        this.plane.setAngle(-90);
+        this.planeObj = new Plane(
+            this,
+            worldSizeX/2,
+            worldSizeY
+        );
+        this.cameras.main.setZoom(0.1);
 
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 
         this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
     }
 
-
-updatePlane():void {
-    const scaleFactor = Math.abs(Math.sin(this.plane.rotation));
-    // TODO: use this for wings later on
-    this.plane.setScale(1*scaleFactor);
-}
-
-update():void {
-    this.updatePlane();
-
-    if (this.cursors.up.isDown) {
-        // @ts-ignore
-        this.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
-    }
-    else {
-        this.plane.setAcceleration(0);
-    }
-
-    if (this.cursors.left.isDown) {
-        this.plane.setAngularVelocity(-300);
-    }
-    else if (this.cursors.right.isDown) {
-        this.plane.setAngularVelocity(300);
-    }
-    else {
-        this.plane.setAngularVelocity(0);
-    }
-
+  update():void {
+    this.planeObj.updatePlane();
     // @ts-ignore
-    this.text.setText('Speed: ' + this.plane.body.speed);
-
-    // if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
-    // {
-    //     fireBullet();
-    // }
-
-    //this.physics.world.wrap(this.sprite, 32);
-
-    // bullets.forEachExists(screenWrap, this);
-    }
+    this.text.setText('Speed: ' + this.planeObj.plane.body.speed);
+  }
 
 }
 
