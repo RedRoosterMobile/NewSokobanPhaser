@@ -7,8 +7,9 @@ import {Bullet} from './../sprites/bullet-image';
 TODO:
 - camera follow OK... ish
 - parallax - background (clouds)
-- pooled bullets
+- pooled bullets OK
 - pooled enemies
+- bullet direction according to ship rotation
 - spawn enemies
 - startship OK
 - ships
@@ -37,6 +38,8 @@ export class RauserScene extends Phaser.Scene {
         this.load.atlas("boostSprites", 'assets/rauser/boost.png', 'assets/rauser/boost.json');
 
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
+
+        this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
     }
 
     create():void {
@@ -78,13 +81,28 @@ export class RauserScene extends Phaser.Scene {
     this.input.on('pointerdown',  (pointer, time, lastFired)=> {
 
         // Get bullet from bullets group
-        let bullet:Bullet = this.playerBullets.get().setActive(true).setVisible(true);
-        console.log('pointerdown', bullet);
+        /*
+        let bullet: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
         if (bullet) {
-            console.log('shciess');
-            bullet.fire(this.planeObj.plane, {x:0,y:0});
+            console.log('schiessbefehl!');
+            bullet.fireAtTarget(this.planeObj.plane, {x:worldSizeX,y:0});
+        }
+
+        let bullet2: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
+        if (bullet2) {
+            console.log('schiessbefehl! 2');
+            bullet2.fireStraight(this.planeObj.plane);
+        }
+        */
+
+        let bullet3: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
+        if (bullet3) {
+            console.log('schiessbefehl! 3');
+            // @ts-ignore
+            bullet3.fireAtTarget(this.planeObj.plane, {x:this.planeObj.plane.body.acceleration.y,y:this.planeObj.plane.body.acceleration.x});
             //this.physics.add.collider(enemy, bullet, enemyHitCallback);
         }
+
     });
     }
 

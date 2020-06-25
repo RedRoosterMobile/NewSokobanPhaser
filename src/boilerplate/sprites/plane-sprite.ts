@@ -1,7 +1,9 @@
 // TODO:
 // - no/less gravity when flying sideways (because of updrift, depending on speed)
-// - wings!
+// - wings! OK
 // - LAG of wings (workaround: embrace the lag: use a transparent pic for physics, body and wings will have the same lag..)
+// - engine sound. Rip this and add more bass (Wings of Fury) https://www.youtube.com/watch?v=ZZSwdqg6VE4
+// - bullet sound: flak from Wings of Fury (Bassy as hell!)
 
 import { Tilemaps } from "phaser";
 
@@ -10,19 +12,14 @@ import { Tilemaps } from "phaser";
 // https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Container.html
 
 export class Plane extends Phaser.Physics.Arcade.Sprite  {
-
-
-
   plane:   Phaser.Physics.Arcade.Image;
   wings: Phaser.GameObjects.Image;
-
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-  renderContainer:   Phaser.GameObjects.Container;
-  rightWing: Phaser.GameObjects.Image;
-  leftWing: Phaser.GameObjects.Image;
   planeBody: Phaser.GameObjects.Image;
   boost: Phaser.GameObjects.Sprite;
-  blockOtherAnimations = false;
+  renderContainer:   Phaser.GameObjects.Container;
+
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+
 
   constructor(scene:Phaser.Scene,x:number,y:number) {
     super(scene,x,y,null);
@@ -109,57 +106,31 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     if (this.cursors.up.isDown) {
         // @ts-ignore
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
-        this.updateWings();
         this.boost.setVisible(true);
         this.animateIfNecessary('boost',this.boost,60)
-
-
-        // @ts-ignore
-        //this.scene.physics.velocityFromRotation(this.leftWing.rotation, 300*2, this.plane.body.acceleration);
-    }
-    else {
-
+    } else {
         this.boost.setVisible(false);
         this.plane.setAcceleration(0);
-        this.updateWings();
     }
 
     // steer
     if (this.cursors.left.isDown) {
         this.plane.setAngularVelocity(-300);
-        this.updateWings();
     }
     else if (this.cursors.right.isDown) {
         this.plane.setAngularVelocity(300);
-        this.updateWings();
     }
     else {
         this.plane.setAngularVelocity(0);
-        this.updateWings();
     }
     this.updateWings();
     // @ts-ignore
     //this.text.setText('Speed: ' + this.plane.body.speed);
   }
   updateWings():void {
-    /*
-    this.wings.setAngle(this.plane.angle);
-    this.wings.setX(this.plane.x)
-    this.wings.setY(this.plane.y);
-    this.planeBody.setAngle(this.plane.angle);
-    this.planeBody.setX(this.plane.x);
-    this.planeBody.setY(this.plane.y);
-    this.boost.setAngle(this.plane.angle+90);
-    this.boost.setX(this.plane.x);
-    this.boost.setY(this.plane.y+this.boost.height/2);
-    */
-   this.renderContainer.setAngle(this.plane.angle);
-   this.renderContainer.setX(this.plane.x);
-   this.renderContainer.setY(this.plane.y);
-   //this.boost.setAngle(this.plane.angle+90);
-   //this.boost.setX(-80);
-  //this.boost.setY(0);
-
+    this.renderContainer.setAngle(this.plane.angle);
+    this.renderContainer.setX(this.plane.x);
+    this.renderContainer.setY(this.plane.y);
     this.updateWingsScale();
   }
 
@@ -167,43 +138,5 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     // da orignial scale effect from luftrausers
     const scaleFactor = Math.abs(Math.sin(this.plane.rotation))*1;
     this.wings.scaleY = Phaser.Math.Clamp(1*scaleFactor,0.1,1);
-    // TODO:
-    /*
-    // @ts-ignore
-    const secretSauce = 0<(Math.abs(this.plane.body.acceleration.x) - Math.abs(this.plane.body.velocity.x));
-
-    const isPlaneTurning = secretSauce;
-    if (this.cursors.space.isDown) {
-      // @ts-ignore
-      console.log( this.plane.rotation);
-    }
-    const tweenTime:number = 100;
-    const easing = 'Sine.easeInOut';
-    if (isPlaneTurning) {
-      const scaleFactor = Math.abs(Math.sin(this.plane.rotation))*1;
-      this.wings.scaleX= Phaser.Math.Clamp(1*scaleFactor,0.5,1);
-
-      // TODO: find an easing function that works
-      this.scene.tweens.add({
-        targets: this.wings,
-        scaleX: Phaser.Math.Clamp(1*scaleFactor,0.5,1),
-        duration: tweenTime/10,
-        repeat: 1,
-        easing:easing
-    });
-    } else {
-      //this.wings.setScale(1);
-      this.scene.tweens.add({
-        targets: this.wings,
-        scaleX: 1,
-        duration: tweenTime,
-        repeat: 1,
-        easing:easing
-    });
-    }
-    */
-
   }
-
-
 }
