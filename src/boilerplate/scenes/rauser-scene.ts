@@ -1,36 +1,8 @@
-
-
-
-/*
-
-
-var config = {
-    type: Phaser.AUTO,
-    parent: 'phaser-example',
-    width: 800,
-    height: 600,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            fps: 60,
-            gravity: { y: 100 }
-        }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
-*/
-
 import { Tilemaps } from "phaser";
-
-
-
 
 /*
 TODO:
+- no/less gravity when flying sideways (because of updrift, depending on speed)
 - camera follow OK... ish
 - parallax - background (clouds)
 - pooled bullets
@@ -38,8 +10,6 @@ TODO:
 - spawn enemies
 - startship OK
 - ships
-- when flying sideways (no gravity, because of updrift, depending on speed)
-
 */
 
 export class RauserScene extends Phaser.Scene {
@@ -60,8 +30,6 @@ export class RauserScene extends Phaser.Scene {
     create():void {
         //this.background = this.add.image(400, 300, "background").setScale(1.7);
 
-
-
         // @ts-ignore
         let worldSizeX:number = parseInt(this.game.config.width) * 4;
         // @ts-ignore
@@ -76,16 +44,10 @@ export class RauserScene extends Phaser.Scene {
         //this.add.tileSprite(0, 0, 800*2, 600*2, 'background');
         this.dasBoot = this.add.image(worldSizeX/2, worldSizeY, "dasboot").setOrigin(0.5,1).setScale(10);
 
-
-
         this.plane = this.physics.add.image(worldSizeX/2, worldSizeY, 'player');
         this.plane.setBounce(1, 0.2);
         this.plane.setCollideWorldBounds(true);
-        //this.sprite.setInteractive(true);
         const worldView = this.cameras.main.worldView;
-
-
-        console.log(worldView.centerX);
 
         this.cameras.main.startFollow(this.plane, true,  0.09, 0.09);
         // zoom out
@@ -108,7 +70,6 @@ updatePlane():void {
 }
 
 update():void {
-    //this.sprite.body.gameObject.
     this.updatePlane();
 
     if (this.cursors.up.isDown) {

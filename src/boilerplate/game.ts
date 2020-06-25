@@ -36,7 +36,8 @@ const config: Phaser.Types.Core.GameConfig = {
       antialias: false,
       pixelArt: true,
       roundPixels: true
-  }
+  },
+  backgroundColor: 0x0000ff
 };
 
 export class Game extends Phaser.Game {
