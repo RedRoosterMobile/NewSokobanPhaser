@@ -36,7 +36,7 @@ TODO:
 - pooled bullets
 - pooled enemies
 - spawn enemies
-- startship
+- startship OK
 - ships
 - when flying sideways (no gravity, because of updrift, depending on speed)
 
@@ -48,19 +48,14 @@ export class RauserScene extends Phaser.Scene {
     plane: Phaser.Physics.Arcade.Image;
     text: Phaser.GameObjects.Text;
     background: Phaser.GameObjects.Image;
+    dasBoot: Phaser.GameObjects.Image;
 
     preload(): void {
         // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/bullets.png
         // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/ship.png
-
-
-
-
         this.load.image('bullet', 'assets/rauser/bullets.png');
         this.load.image('player', 'assets/rauser/plane1.png');
-        this.load.image('player', 'assets/rauser/plane1.png');
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
-
     }
     create():void {
         //this.background = this.add.image(400, 300, "background").setScale(1.7);
@@ -74,21 +69,18 @@ export class RauserScene extends Phaser.Scene {
 
 
         // the total size of the world
-        this.physics.world.setBounds(0, 0, worldSizeX, worldSizeY,true,true, true, true);
+        this.physics.world.setBounds(0, 0, worldSizeX, worldSizeY, true, true, true, true);
         const graphics = this.add.graphics();
         graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
         graphics.fillRect(0, 0, worldSizeX, worldSizeY);
         //this.add.tileSprite(0, 0, 800*2, 600*2, 'background');
-        this.background = this.add.image(worldSizeX/2, worldSizeY, "dasboot").setOrigin(0.5,1).setScale(10);
+        this.dasBoot = this.add.image(worldSizeX/2, worldSizeY, "dasboot").setOrigin(0.5,1).setScale(10);
 
 
 
-        this.plane = this.physics.add.image(400, 300, 'player');
+        this.plane = this.physics.add.image(worldSizeX/2, worldSizeY, 'player');
         this.plane.setBounce(1, 0.2);
         this.plane.setCollideWorldBounds(true);
-
-        // does not scale... why?
-        this.plane.setScale(0.5);
         //this.sprite.setInteractive(true);
         const worldView = this.cameras.main.worldView;
 
@@ -101,6 +93,7 @@ export class RauserScene extends Phaser.Scene {
         this.plane.setDamping(true);
         this.plane.setDrag(0.99);
         this.plane.setMaxVelocity(400);
+        this.plane.setAngle(-90);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -109,17 +102,9 @@ export class RauserScene extends Phaser.Scene {
 
 
 updatePlane():void {
-    const currentRotation = Math.abs(this.plane.rotation);
-    // console.log(currentRotation);
-
-    if (currentRotation<0.50) {
-        //this.sprite.setDisplaySize(128,10);
-        this.plane.setScale(0.5)
-
-        //console.log('changing size',this.sprite.height);
-    }
-
-    this.plane.setScale(1)
+    const scaleFactor = Math.abs(Math.sin(this.plane.rotation));
+    // TODO: use this for wings later on
+    this.plane.setScale(1*scaleFactor);
 }
 
 update():void {
