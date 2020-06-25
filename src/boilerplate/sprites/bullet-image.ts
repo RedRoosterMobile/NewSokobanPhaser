@@ -16,13 +16,14 @@ export class Bullet extends Phaser.GameObjects.Image  {
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.setSize(12, 12);
+    this.setScale(20);
   }
 
   fire(shooter, target):void {
         this.setPosition(shooter.x, shooter.y); // Initial position
-        //this.direction = Math.atan( (target.x-this.x) / (target.y-this.y));
+        this.direction = Math.atan( (target.x-this.x) / (target.y-this.y));
 
-        this.direction = shooter.rotation;
+        //this.direction = shooter.rotation;
 
         console.log(this.direction, shooter.rotation);
         //this.direction = Math.atan( (0-this.x) / (0-this.y));
@@ -44,16 +45,16 @@ export class Bullet extends Phaser.GameObjects.Image  {
         this.born = 0; // Time since new bullet spawned
   }
   // Updates the position of the bullet each cycle
-  update(time, delta):void
+  update(time:number, delta:number):void
   {
       this.x += this.xSpeed * delta;
       this.y += this.ySpeed * delta;
       this.born += delta;
-      if (this.born > 1800)
-      {
-        console.log('killing bullet');
+      if (this.born > 500) {
+          console.log('killing bullet');
           this.setActive(false);
           this.setVisible(false);
+          this.destroy();
       }
   }
 

@@ -82,7 +82,7 @@ export class RauserScene extends Phaser.Scene {
         console.log('pointerdown', bullet);
         if (bullet) {
             console.log('shciess');
-            bullet.fire(this.planeObj.plane, pointer);
+            bullet.fire(this.planeObj.plane, {x:0,y:0});
             //this.physics.add.collider(enemy, bullet, enemyHitCallback);
         }
     });
