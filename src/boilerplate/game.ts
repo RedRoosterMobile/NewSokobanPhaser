@@ -30,7 +30,12 @@ const config: Phaser.Types.Core.GameConfig = {
         fps: 60,
         gravity: { y: 200 },
         debug: true
-    }
+    },
+  },
+  render: {
+      antialias: false,
+      pixelArt: true,
+      roundPixels: true
   }
 };
 
