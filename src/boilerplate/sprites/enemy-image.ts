@@ -2,27 +2,31 @@
 
 export class Enemy extends Phaser.GameObjects.Image  {
 
-  speed =0.01;
-  born=0;
-  xSpeed=0;
-  ySpeed=0;
-  direction=0
-  hp = 10
+  speed     = 0.01;
+  born      = 0;
+  xSpeed    = 0;
+  ySpeed    = 0;
+  direction = 0;
+  hp        = 10;
   target: Enemy;
 
   sound:Phaser.Sound.BaseSound;
 
   constructor(scene,x=0,y=0) {
     super(scene,x,y,'enemy');
-    this.speed = 0.01;
+    // super.setTexture('');
+    this.speed = 0.1;
     this.born = 0;
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.setSize(12, 12);
     this.setScale(4);
-    this.hp = 1;
+    //this.hp = 10;
   }
+
+  // TODO: somehow passing an object to the constructor 
+  // to change properites of enemy: class, texture, hp, speed, ...
 
   playFireSound(loop=false) {
 
@@ -103,7 +107,8 @@ export class Enemy extends Phaser.GameObjects.Image  {
   // Updates the position of the bullet each cycle
   update(time:number, delta:number):void {
     if (this.target) {
-      this.scene.physics.accelerateToObject(this, this.target, 600, 300, 300);
+      // less speed on y (we are planes and have to turn..)
+      this.scene.physics.accelerateToObject(this, this.target, 60, 300, 150);
     }
     /*
       this.x += this.xSpeed * delta;

@@ -19,6 +19,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   planeBody: Phaser.GameObjects.Image;
   boost: Phaser.GameObjects.Sprite;
   renderContainer:   Phaser.GameObjects.Container;
+  hpMax: 300;
+  hp: number;
+
 
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -26,13 +29,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   constructor(scene:Phaser.Scene,x:number,y:number) {
     super(scene,x,y,null);
 
-
-    /*
-    // @ts-ignore
-    let worldSizeX:number = parseInt(this.scene.game.config.width) * 4;
-    // @ts-ignore
-    let worldSizeY:number = parseInt(this.scene.game.config.height) * 4;
-    */
+    this.hp= 300;
+    this.hpMax= 300;
 
     this.setOrigin(0,0);
     this.createPlane(x,y);
@@ -56,19 +54,34 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
     this.boost = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
 
-    //  Add some sprites - positions are relative to the Container x/y
+    // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
+    // Add some sprites - positions are relative to the Container x/y
     this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost]);
     this.boost.setOrigin(0.5,0);
     this.boost.setAngle(90);
 
     this.createAnims();
+  }
 
-    // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
-    // this shit cointainer does not work at all... what's it good for if I have to do everything manually anyway???
+  decreaseHealth(value:number) : void {
+    console.log(typeof this.hp, value);
+    this.hp -= value;
+    console.log(this.hp);
+    if ( this.hp <= 0 ) {
+      // TODO: explosionz!!!!!!
 
-    //this.container = new Container(this.scene , x , y , [this.plane, graphics]);
+      console.log('YOU DIE!!!');
+      // explosionz, 
+      this.setActive(false);
+      this.setVisible(false);
+      this.destroy();
+    }
+    
+  }
 
-    // this.plane.addChild(game.make.sprite(-50, -50, 'mummy'));
+  increaseHealth(value:number) : void {
+    if (this.hp <= this.hpMax)
+      this.hp+=value;
   }
 
   createAnims():void{
@@ -87,7 +100,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     });
   }
   animateIfNecessary = (animationName, animatedSprite, frameRate = 20) => {
-
       if (
         animatedSprite.anims.isPlaying &&
         animatedSprite.anims.currentAnim.key === animationName
@@ -100,27 +112,57 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         // nothing else is playing
         animatedSprite.play(animationName);
       }
-
   };
 
   updatePlane():void {
+
+    if (!this.active) {
+      console.log('probaly dead!');
+      //TODO: show dramatic explosions
+      return;
+    }
     // thrust
     if (this.cursors.up.isDown) {
         // @ts-ignore
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
         this.boost.setVisible(true);
-        this.animateIfNecessary('boost',this.boost,60)
+        this.animateIfNecessary('boost',this.boost,60);
+        this.plane.setGravity(0 , 0);
+        //console.log(this.renderContainer);
+        /*this.scene.tweens.add({
+          targets: this.plane,
+          props: {
+            gravitiyY: 0
+          },
+          delay: 0,
+          duration: 100,
+          ease: "Linear",
+          easeParams: null,
+          hold: 0,
+          repeat: 1,
+        });*/
+        
     } else {
-        this.boost.setVisible(false);
-        this.plane.setAcceleration(0);
+      // TODO: while x velocity is still active don't add too much gravity
+      this.plane.setGravity(0 , 200);
+      this.boost.setVisible(false);
+      this.plane.setAcceleration(0);
     }
 
     // steer
-    if (this.cursors.left.isDown) {
+    if (this.cursors.left.isDown && !this.cursors.up.isDown) {
         this.plane.setAngularVelocity(-300);
     }
-    else if (this.cursors.right.isDown) {
+    else if (this.cursors.left.isDown && this.cursors.up.isDown) {
+      // slow turning while accellerating
+      this.plane.setAngularVelocity(-150);
+    }
+    else if (this.cursors.right.isDown && !this.cursors.up.isDown) {
         this.plane.setAngularVelocity(300);
+    }
+    else if (this.cursors.right.isDown && this.cursors.up.isDown) {
+      // slow turning while accellerating
+      this.plane.setAngularVelocity(150);
     }
     else {
         this.plane.setAngularVelocity(0);

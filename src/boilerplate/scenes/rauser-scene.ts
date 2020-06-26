@@ -5,6 +5,10 @@ import {Bullet} from './../sprites/bullet-image';
 import {Enemy} from './../sprites/enemy-image';
 
 /*
+
+
+https://community.adobe.com/t5/air/adobe-air-error-message-macosx-catalina/td-p/10683302?page=1
+
 TODO:
 - camera follow OK... ish
 - unlimited x tiled background (no left/right bounds!)
@@ -17,6 +21,8 @@ TODO:
 - battleships (drop bombs?)
 - deep techno sound that changes parts upon user interaction (timing?) 
 - idea: fade in when sth happens and fade out after a while (sinus LFOs?)
+- yep, this is how THEY did it.. /Applications/Luftrausers.app/Contents/Resources/data/bgm/luftrauser_bass3.ogg
+- post processing: shaders https://www.shadertoy.com/view/4slGRM
 */
 
 var gameSettings = {
@@ -102,16 +108,36 @@ export class RauserScene extends Phaser.Scene {
 
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
         this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
+        
+        
         // Add 2 groups for Bullet objects
         this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
         this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
 
-        this.physics.add.collider(this.playerBullets, this.enemies, (playerBullet:Bullet, enemy:Enemy)=>{
+
+        // player shoots enemy
+        this.physics.add.overlap(this.playerBullets,this.enemies,(playerBullet:Bullet, enemy:Enemy)=>{
             playerBullet.setActive(false);
             playerBullet.setVisible(false);
             playerBullet.destroy();
             enemy.decreaseHealth(1);
         });
+        // player and enemy collide
+        this.physics.add.overlap(this.planeObj.plane,this.enemies,(player:any, enemy:Enemy)=>{
+            console.log('crashing..');
+            enemy.decreaseHealth(5);
+            this.planeObj.decreaseHealth(5);
+            
+        });
+        // enemy shoots player
+        this.physics.add.overlap(this.enemyBullets,this.planeObj.plane,(enemyBullet:Bullet, player:any) => {
+            enemyBullet.setActive(false);
+            enemyBullet.setVisible(false);
+            enemyBullet.destroy();
+            this.planeObj.decreaseHealth(1);
+            //enemy.decreaseHealth(1);
+        });
+       
 
 
     // Fires bullet from player on left click of mouse

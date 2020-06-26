@@ -1,0 +1,70 @@
+#pragma pack_matrix (column_major) // sets default order to column major
+
+struct input
+{
+float4 position : TEXCOORD0;
+float4 gl_Position : POSITION;
+float2 texCoords 	: TEXCOORD1;
+};
+
+struct output
+{
+float4 color 	: COLOR;
+};
+
+output main(input IN,
+uniform sampler2D colorTexture : TEXUNIT0,
+uniform float2 viewport,
+uniform float4 cameraPosition,
+uniform float4 healthRadius,
+uniform float4 playerPosition,
+uniform float4 cameraWorldPosition,
+uniform float4 uniform_backcol,
+uniform float4 uniform_colors[8])
+{
+	float4 backCol = uniform_backcol;
+	float cameraYViewSpace = cameraPosition.x-0.5;
+	float4 finalColor = tex2D(colorTexture, IN.texCoords);
+	if(((1-IN.texCoords.y) + cameraYViewSpace) > 0)
+	{
+		float delta = 0.01;
+		if (length(finalColor.xyz-uniform_colors[1].xyz) < delta)
+			finalColor = uniform_colors[3];
+		else if (length(finalColor.xyz-uniform_colors[2].xyz) < delta)
+			finalColor = uniform_colors[3];
+		else if (length(finalColor.xyz-uniform_colors[4].xyz) < delta)
+			finalColor = uniform_backcol;
+		else if (length(finalColor.xyz-uniform_colors[5].xyz) < delta)
+			finalColor = uniform_colors[6];
+		else if (length(finalColor.xyz-uniform_colors[6].xyz) < delta)
+			finalColor = uniform_backcol;
+		else if (length(finalColor.xyz-uniform_colors[7].xyz) < delta)
+			finalColor = uniform_colors[6];
+		else finalColor = backCol;
+	}	
+
+	float2 pixelPosition = (cameraWorldPosition.xy - IN.position.xy*float2(-300,200));
+	float2 playerToPixelPosition = playerPosition.xy-pixelPosition;
+	float distanceToPlayer = length(playerToPixelPosition);
+	distanceToPlayer /= 350;
+	float healthAmount = healthRadius.x/healthRadius.y;
+	if (healthAmount > 0.99)healthAmount = 1000;
+	
+	
+	output OUT;
+	if (finalColor.a == 0)
+	{
+		if (healthAmount < distanceToPlayer && ((1-IN.texCoords.y) + cameraYViewSpace) < 0)
+		{
+			if(healthRadius.z  < 1 ) OUT.color = uniform_colors[7];
+			else OUT.color = uniform_colors[6];
+		}
+		else
+		{
+			OUT.color = backCol;
+		}
+		return OUT;
+	}
+	OUT.color = (1.0 - 0) * finalColor + 0 * backCol;
+	return OUT;
+}
