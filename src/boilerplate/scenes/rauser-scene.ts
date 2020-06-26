@@ -3,18 +3,20 @@ import { Tilemaps } from "phaser";
 import {Plane} from './../sprites/plane-sprite';
 import {Bullet} from './../sprites/bullet-image';
 import {Enemy} from './../sprites/enemy-image';
-import { Vector } from "matter";
 
 /*
 TODO:
 - camera follow OK... ish
+- unlimited x tiled background (no left/right bounds!)
 - parallax - background (clouds)
 - pooled bullets OK
-- pooled enemies
-- bullet direction according to ship rotation
-- spawn enemies
+- pooled enemies OK
+- bullet direction according to ship rotation (shoot straight!)
+- spawn enemies OK
 - startship OK
-- ships
+- battleships (drop bombs?)
+- deep techno sound that changes parts upon user interaction (timing?) 
+- idea: fade in when sth happens and fade out after a while (sinus LFOs?)
 */
 
 var gameSettings = {
@@ -117,11 +119,6 @@ export class RauserScene extends Phaser.Scene {
 
         // Get bullet from bullets group
         /*
-        let bullet: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
-        if (bullet) {
-            console.log('schiessbefehl!');
-            bullet.fireAtTarget(this.planeObj.plane, {x:worldSizeX,y:0});
-        }
 
         let bullet2: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
         if (bullet2) {
@@ -134,11 +131,10 @@ export class RauserScene extends Phaser.Scene {
         if (bullet3) {
             const en = this.enemies.getFirstAlive();
             if (en) {
-                bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
-            }
-            // @ts-ignore
+                //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
 
-            //bullet3.fireAtTarget(this.planeObj.plane, {x:this.planeObj.plane.body.acceleration.y,y:this.planeObj.plane.body.acceleration.x});
+                bullet3.fireStraight(this.planeObj.plane);
+            }
         }
 
     });
@@ -147,19 +143,12 @@ export class RauserScene extends Phaser.Scene {
   update():void {
     this.planeObj.updatePlane();
 
-    if (this.enemies.getLength()<gameSettings.maxEnemies) {
-
-        // @ts-ignore
-        let worldSizeX:number = parseInt(this.game.config.width) * 4;
-        // @ts-ignore
-        let worldSizeY:number = parseInt(this.game.config.height) * 4;
+    if (this.enemies.getLength() < gameSettings.maxEnemies) {
+        const {worldSizeX,worldSizeY} = this.getWorldSize();
         let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
         anEnemy.x = Phaser.Math.Between(0,worldSizeX);
         anEnemy.y = Phaser.Math.Between(0,worldSizeY);
         anEnemy.setTarget(this.planeObj.plane);
-
-        //anEnemy.x = worldSizeX/2;
-        //anEnemy.y = worldSizeY/2;
         console.log('creating enemy at ',anEnemy.x, anEnemy.y );
     }
     // @ts-ignore
