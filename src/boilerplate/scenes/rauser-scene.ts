@@ -3,6 +3,7 @@ import { Tilemaps } from "phaser";
 import {Plane} from './../sprites/plane-sprite';
 import {Bullet} from './../sprites/bullet-image';
 import {Enemy} from './../sprites/enemy-image';
+import { Vector } from "matter";
 
 /*
 TODO:
@@ -51,6 +52,14 @@ export class RauserScene extends Phaser.Scene {
         this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
     }
 
+    getWorldSize():any {
+        // @ts-ignore
+        const worldSizeX:number = parseInt(this.game.config.width) * 4;
+        // @ts-ignore
+        const worldSizeY:number = parseInt(this.game.config.height) * 4;
+        return {worldSizeX,worldSizeY};
+    }
+
     create():void {
         // this.background = this.add.image(400, 300, "background").setScale(1.7);
         //this.sound.add("sndGameMusic").play();
@@ -66,10 +75,7 @@ export class RauserScene extends Phaser.Scene {
 
         //this.sound.play('sndGameMusic',soundConfig);
 
-        // @ts-ignore
-        let worldSizeX:number = parseInt(this.game.config.width) * 4;
-        // @ts-ignore
-        let worldSizeY:number = parseInt(this.game.config.height) * 4;
+        const {worldSizeX,worldSizeY} = this.getWorldSize();
 
 
         // the total size of the world
@@ -94,15 +100,16 @@ export class RauserScene extends Phaser.Scene {
 
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
         this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
-// Add 2 groups for Bullet objects
-this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
-this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+        // Add 2 groups for Bullet objects
+        this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+        this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
 
-        this.physics.add.collider(this.playerBullets, this.enemies, ()=>{
-            console.log('hit me baby one more time');
+        this.physics.add.collider(this.playerBullets, this.enemies, (playerBullet:Bullet, enemy:Enemy)=>{
+            playerBullet.setActive(false);
+            playerBullet.setVisible(false);
+            playerBullet.destroy();
+            enemy.decreaseHealth(1);
         });
-
-
 
 
     // Fires bullet from player on left click of mouse
@@ -136,11 +143,6 @@ this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: 
 
     });
     }
-
-
-
-
-
 
   update():void {
     this.planeObj.updatePlane();

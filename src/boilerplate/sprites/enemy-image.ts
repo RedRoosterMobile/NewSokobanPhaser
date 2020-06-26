@@ -20,9 +20,8 @@ export class Enemy extends Phaser.GameObjects.Image  {
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.setSize(12, 12);
-    this.setScale(10);
-    this.hp = 10;
-
+    this.setScale(4);
+    this.hp = 1;
   }
 
   playFireSound(loop=false) {
@@ -32,7 +31,12 @@ export class Enemy extends Phaser.GameObjects.Image  {
   decreaseHealth(value:number) : void {
     this.hp-=value;
     if ( this.hp <= 0 ) {
+      // TODO: explosionz!!!!!!
+
+      console.log('AAAHHHHHHHRGHHH!!!');
       // or set inactive??? dunno...
+      this.setActive(false);
+      this.setVisible(false);
       this.destroy();
     }
   }

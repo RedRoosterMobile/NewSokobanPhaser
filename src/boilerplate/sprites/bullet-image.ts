@@ -36,6 +36,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
     this.sound.play(soundConfige);
   }
 
+  // works
   fireAtTarget(shooter, target):void {
 
         this.playFireSound();
@@ -44,7 +45,6 @@ export class Bullet extends Phaser.GameObjects.Image  {
 
         //this.direction = shooter.rotation;
 
-        console.log(this.direction, shooter.rotation);
         //this.direction = Math.atan( (0-this.x) / (0-this.y));
 
 
@@ -63,13 +63,13 @@ export class Bullet extends Phaser.GameObjects.Image  {
         this.rotation = shooter.rotation; // angle bullet with shooters rotation
         this.born = 0; // Time since new bullet spawned
   }
+  // sucks, @FIXME PLEASE!
   fireStraight(shooter):void {
     this.setPosition(shooter.x, shooter.y); // Initial position
     this.direction = Math.atan( (shooter.x) / (shooter.y));
 
     //this.direction = shooter.rotation;
 
-    console.log(this.direction, shooter.rotation);
     //this.direction = Math.atan( (0-this.x) / (0-this.y));
 
 
@@ -95,7 +95,6 @@ export class Bullet extends Phaser.GameObjects.Image  {
       this.y += this.ySpeed * delta;
       this.born += delta;
       if (this.born > 1000) {
-          console.log('killing bullet');
           this.setActive(false);
           this.setVisible(false);
           this.destroy();
