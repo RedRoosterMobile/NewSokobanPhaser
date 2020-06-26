@@ -120,50 +120,42 @@ export class RauserScene extends Phaser.Scene {
             playerBullet.setActive(false);
             playerBullet.setVisible(false);
             playerBullet.destroy();
-            enemy.decreaseHealth(1);
+            enemy.decreaseHealth(2);
         });
         // player and enemy collide
         this.physics.add.overlap(this.planeObj.plane,this.enemies,(player:any, enemy:Enemy)=>{
             console.log('crashing..');
-            enemy.decreaseHealth(5);
+            enemy.decreaseHealth(2);
             this.planeObj.decreaseHealth(5);
-            
         });
         // enemy shoots player
         this.physics.add.overlap(this.enemyBullets,this.planeObj.plane,(enemyBullet:Bullet, player:any) => {
             enemyBullet.setActive(false);
             enemyBullet.setVisible(false);
             enemyBullet.destroy();
-            this.planeObj.decreaseHealth(1);
-            //enemy.decreaseHealth(1);
+            this.planeObj.decreaseHealth(2);
         });
        
 
-
-    // Fires bullet from player on left click of mouse
-    this.input.on('pointerdown',  (pointer, time, lastFired)=> {
-
-        // Get bullet from bullets group
-        /*
-
-        let bullet2: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
-        if (bullet2) {
-            console.log('schiessbefehl! 2');
-            bullet2.fireStraight(this.planeObj.plane);
-        }
-        */
-
-        let bullet3: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
-        if (bullet3) {
-            const en = this.enemies.getFirstAlive();
-            if (en) {
-                //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
-
-                bullet3.fireStraight(this.planeObj.plane);
+        const playerFireCallBack = () => {
+            const bullet: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
+            if (bullet) {
+                const en = this.enemies.getFirstAlive();
+                if (en) {
+                    //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
+                    bullet.fireStraight(this.planeObj.plane);
+                }
             }
         }
+        // todo: heatseaking missle fireAtTarget (get closetst enemy?)
+        this.planeObj.setFireCallback(playerFireCallBack);
 
-    });
+        // Fires bullet from player on left click of mouse
+        this.input.on('pointerdown',  (pointer, time, lastFired)=> {
+            // Get bullet from bullets group
+            // TODO: move into player class
+            playerFireCallBack();
+        });
     }
 
   update():void {

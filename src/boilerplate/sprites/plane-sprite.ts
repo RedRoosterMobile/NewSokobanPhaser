@@ -21,7 +21,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   renderContainer:   Phaser.GameObjects.Container;
   hpMax: 300;
   hp: number;
-
+  fireCallback: Function;
+  isShooting: boolean;
 
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -31,6 +32,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
     this.hp= 300;
     this.hpMax= 300;
+    this.isShooting= false;
 
     this.setOrigin(0,0);
     this.createPlane(x,y);
@@ -84,6 +86,10 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       this.hp+=value;
   }
 
+  setFireCallback(callback:Function) {
+    this.fireCallback= callback;
+  }
+
   createAnims():void{
 
     this.scene.anims.create({
@@ -120,6 +126,19 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       console.log('probaly dead!');
       //TODO: show dramatic explosions
       return;
+    }
+
+    
+    if (this.cursors.space.isDown && !this.isShooting) {
+      if (this.fireCallback) {
+        this.fireCallback();
+        this.isShooting = true;
+
+        // wait until next shot
+        this.scene.time.delayedCall(250,()=>{
+          this.isShooting = false;
+        });
+      }
     }
     // thrust
     if (this.cursors.up.isDown) {
