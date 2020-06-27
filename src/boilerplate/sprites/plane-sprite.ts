@@ -162,7 +162,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       return;
     }
     if (this.cursors.shift.isDown) {
-      this.knockback();
+      //this.knockback();
+      
     }
 
     

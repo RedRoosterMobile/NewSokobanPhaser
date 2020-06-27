@@ -54,9 +54,14 @@ export class RauserScene extends Phaser.Scene {
         this.load.image('planeBody', 'assets/rauser/plane_body.png');
         this.load.image('planePhysics', 'assets/rauser/plane_transparent.png');
         this.load.image('planeWings', 'assets/rauser/plane_wings.png');
+        
         this.load.atlas("boostSprites", 'assets/rauser/boost.png', 'assets/rauser/boost.json');
 
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
+
+        this.load.image('bg1', 'assets/rauser/clouds_front.png');
+        this.load.image('bg2', 'assets/rauser/clouds_center.png');
+        this.load.image('bg3', 'assets/rauser/clouds_back.png');
 
         this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
         this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
@@ -112,18 +117,16 @@ export class RauserScene extends Phaser.Scene {
             worldSizeX/2,
             worldSizeY
         );
-        this.cameras.main.setZoom(0.4);
+        this.cameras.main.setZoom(0.3);
 
         this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
         this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
         
-        
         // Add 2 groups for Bullet objects
         this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
         this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
-
 
         // player shoots enemy
         this.physics.add.overlap(this.playerBullets,this.enemies,(playerBullet:Bullet, enemy:Enemy)=>{
@@ -146,25 +149,28 @@ export class RauserScene extends Phaser.Scene {
             enemyBullet.destroy();
             this.planeObj.decreaseHealth(2);
         });
-       
-        let tempMatrix = new Phaser.GameObjects.Components.TransformMatrix();
-        let tempParentMatrix = new Phaser.GameObjects.Components.TransformMatrix();
 
         const playerFireCallBack = () => {
             const bullet: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
+            const bullet2: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
+            const bullet3: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
             if (bullet) {
                 //  d.translateX
                 //bullet.fireStraight(this.planeObj.plane);
                 //http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
-// https://phaser.discourse.group/t/translate-inner-position-of-rotating-container-into-absolute-position/1762
+                // https://phaser.discourse.group/t/translate-inner-position-of-rotating-container-into-absolute-position/1762
                 //https://phaser.discourse.group/t/object-position-to-canvas-pixel-position/1099/6
                 // @ts-ignore
-                bullet.fireStraight2(this.planeObj.muzzle.x,this.planeObj.muzzle.y,this.planeObj.plane.rotation);
+
+                const targetRotation = this.planeObj.plane.rotation;
+                const targetAngle = Phaser.Math.RadToDeg(targetRotation);
+                const diff = 10;
+                bullet.fireStraight2(this.planeObj.muzzle.x,this.planeObj.muzzle.y,targetRotation);
+                bullet2.fireStraight2(this.planeObj.muzzle.x,this.planeObj.muzzle.y,Phaser.Math.DegToRad(targetAngle-diff));
+                bullet3.fireStraight2(this.planeObj.muzzle.x,this.planeObj.muzzle.y,Phaser.Math.DegToRad(targetAngle+diff));
                 const en = this.enemies.getFirstAlive();
                 if (en) {
-                    //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
-                    
-                    
+                    //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});    
                     // somehow use world coordinates for muzzle
                     // http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
                     //bullet.fireStraight2(this.planeObj.muzzle.displayOriginX,this.planeObj.muzzle.displayOriginY,this.planeObj.plane.rotation);
@@ -181,19 +187,24 @@ export class RauserScene extends Phaser.Scene {
             playerFireCallBack();
         });
     }
+
+    spawnEnemies():void {
+        if (this.enemies.getLength() < gameSettings.maxEnemies) {
+            const {worldSizeX,worldSizeY} = this.getWorldSize();
+            let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
+            anEnemy.x = Phaser.Math.Between(0,worldSizeX);
+            anEnemy.y = Phaser.Math.Between(0,worldSizeY);
+            anEnemy.setTarget(this.planeObj.plane);
+            console.log('creating enemy at ',anEnemy.x, anEnemy.y );
+        }
+    }
     
 
   update():void {
     this.planeObj.updatePlane();
+    this.spawnEnemies();
 
-    if (this.enemies.getLength() < gameSettings.maxEnemies) {
-        const {worldSizeX,worldSizeY} = this.getWorldSize();
-        let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
-        anEnemy.x = Phaser.Math.Between(0,worldSizeX);
-        anEnemy.y = Phaser.Math.Between(0,worldSizeY);
-        anEnemy.setTarget(this.planeObj.plane);
-        console.log('creating enemy at ',anEnemy.x, anEnemy.y );
-    }
+    
     // @ts-ignore
     this.text.setText('Speed: ' + this.planeObj.plane.body.speed);
   }
