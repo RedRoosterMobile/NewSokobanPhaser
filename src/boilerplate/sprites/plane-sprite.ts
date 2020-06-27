@@ -60,7 +60,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzleAnimation = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
     this.muzzleAnimation.setVisible(false);
     this.muzzleAnimation.flipY= true;
-    this.muzzleAnimation.setScale(0.2);
+    this.muzzleAnimation.setScale(1.5,0.2);
     
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
     

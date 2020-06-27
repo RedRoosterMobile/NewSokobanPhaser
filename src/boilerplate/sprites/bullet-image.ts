@@ -43,14 +43,16 @@ export class Bullet extends Phaser.GameObjects.Image  {
   }
 
   playFireSound(loop=false) {
-    const soundConfige = {
+    const soundConfige:Phaser.Types.Sound.SoundConfig = {
       mute: false,
       volume: 0.5,
       rate: 0.5,
       detune: 0,
-      seek: 0,
+      seek: 0.40,
       loop: loop,
-      delay: 0
+      delay: 0,
+      
+
     };
     this.sound.play(soundConfige);
   }
@@ -95,6 +97,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
 }
 
 fireStraight2(x,y,rotation):void {
+  this.playFireSound();
   this.setPosition(x+25, y); // Initial position
   this.rotation =rotation; // angle bullet with shooters rotation
   
