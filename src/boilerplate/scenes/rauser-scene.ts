@@ -3,6 +3,7 @@ import { Tilemaps } from "phaser";
 import {Plane} from './../sprites/plane-sprite';
 import {Bullet} from './../sprites/bullet-image';
 import {Enemy} from './../sprites/enemy-image';
+import {Background} from './../sprites/background-sprite';
 
 /*
 
@@ -46,6 +47,7 @@ export class RauserScene extends Phaser.Scene {
         // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/ship.png
         this.load.image('bullet', 'assets/rauser/bullets.png');
         this.load.image('player', 'assets/rauser/plane1.png');
+        this.load.image('bgGradient', 'assets/rauser/bg_gradient.png');
 
         this.load.image('enemy', 'assets/car90.png');
 
@@ -87,10 +89,18 @@ export class RauserScene extends Phaser.Scene {
 
 
         // the total size of the world
-        this.physics.world.setBounds(0, 0, worldSizeX, worldSizeY, true, true, true, true);
-        const graphics = this.add.graphics();
-        graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
-        graphics.fillRect(0, 0, worldSizeX, worldSizeY);
+        this.physics.world.setBounds(0, 0, worldSizeX, worldSizeY, false, false, true, true);
+        //const graphics = this.add.graphics();
+        //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+        //graphics.fillRect(0, 0, worldSizeX, worldSizeY);
+        new Background(this,0,0,worldSizeX,worldSizeY);
+
+
+        /*this.sky = scene.add
+        .tileSprite(0, 0, x * 2, y * 2, "sky")
+        .setOrigin(0, 0)
+        .setScrollFactor(0)
+        .setTint(0xffeeff);*/
 
         //this.add.tileSprite(0, 0, 800*2, 600*2, 'background');
         this.dasBoot = this.add.image(worldSizeX/2, worldSizeY, "dasboot").setOrigin(0.5,1).setScale(10);
@@ -124,6 +134,7 @@ export class RauserScene extends Phaser.Scene {
         });
         // player and enemy collide
         this.physics.add.overlap(this.planeObj.plane,this.enemies,(player:any, enemy:Enemy)=>{
+            // TODO only once per 
             console.log('crashing..');
             enemy.decreaseHealth(2);
             this.planeObj.decreaseHealth(5);
