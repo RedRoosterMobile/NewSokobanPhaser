@@ -35,7 +35,7 @@ export class RauserScene extends Phaser.Scene {
     // plane: Phaser.Physics.Arcade.Image;
     planeObj: Plane;
     text: Phaser.GameObjects.Text;
-    background: Phaser.GameObjects.Image;
+    background: Background;
     dasBoot: Phaser.GameObjects.Image;
     enemyBullets: Phaser.Physics.Arcade.Group;
     playerBullets: Phaser.Physics.Arcade.Group;
@@ -98,7 +98,7 @@ export class RauserScene extends Phaser.Scene {
         //const graphics = this.add.graphics();
         //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
         //graphics.fillRect(0, 0, worldSizeX, worldSizeY);
-        new Background(this,0,0,worldSizeX,worldSizeY);
+        this.background = new Background(this,0,0,worldSizeX,worldSizeY);
 
 
         /*this.sky = scene.add
@@ -117,7 +117,7 @@ export class RauserScene extends Phaser.Scene {
             worldSizeX/2,
             worldSizeY
         );
-        this.cameras.main.setZoom(0.3);
+        this.cameras.main.setZoom(0.4);
 
         this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 
@@ -203,6 +203,7 @@ export class RauserScene extends Phaser.Scene {
   update():void {
     this.planeObj.updatePlane();
     this.spawnEnemies();
+    this.background.updateBackground(this.planeObj.plane.body.velocity.x,this.planeObj.plane.body.velocity.y);
 
     
     // @ts-ignore

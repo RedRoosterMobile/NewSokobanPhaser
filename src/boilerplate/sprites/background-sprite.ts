@@ -1,6 +1,9 @@
 // Phaser.GameObjects.TileSprite
 export class Background extends Phaser.Physics.Arcade.Sprite  {
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+    bg1:Phaser.GameObjects.TileSprite;
+    bg2:Phaser.GameObjects.TileSprite;
+    bg3:Phaser.GameObjects.TileSprite;
 
     constructor(scene,x,y, worldSizeX, worldSizeY) {
         super(scene,x,y,null);
@@ -29,51 +32,38 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
         const height = this.scene.scale.height
         const totalWidth = width * 10
 
-        this.scene.add.image(width * 0.5, height * 0.5, 'bg3')
-            .setScrollFactor(0)
+         this.bg3 = this.scene.add.tileSprite(0,0,800, 600, 'bg3')
+            .setScrollFactor(0).setScale(4);
+         this.bg2 = this.scene.add.tileSprite(0,0,800, 600, 'bg2')
+            .setScrollFactor(0).setScale(4);
+         this.bg1 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
+            .setScrollFactor(0).setScale(4);;
 
-        this.createAligned(this.scene, totalWidth, 'bg2', 0.25)
-        this.createAligned(this.scene, totalWidth, 'bg1', 0.5)
+        //this.createAligned(this.scene, totalWidth, 'bg2', 0.25)
+        //this.createAligned(this.scene, totalWidth, 'bg1', 0.5)
 
-        this.cursors = this.scene.input.keyboard.createCursorKeys();
+        
         //createAligned(this, totalWidth, 'ground', 1)
         //createAligned(this, totalWidth, 'plants', 1.25)
     }
 
-    /**
-     * 
-     * @param {Phaser.Scene} scene 
-     * @param {number} totalWidth 
-     * @param {string} texture 
-     * @param {number} scrollFactor 
-     */
-    createAligned = (scene, totalWidth, texture, scrollFactor) => {
-        const w = scene.textures.get(texture).getSourceImage().width
-        const count = Math.ceil(totalWidth / w) * scrollFactor
 
-        let x = 0
-        for (let i = 0; i < count; ++i)
-        {
-            const m = scene.add.image(x, scene.scale.height, texture)
-                .setOrigin(0, 1)
-                .setScrollFactor(1,scrollFactor)
+    // TODO: use velocity of player!!
+    updateBackground(velocityX,velocityY) {
+        // https://www.youtube.com/watch?v=pknZUn82x2U best way tlesprites
 
-            x += m.width
-        }
-    }
 
-    updateBackground() {
-        const cam = this.scene.cameras.main
-		const speed = 5
+        const damperX = 50;
+        this.bg1.tilePositionX += velocityX/damperX;
+        this.bg2.tilePositionX += velocityX/damperX *0.5;
+        this.bg3.tilePositionX += velocityX/damperX * 0.1;
 
-		if (this.cursors.right.isDown)
-		{
-			cam.scrollX += speed
-		}
-		else if (this.cursors.left.isDown)
-		{
-			cam.scrollX -= speed
-		}
+        const damperY = 1000;
+        this.bg1.tilePositionY += velocityY/damperY;
+        this.bg2.tilePositionY += velocityY/damperY *0.5;
+        this.bg3.tilePositionY += velocityY/damperY * 0.1;
+
+     
     }
 
     initBg():void {
