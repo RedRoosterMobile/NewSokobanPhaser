@@ -13,6 +13,9 @@ import { Tilemaps } from "phaser";
 // check this!
 // https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Container.html
 
+
+//bullets
+//https://blog.ourcade.co/posts/2020/fire-bullets-from-facing-direction-phaser-3/
 export class Plane extends Phaser.Physics.Arcade.Sprite  {
   plane:   Phaser.Physics.Arcade.Image;
   wings: Phaser.GameObjects.Image;
@@ -63,6 +66,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzleAnimation.setScale(1.5,0.2);
     
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
+    this.muzzle.setVisible(false);
     
 
     
@@ -139,12 +143,26 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       }
   };
 
+  knockback(knockbackAmount= 10):void  {
+  
+    
+      // @ts-ignore
+      const vector = this.scene.physics.velocityFromAngle(this.plane.angle+180,knockbackAmount, this.plane.body.acceleration);
+      this.plane.setVelocityX(this.plane.body.velocity.x + vector.x);
+      this.plane.setVelocityY(this.plane.body.velocity.y + vector.y);
+      //this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
+      //this.scene.physics.velocityFromRotation(this.plane.rotation, 40000, this.plane.body.acceleration);
+  }
+
   updatePlane():void {
 
     if (!this.active) {
       console.log('probaly dead!');
       //TODO: show dramatic explosions
       return;
+    }
+    if (this.cursors.shift.isDown) {
+      this.knockback();
     }
 
     
@@ -156,7 +174,16 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         // - play only once per shot..
         // - hide after shot
         this.muzzleAnimation.setVisible(true);
-        this.animateIfNecessary('boost',this.muzzleAnimation,60);
+        this.animateIfNecessary('boost',this.muzzleAnimation,0);
+        this.knockback();
+        // knockback?? (see super crate box code..)
+        //Phaser.Math.RotateAroundDistance();
+        //this.plane.body.bounce.
+        //this.plane.setVelocityX(this.plane.body.velocity.x*-0.98 );
+        //this.plane.setVelocityY(this.plane.body.velocity.y*-0.98 );
+        
+        
+        this.plane.body.velocity.y 
 
         // wait until next shot
         this.scene.time.delayedCall(250,()=>{
@@ -169,6 +196,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     // thrust
     if (this.cursors.up.isDown) {
         // @ts-ignore
+
+
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
         this.boost.setVisible(true);
         this.animateIfNecessary('boost',this.boost,60);
