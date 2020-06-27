@@ -18,6 +18,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   wings: Phaser.GameObjects.Image;
   planeBody: Phaser.GameObjects.Image;
   boost: Phaser.GameObjects.Sprite;
+  muzzleAnimation: Phaser.GameObjects.Sprite;
+  muzzle: Phaser.GameObjects.Image;
   renderContainer:   Phaser.GameObjects.Container;
   hpMax: 300;
   hp: number;
@@ -55,12 +57,29 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.wings = this.scene.add.image(0,0,'planeWings');
     this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
     this.boost = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
+    this.muzzleAnimation = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
+    this.muzzleAnimation.setVisible(false);
+    this.muzzleAnimation.flipY= true;
+    this.muzzleAnimation.setScale(0.2);
+    
+    this.muzzle = this.scene.add.image(0, 0, "car", 0)
+    
 
+    
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
     // Add some sprites - positions are relative to the Container x/y
-    this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost]);
+    //this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost, this.muzzle]);
+    this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost, this.muzzleAnimation]);
     this.boost.setOrigin(0.5,0);
     this.boost.setAngle(90);
+
+    this.muzzleAnimation.setOrigin(0.5,0.5);
+    this.muzzleAnimation.setAngle(90);
+    this.muzzleAnimation.x=64;
+
+    this.muzzle.setOrigin(0.5,0.5);
+    //this.muzzle.setAngle(90);
+    //this.muzzle.x=64;
 
     this.createAnims();
   }
@@ -133,9 +152,16 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       if (this.fireCallback) {
         this.fireCallback();
         this.isShooting = true;
+        // TODO
+        // - play only once per shot..
+        // - hide after shot
+        this.muzzleAnimation.setVisible(true);
+        this.animateIfNecessary('boost',this.muzzleAnimation,60);
 
         // wait until next shot
         this.scene.time.delayedCall(250,()=>{
+          //this.muzzleAnimation.p
+          this.muzzleAnimation.setVisible(false);
           this.isShooting = false;
         });
       }
@@ -163,7 +189,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         
     } else {
       // TODO: while x velocity is still active don't add too much gravity
-      this.plane.setGravity(0 , 200);
+      this.plane.setGravity(0 , 400);
       this.boost.setVisible(false);
       this.plane.setAcceleration(0);
     }
@@ -195,6 +221,12 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.renderContainer.setX(this.plane.x);
     this.renderContainer.setY(this.plane.y);
     this.updateWingsScale();
+    // update muzzle
+    const thePoint = new Phaser.Geom.Point(-100000,0);
+    const newPoint = Phaser.Math.RotateAroundDistance(thePoint,this.plane.x,this.plane.y, this.plane.rotation,-100);
+    this.muzzle.x =  newPoint.x;
+    this.muzzle.y =  newPoint.y;
+    //this.muzzle.setAngle(this.plane.angle);
   }
 
   updateWingsScale():void {

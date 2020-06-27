@@ -147,14 +147,27 @@ export class RauserScene extends Phaser.Scene {
             this.planeObj.decreaseHealth(2);
         });
        
+        let tempMatrix = new Phaser.GameObjects.Components.TransformMatrix();
+        let tempParentMatrix = new Phaser.GameObjects.Components.TransformMatrix();
 
         const playerFireCallBack = () => {
             const bullet: Bullet = this.playerBullets.get().setActive(true).setVisible(true);
             if (bullet) {
+                //  d.translateX
+                //bullet.fireStraight(this.planeObj.plane);
+                //http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
+// https://phaser.discourse.group/t/translate-inner-position-of-rotating-container-into-absolute-position/1762
+                //https://phaser.discourse.group/t/object-position-to-canvas-pixel-position/1099/6
+                // @ts-ignore
+                bullet.fireStraight2(this.planeObj.muzzle.x,this.planeObj.muzzle.y,this.planeObj.plane.rotation);
                 const en = this.enemies.getFirstAlive();
                 if (en) {
                     //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
-                    bullet.fireStraight(this.planeObj.plane);
+                    
+                    
+                    // somehow use world coordinates for muzzle
+                    // http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
+                    //bullet.fireStraight2(this.planeObj.muzzle.displayOriginX,this.planeObj.muzzle.displayOriginY,this.planeObj.plane.rotation);
                 }
             }
         }
@@ -168,6 +181,7 @@ export class RauserScene extends Phaser.Scene {
             playerFireCallBack();
         });
     }
+    
 
   update():void {
     this.planeObj.updatePlane();

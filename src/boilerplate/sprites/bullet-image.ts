@@ -35,8 +35,10 @@ export class Bullet extends Phaser.GameObjects.Image  {
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
+    this.setOrigin(0.5,0.5);
+    this.setScale(5);
     this.setSize(12, 12);
-    this.setScale(10);
+    //this.setScale(10);
     this.sound = this.scene.sound.add("sndMachineGun");
   }
 
@@ -81,7 +83,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
         this.born = 0; // Time since new bullet spawned
   }
 
-  // sucks, @FIXME PLEASE!
+
   fireStraight(shooter):void {
     this.setPosition(shooter.x, shooter.y); // Initial position
     this.rotation = shooter.rotation; // angle bullet with shooters rotation
@@ -90,6 +92,16 @@ export class Bullet extends Phaser.GameObjects.Image  {
     this.scene.physics.velocityFromRotation(shooter.rotation, 4000, this.body.acceleration);
     this.direction = Math.atan( (shooter.x) / (shooter.y));
     this.born = 0; // Time since new bullet spawned
+}
+
+fireStraight2(x,y,rotation):void {
+  this.setPosition(x+25, y); // Initial position
+  this.rotation =rotation; // angle bullet with shooters rotation
+  
+  // @ts-ignore
+  this.scene.physics.velocityFromRotation(rotation, 40000, this.body.acceleration);
+  this.direction = Math.atan( (x) / (y));
+  this.born = 0; // Time since new bullet spawned
 }
   // Updates the position of the bullet each cycle
   update(time:number, delta:number):void
