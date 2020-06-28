@@ -5,9 +5,12 @@
 // - LAG of wings (workaround: embrace the lag: use a transparent pic for physics, body and wings will have the same lag..)
 // - engine sound. Rip this and add more bass (Wings of Fury) https://www.youtube.com/watch?v=ZZSwdqg6VE4
 // - when hitting the water, add some sort of water updrift that gives the planes an upwards push while under water
-// -> aka REVERSE GRAVITY and amplifiy it!
+// -> aka REVERSE GRAVITY and amplifiy it! OK
+// - when plane gets close to the water, show thrustwaves in the water. FlipY depending on velocity?
+// - different particle effects depending on damage level
+// - particel effect editor: https://labs.phaser.io/view.html?src=src/game%20objects/particle%20emitter/particle%20editor.js&v=3.23.0
 // - add more (and harder) enemies depending on score
-//- intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
+// - intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
 
 import { Tilemaps } from "phaser";
 
@@ -98,6 +101,11 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       // TODO: explosionz!!!!!!
 
       console.log('YOU DIE!!!');
+      this.plane.setVelocityX(0);
+      this.plane.setVelocityY(0);
+      this.plane.setGravity(0,0);
+      this.plane.setActive(false);
+      this.plane.destroy();
       // explosionz, 
       this.setActive(false);
       this.setVisible(false);
@@ -208,7 +216,16 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
         this.boost.setVisible(true);
         this.animateIfNecessary('boost',this.boost,60);
-        this.plane.setGravity(0 , 0);
+
+        
+        const { worldSizeY } = this.getWorldSize();
+        if (this.plane.y > worldSizeY) {
+          const factor = Math.abs(this.plane.y - worldSizeY);
+          this.plane.setGravity(0 , -10*factor);
+        }  else {
+          this.plane.setGravity(0 , 0);
+        }
+
         //console.log(this.renderContainer);
         /*this.scene.tweens.add({
           targets: this.plane,
@@ -225,12 +242,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         
     } else {
       // TODO: while x velocity is still active don't add too much gravity
-      const {worldSizeY} = this.getWorldSize();
+      const { worldSizeY } = this.getWorldSize();
       if (this.plane.y > worldSizeY) {
-        console.log('reversing gravity');
-        // under water: add updrift
         const factor = Math.abs(this.plane.y - worldSizeY);
-        console.log(factor);
         this.plane.setGravity(0 , -10*factor);
       }  else {
         this.plane.setGravity(0 , 400);
