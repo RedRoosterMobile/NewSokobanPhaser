@@ -4,6 +4,7 @@ import {Plane} from './../sprites/plane-sprite';
 import {Bullet} from './../sprites/bullet-image';
 import {Enemy} from './../sprites/enemy-image';
 import {Background} from './../sprites/background-sprite';
+import {DamageParticle} from './../sprites/damage-particle';
 
 /*
 
@@ -27,7 +28,7 @@ TODO:
 */
 
 var gameSettings = {
-    maxEnemies: 7
+    maxEnemies: 1
 };
 
 export class RauserScene extends Phaser.Scene {
@@ -56,6 +57,7 @@ export class RauserScene extends Phaser.Scene {
         this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
         
         this.load.atlas("boostSprites", 'assets/rauser/boost-fs8.png', 'assets/rauser/boost.json');
+        this.load.spritesheet('debreeSprite','assets/rauser/debree_sprite.png', { frameWidth: 1, frameHeight: 1 });
 
         this.load.image('dasboot', 'assets/rauser/das_boot-fs8.png');
 
@@ -185,6 +187,31 @@ export class RauserScene extends Phaser.Scene {
             // TODO: move into player class
             playerFireCallBack();
         });
+
+        
+
+        // use: white gray and dark pixel frame
+        // explosion animation gray and white and black circles
+        /*let emitter = particles.createEmitter({
+            alpha: { start: 1, end: 0 },
+            scale: { start: 0.5, end: 2.5 },
+            //tint: { start: 0xff945e, end: 0xff945e },
+            speed: 20,
+            accelerationY: -300,
+            angle: { min: -85, max: -95 },
+            rotate: { min: -180, max: 180 },
+            lifespan: { min: 1000, max: 1100 },
+            blendMode: 'ADD',
+            frequency: 110,
+            maxParticles: 10,
+            // @ts-ignore
+            particleClass: DamageParticle
+            
+        });*/
+        
+        
+        
+
     }
 
     // TODO: spawn closer to player (world coordinates)

@@ -33,16 +33,22 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   hp: number;
   fireCallback: Function;
   isShooting: boolean;
+  emitter:Phaser.GameObjects.Particles.ParticleEmitter;
 
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
+  emitterFrame: number;
 
 
   constructor(scene:Phaser.Scene,x:number,y:number) {
     super(scene,x,y,null);
 
-    this.hp= 300;
+    this.hp= 10;
     this.hpMax= 300;
     this.isShooting= false;
+
+    this.emitterFrame = 1;
+  
 
     this.setOrigin(0,0);
     this.createPlane(x,y);
@@ -89,14 +95,33 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzle.setOrigin(0.5,0.5);
     //this.muzzle.setAngle(90);
     //this.muzzle.x=64;
-
+    
+    this.createParticles()
     this.createAnims();
+  }
+
+  createParticles():void {
+    this.particles = this.scene.add.particles('debreeSprite');
+    this.emitter = this.particles.createEmitter( {
+      x: this.plane.x,
+      y: this.plane.y,
+      frame: 0,
+      quantity: 0, // 3
+      frequency: 100,
+      angle: { min: 0, max: 360 },
+      scale: { start: 5, end: 1 },
+      speed: 200,
+      gravityY: this.plane.body.gravity.y,
+      lifespan: { min: 1000, max: 2000 },  
+    });
+    this.emitter.setFrame(0);
   }
 
   decreaseHealth(value:number) : void {
     console.log(typeof this.hp, value);
     this.hp -= value;
     console.log(this.hp);
+    this.emitter.setQuantity(3);
     if ( this.hp <= 0 ) {
       // TODO: explosionz!!!!!!
 
@@ -115,7 +140,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   }
 
   increaseHealth(value:number) : void {
-    if (this.hp <= this.hpMax)
+    if (this.hp < this.hpMax)
       this.hp+=value;
   }
 
@@ -154,21 +179,16 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   };
 
   knockback(knockbackAmount= 10):void  {
-  
-    
       // @ts-ignore
       const vector = this.scene.physics.velocityFromAngle(this.plane.angle+180,knockbackAmount, this.plane.body.acceleration);
       this.plane.setVelocityX(this.plane.body.velocity.x + vector.x);
       this.plane.setVelocityY(this.plane.body.velocity.y + vector.y);
-      //this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
-      //this.scene.physics.velocityFromRotation(this.plane.rotation, 40000, this.plane.body.acceleration);
   }
 
   updatePlane():void {
 
     if (!this.active || !this.plane.body) {
-      console.log('probaly dead!', this.hp);
-      //TODO: show dramatic explosions
+      // console.log('probaly dead!', this.hp);
       return;
     }
     if (this.cursors.shift.isDown) {
@@ -190,12 +210,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         // - hide after shot
         this.muzzleAnimation.setVisible(true);
         this.animateIfNecessary('boost',this.muzzleAnimation,0);
-        this.knockback();
-        // knockback?? (see super crate box code..)
-        //Phaser.Math.RotateAroundDistance();
-        //this.plane.body.bounce.
-        //this.plane.setVelocityX(this.plane.body.velocity.x*-0.98 );
-        //this.plane.setVelocityY(this.plane.body.velocity.y*-0.98 );
+        this.knockback(10);
         
         
         this.plane.body.velocity.y 
@@ -211,17 +226,14 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     // thrust
     if (this.cursors.up.isDown) {
         // @ts-ignore
-
-
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
         this.boost.setVisible(true);
         this.animateIfNecessary('boost',this.boost,60);
-
         
         const { worldSizeY } = this.getWorldSize();
-        if (this.plane.y > worldSizeY) {
+        if ( this.plane.y > worldSizeY ) {
           const factor = Math.abs(this.plane.y - worldSizeY);
-          this.plane.setGravity(0 , -10*factor);
+          this.plane.setGravity(0 , -10 * factor);
         }  else {
           this.plane.setGravity(0 , 0);
         }
@@ -295,6 +307,27 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzle.x =  newPoint.x;
     this.muzzle.y =  newPoint.y;
     //this.muzzle.setAngle(this.plane.angle);
+    
+    this.updateParticles();
+  }
+
+  updateParticles():void {
+    this.emitter.setPosition(this.plane.x,this.plane.y);
+    if (this.hp <= 299 ) {
+      
+      this.emitterFrame += 1;
+      if (this.emitterFrame > 3) {
+        this.emitterFrame = 0;
+      }
+    
+      //console.log('pausing emitter');
+      //this.emitter.stop();
+    } else {
+      this.emitterFrame = 0;
+      //console.log('resuming emitter', this.hp, this.hpMax);
+      //this.emitter.start();
+    }
+    this.emitter.setFrame(this.emitterFrame);
   }
 
   updateWingsScale():void {
