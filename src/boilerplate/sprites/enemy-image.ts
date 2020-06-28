@@ -1,5 +1,7 @@
 // https://github.com/photonstorm/phaser3-examples/blob/master/public/src/games/topdownShooter/topdown_combatMechanics.js
 
+import { Bullet } from "./bullet-image";
+
 export class Enemy extends Phaser.GameObjects.Image  {
 
   speed     = 0.01;
@@ -11,6 +13,7 @@ export class Enemy extends Phaser.GameObjects.Image  {
   target: Enemy;
 
   sound:Phaser.Sound.BaseSound;
+  bullets: any;
 
   constructor(scene,x=0,y=0) {
     super(scene,x,y,'enemy');
@@ -103,12 +106,21 @@ export class Enemy extends Phaser.GameObjects.Image  {
   setTarget(target): void {
     this.target = target;
   }
+  setBullets(bullets): void {
+    this.bullets = bullets;
+  }
 
   // Updates the position of the bullet each cycle
   update(time:number, delta:number):void {
     if (this.target) {
       // less speed on y (we are planes and have to turn..)
       this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
+    }
+
+    const shootInterval = 100 + Phaser.Math.Between(0,100);
+    if ((Math.round(time*100)%shootInterval)==0) {
+      const aBullet:Bullet = this.bullets.get().setActive(true).setVisible(true);
+      aBullet.fireAtTarget(this,this.target);
     }
     /*
       this.x += this.xSpeed * delta;

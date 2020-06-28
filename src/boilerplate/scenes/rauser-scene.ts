@@ -142,10 +142,12 @@ export class RauserScene extends Phaser.Scene {
         });
         // enemy shoots player
         this.physics.add.overlap(this.enemyBullets,this.planeObj.plane,(enemyBullet:Bullet, player:any) => {
-            enemyBullet.setActive(false);
+            console.log('player got hit');
+            // somehow this is destroying the player..
+            /*enemyBullet.setActive(false);
             enemyBullet.setVisible(false);
-            enemyBullet.destroy();
-            this.planeObj.decreaseHealth(2);
+            enemyBullet.destroy();*/
+            this.planeObj.decreaseHealth(5);
         });
 
         const playerFireCallBack = () => {
@@ -196,6 +198,7 @@ export class RauserScene extends Phaser.Scene {
             //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
             //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
             anEnemy.setTarget(this.planeObj.plane);
+            anEnemy.setBullets(this.enemyBullets);
             //this.planeObj.x
             //this.planeObj.y
 
@@ -206,7 +209,8 @@ export class RauserScene extends Phaser.Scene {
     
 
   update(time, delta):void {
-    this.planeObj.updatePlane();
+    if (this.planeObj)
+        this.planeObj.updatePlane();
     this.spawnEnemies();
     //const velocity = this.planeObj.plane.body.velocity;
 

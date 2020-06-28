@@ -156,14 +156,18 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
   updatePlane():void {
 
-    if (!this.active) {
-      console.log('probaly dead!');
+    if (!this.active || !this.plane.body) {
+      console.log('probaly dead!', this.hp);
       //TODO: show dramatic explosions
       return;
     }
     if (this.cursors.shift.isDown) {
       //this.knockback();
 
+    }
+    // recover health when not shooting
+    if (!this.isShooting) {
+      this.increaseHealth(1);
     }
 
     
@@ -219,9 +223,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         
     } else {
       // TODO: while x velocity is still active don't add too much gravity
-      this.plane.setGravity(0 , 400);
-      this.boost.setVisible(false);
-      this.plane.setAcceleration(0);
+        this.plane.setGravity(0 , 400);
+        this.boost.setVisible(false);
+        this.plane.setAcceleration(0);
     }
 
     // steer
