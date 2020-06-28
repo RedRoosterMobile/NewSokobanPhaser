@@ -28,7 +28,7 @@ TODO:
 */
 
 var gameSettings = {
-    maxEnemies: 1
+    maxEnemies: 7
 };
 
 export class RauserScene extends Phaser.Scene {
@@ -65,6 +65,7 @@ export class RauserScene extends Phaser.Scene {
 
         this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
         this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
+        this.load.audio('sndExplosion', 'assets/rauser/sounds/explosion.mp3');
     }
 
     getWorldSize():any {
@@ -76,8 +77,6 @@ export class RauserScene extends Phaser.Scene {
     }
 
     create():void {
-        // this.background = this.add.image(400, 300, "background").setScale(1.7);
-        //this.sound.add("sndGameMusic").play();
         const soundConfig = {
             mute: false,
             volume: 0.5,
@@ -87,11 +86,9 @@ export class RauserScene extends Phaser.Scene {
             loop: true,
             delay: 0
           };
-
-        //this.sound.play('sndGameMusic',soundConfig);
+        this.sound.play('sndGameMusic',soundConfig);
 
         const {worldSizeX,worldSizeY} = this.getWorldSize();
-
 
         const waterDepth = 400;
         // the total size of the world
@@ -220,7 +217,7 @@ export class RauserScene extends Phaser.Scene {
             const {worldSizeX,worldSizeY} = this.getWorldSize();
             let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
 
-            Phaser.Actions.RotateAroundDistance([anEnemy], this.planeObj, Phaser.Math.DegToRad(Phaser.Math.Between(-90,90)), (this.game.config.height as number)*4 );
+            Phaser.Actions.RotateAroundDistance([anEnemy], this.planeObj, Phaser.Math.DegToRad(Phaser.Math.Between(0+180+90,180+180+90)), (this.game.config.height as number)*4 );
             //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
             //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
             anEnemy.setTarget(this.planeObj.plane);
@@ -237,11 +234,12 @@ export class RauserScene extends Phaser.Scene {
   update(time, delta):void {
     if (this.planeObj)
         this.planeObj.updatePlane();
-    this.spawnEnemies();
-    //const velocity = this.planeObj.plane.body.velocity;
-
-    //if (Math.round(delta*100) % 1)
-    //this.background.updateBackground(velocity.x,velocity.y);
+    
+    if (this.planeObj.active) {
+        this.spawnEnemies();
+        const velocity = this.planeObj.plane.body.velocity;
+        this.background.updateBackground(velocity.x,velocity.y);
+    }
 
     
     // @ts-ignore

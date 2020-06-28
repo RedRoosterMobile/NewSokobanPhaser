@@ -34,6 +34,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   fireCallback: Function;
   isShooting: boolean;
   emitter:Phaser.GameObjects.Particles.ParticleEmitter;
+  initialZoom: integer
 
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
@@ -98,6 +99,33 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     
     this.createParticles()
     this.createAnims();
+    this.scene.input.keyboard.on('keyup-' + 'UP',   this.justWentOffTheGas);
+    this.initialZoom=this.scene.cameras.main.zoom;
+  }
+
+  justWentOffTheGas(event):void {
+    console.log('UP key is UP: camera zoom tween here', event.timeStamp);
+    let previousZoom = 0.4;//this.scene.cameras.main.zoom;
+    
+    this.scene.tweens.add({
+      targets: this.scene.cameras.main,
+      props: {
+        zoom: previousZoom-0.01
+      },
+      delay: 0,
+      yoyo: true,
+      duration: 200,
+      // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/tween/#ease-equations
+      ease: "Sine.easeOut",
+      easeParams: null,
+      hold: 0,
+      repeat: 0,
+      onComplete: () => {
+        this.scene.cameras.main.zoom=previousZoom;
+      }
+    });
+    //this.scene.cameras.main.zoom=previousZoom;
+
   }
 
   createParticles():void {
@@ -223,6 +251,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         });
       }
     }
+  
     // thrust
     if (this.cursors.up.isDown) {
         // @ts-ignore
@@ -237,22 +266,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         }  else {
           this.plane.setGravity(0 , 0);
         }
-
-        //console.log(this.renderContainer);
-        /*this.scene.tweens.add({
-          targets: this.plane,
-          props: {
-            gravitiyY: 0
-          },
-          delay: 0,
-          duration: 100,
-          ease: "Linear",
-          easeParams: null,
-          hold: 0,
-          repeat: 1,
-        });*/
-        
-    } else {
+    } else {        
       // TODO: while x velocity is still active don't add too much gravity
       const { worldSizeY } = this.getWorldSize();
       if (this.plane.y > worldSizeY) {

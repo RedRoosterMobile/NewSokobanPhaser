@@ -29,16 +29,16 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
         
 
         // FIXME: why is this shit so super CPU heavy???
-        /*
+        
         this.bg3 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
-            .setScrollFactor(0).setScale(4).setTint(0x123456);//.setAlpha(0.1);
+            .setScrollFactor(0).setScale(4).setTint(0x123456).setAlpha(0.1);
         this.bg3.tilePositionX = 50;
         this.bg2 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
-            .setScrollFactor(0).setScale(5).setTint(0xff3456);//.setAlpha(0.3);
+            .setScrollFactor(0).setScale(5).setTint(0xff3456).setAlpha(0.3);
         this.bg2.tilePositionX = 100;
         this.bg1 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
-            .setScrollFactor(0).setScale(6).setTint(0xffff56);//.setAlpha(0.8);
-        this.bg1.tilePositionX = 500;*/
+            .setScrollFactor(0).setScale(6).setTint(0xffff56).setAlpha(0.8);
+        this.bg1.tilePositionX = 500;
     }
 
     updateBackground(velocityX,velocityY) {
@@ -49,7 +49,7 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
         this.bg2.tilePositionX += velocityX/damperX *0.5;
         this.bg3.tilePositionX += velocityX/damperX * 0.1;
 
-        const damperY = 10000;
+        const damperY = 10000/2;
         this.bg1.tilePositionY += velocityY/damperY;
         this.bg2.tilePositionY += velocityY/damperY *0.5;
         this.bg3.tilePositionY += velocityY/damperY * 0.1;
