@@ -28,40 +28,31 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
         .setTint(0xffeeff);
         //let image = this.scene.add.image(400, 300, 'bgGradient');
         
-        const width = this.scene.scale.width
-        const height = this.scene.scale.height
-        const totalWidth = width * 10
+        const width = this.scene.scale.width;
+        const height = this.scene.scale.height;
+        const totalWidth = width * 10;
 
          this.bg3 = this.scene.add.tileSprite(0,0,800, 600, 'bg3')
-            .setScrollFactor(0).setScale(4);
+            .setScrollFactor(0).setScale(4).setTint(0x123456).setAlpha(0.1);
          this.bg2 = this.scene.add.tileSprite(0,0,800, 600, 'bg2')
-            .setScrollFactor(0).setScale(4);
+            .setScrollFactor(0).setScale(5).setTint(0xff3456).setAlpha(0.3);
          this.bg1 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
-            .setScrollFactor(0).setScale(4);;
-
-        //this.createAligned(this.scene, totalWidth, 'bg2', 0.25)
-        //this.createAligned(this.scene, totalWidth, 'bg1', 0.5)
-
-        
-        //createAligned(this, totalWidth, 'ground', 1)
-        //createAligned(this, totalWidth, 'plants', 1.25)
+            .setScrollFactor(0).setScale(6).setTint(0xffff56).setAlpha(0.8);
     }
 
 
-    // TODO: use velocity of player!!
     updateBackground(velocityX,velocityY) {
         // https://www.youtube.com/watch?v=pknZUn82x2U best way tlesprites
-
-
-        const damperX = 50;
+        const damperX = 500;
         this.bg1.tilePositionX += velocityX/damperX;
         this.bg2.tilePositionX += velocityX/damperX *0.5;
         this.bg3.tilePositionX += velocityX/damperX * 0.1;
 
-        const damperY = 1000;
+        const damperY = 10000;
         this.bg1.tilePositionY += velocityY/damperY;
         this.bg2.tilePositionY += velocityY/damperY *0.5;
         this.bg3.tilePositionY += velocityY/damperY * 0.1;
+        
 
      
     }

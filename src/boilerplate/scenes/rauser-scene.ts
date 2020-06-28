@@ -59,9 +59,9 @@ export class RauserScene extends Phaser.Scene {
 
         this.load.image('dasboot', 'assets/rauser/das_boot.png');
 
-        this.load.image('bg1', 'assets/rauser/clouds_front.png');
-        this.load.image('bg2', 'assets/rauser/clouds_center.png');
-        this.load.image('bg3', 'assets/rauser/clouds_back.png');
+        this.load.image('bg1', 'assets/rauser/clouds_pixel_800_600.png');
+        this.load.image('bg2', 'assets/rauser/clouds_pixel_800_600.png');
+        this.load.image('bg3', 'assets/rauser/clouds_pixel_800_600.png');
 
         this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
         this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
@@ -188,6 +188,7 @@ export class RauserScene extends Phaser.Scene {
         });
     }
 
+    // TODO: spawn closer to player (world coordinates)
     spawnEnemies():void {
         if (this.enemies.getLength() < gameSettings.maxEnemies) {
             const {worldSizeX,worldSizeY} = this.getWorldSize();
