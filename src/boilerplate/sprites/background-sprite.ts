@@ -26,23 +26,24 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
         .setOrigin(0.5, 0)
         .setScrollFactor(0,1)
         .setTint(0xffeeff);
-        //let image = this.scene.add.image(400, 300, 'bgGradient');
         
-        const width = this.scene.scale.width;
-        const height = this.scene.scale.height;
-        const totalWidth = width * 10;
 
-         this.bg3 = this.scene.add.tileSprite(0,0,800, 600, 'bg3')
-            .setScrollFactor(0).setScale(4).setTint(0x123456).setAlpha(0.1);
-         this.bg2 = this.scene.add.tileSprite(0,0,800, 600, 'bg2')
-            .setScrollFactor(0).setScale(5).setTint(0xff3456).setAlpha(0.3);
-         this.bg1 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
-            .setScrollFactor(0).setScale(6).setTint(0xffff56).setAlpha(0.8);
+        // FIXME: why is this shit so super CPU heavy???
+        /*
+        this.bg3 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
+            .setScrollFactor(0).setScale(4).setTint(0x123456);//.setAlpha(0.1);
+        this.bg3.tilePositionX = 50;
+        this.bg2 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
+            .setScrollFactor(0).setScale(5).setTint(0xff3456);//.setAlpha(0.3);
+        this.bg2.tilePositionX = 100;
+        this.bg1 = this.scene.add.tileSprite(0,0,800, 600, 'bg1')
+            .setScrollFactor(0).setScale(6).setTint(0xffff56);//.setAlpha(0.8);
+        this.bg1.tilePositionX = 500;*/
     }
 
-
     updateBackground(velocityX,velocityY) {
-        // https://www.youtube.com/watch?v=pknZUn82x2U best way tlesprites
+        // https://www.youtube.com/watch?v=pknZUn82x2U best way tilesprites
+        // https://www.html5gamedevs.com/topic/36524-tilesprite-for-parallax/
         const damperX = 500;
         this.bg1.tilePositionX += velocityX/damperX;
         this.bg2.tilePositionX += velocityX/damperX *0.5;
@@ -52,9 +53,10 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
         this.bg1.tilePositionY += velocityY/damperY;
         this.bg2.tilePositionY += velocityY/damperY *0.5;
         this.bg3.tilePositionY += velocityY/damperY * 0.1;
-        
-
-     
+    }
+    updateBackgroundFromCamera() {
+        const cam = this.scene.cameras.main;
+        cam.scrollX;
     }
 
     initBg():void {
@@ -65,6 +67,4 @@ export class Background extends Phaser.Physics.Arcade.Sprite  {
 
         // idea: put in container and only move layer 2 relative to layer 1?
     }
-
-    
 }

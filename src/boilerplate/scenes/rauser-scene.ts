@@ -51,17 +51,15 @@ export class RauserScene extends Phaser.Scene {
 
         this.load.image('enemy', 'assets/car90.png');
 
-        this.load.image('planeBody', 'assets/rauser/plane_body.png');
-        this.load.image('planePhysics', 'assets/rauser/plane_transparent.png');
-        this.load.image('planeWings', 'assets/rauser/plane_wings.png');
+        this.load.image('planeBody', 'assets/rauser/plane_body-fs8.png');
+        this.load.image('planePhysics', 'assets/rauser/plane_transparent-fs8.png');
+        this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
         
-        this.load.atlas("boostSprites", 'assets/rauser/boost.png', 'assets/rauser/boost.json');
+        this.load.atlas("boostSprites", 'assets/rauser/boost-fs8.png', 'assets/rauser/boost.json');
 
-        this.load.image('dasboot', 'assets/rauser/das_boot.png');
+        this.load.image('dasboot', 'assets/rauser/das_boot-fs8.png');
 
-        this.load.image('bg1', 'assets/rauser/clouds_pixel_800_600.png');
-        this.load.image('bg2', 'assets/rauser/clouds_pixel_800_600.png');
-        this.load.image('bg3', 'assets/rauser/clouds_pixel_800_600.png');
+        this.load.image('bg1', 'assets/rauser/clouds_pixel_800_600-fs8.png');
 
         this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
         this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
@@ -122,7 +120,7 @@ export class RauserScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.planeObj.plane, true,  0.09, 0.09);
 
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
-        this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' });
+        this.text = this.add.text(10, 10, '', { font: '64px Courier', fill: '#00ff00' });
         
         // Add 2 groups for Bullet objects
         this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
@@ -193,22 +191,32 @@ export class RauserScene extends Phaser.Scene {
         if (this.enemies.getLength() < gameSettings.maxEnemies) {
             const {worldSizeX,worldSizeY} = this.getWorldSize();
             let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
-            anEnemy.x = Phaser.Math.Between(0,worldSizeX);
-            anEnemy.y = Phaser.Math.Between(0,worldSizeY);
+
+            Phaser.Actions.RotateAroundDistance([anEnemy], this.planeObj, Phaser.Math.DegToRad(Phaser.Math.Between(-90,90)), (this.game.config.height as number)*4 );
+            //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
+            //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
             anEnemy.setTarget(this.planeObj.plane);
+            //this.planeObj.x
+            //this.planeObj.y
+
             console.log('creating enemy at ',anEnemy.x, anEnemy.y );
         }
+
     }
     
 
-  update():void {
+  update(time, delta):void {
     this.planeObj.updatePlane();
     this.spawnEnemies();
-    this.background.updateBackground(this.planeObj.plane.body.velocity.x,this.planeObj.plane.body.velocity.y);
+    //const velocity = this.planeObj.plane.body.velocity;
+
+    //if (Math.round(delta*100) % 1)
+    //this.background.updateBackground(velocity.x,velocity.y);
 
     
     // @ts-ignore
-    this.text.setText('Speed: ' + this.planeObj.plane.body.speed);
+    //this.text.setText('Speed: ' + this.planeObj.plane.body.speed+ ' fps:'+ this.game.loop.actualFps);
+    
   }
 
 }

@@ -108,7 +108,7 @@ export class Enemy extends Phaser.GameObjects.Image  {
   update(time:number, delta:number):void {
     if (this.target) {
       // less speed on y (we are planes and have to turn..)
-      this.scene.physics.accelerateToObject(this, this.target, 120, 300, 150);
+      this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
     }
     /*
       this.x += this.xSpeed * delta;

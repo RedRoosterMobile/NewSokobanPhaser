@@ -163,7 +163,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     }
     if (this.cursors.shift.isDown) {
       //this.knockback();
-      
+
     }
 
     
@@ -244,7 +244,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     }
     this.updateWings();
     // @ts-ignore
-    //this.text.setText('Speed: ' + this.plane.body.speed);
+    //this.scene.text.setText('Speed: ' + this.plane.body.speed + ' fps:'+ this.scene.game.loop.actualFps);
   }
   updateWings():void {
     this.renderContainer.setAngle(this.plane.angle);
