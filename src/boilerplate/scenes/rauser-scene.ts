@@ -91,8 +91,9 @@ export class RauserScene extends Phaser.Scene {
         const {worldSizeX,worldSizeY} = this.getWorldSize();
 
 
+        const waterDepth = 400;
         // the total size of the world
-        this.physics.world.setBounds(0, 0, worldSizeX, worldSizeY, false, false, true, true);
+        this.physics.world.setBounds(0, 0, worldSizeX, worldSizeY+waterDepth, false, false, true, true);
         //const graphics = this.add.graphics();
         //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
         //graphics.fillRect(0, 0, worldSizeX, worldSizeY);

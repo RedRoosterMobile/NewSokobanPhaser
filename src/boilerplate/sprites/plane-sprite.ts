@@ -1,10 +1,12 @@
 // TODO:
 // - no/less gravity when flying sideways (because of updrift, depending on speed)
 // - wings! OK
+// - bullet sound: flak from Wings of Fury (Bassy as hell!) OK
 // - LAG of wings (workaround: embrace the lag: use a transparent pic for physics, body and wings will have the same lag..)
 // - engine sound. Rip this and add more bass (Wings of Fury) https://www.youtube.com/watch?v=ZZSwdqg6VE4
-// - bullet sound: flak from Wings of Fury (Bassy as hell!)
-
+// - when hitting the water, add some sort of water updrift that gives the planes an upwards push while under water
+// -> aka REVERSE GRAVITY and amplifiy it!
+// - add more (and harder) enemies depending on score
 //- intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
 
 import { Tilemaps } from "phaser";
@@ -223,9 +225,20 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         
     } else {
       // TODO: while x velocity is still active don't add too much gravity
+      const {worldSizeY} = this.getWorldSize();
+      if (this.plane.y > worldSizeY) {
+        console.log('reversing gravity');
+        // under water: add updrift
+        const factor = Math.abs(this.plane.y - worldSizeY);
+        console.log(factor);
+        this.plane.setGravity(0 , -10*factor);
+      }  else {
         this.plane.setGravity(0 , 400);
-        this.boost.setVisible(false);
-        this.plane.setAcceleration(0);
+      } 
+      
+        
+      this.boost.setVisible(false);
+      this.plane.setAcceleration(0);
     }
 
     // steer
@@ -250,6 +263,13 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     // @ts-ignore
     //this.scene.text.setText('Speed: ' + this.plane.body.speed + ' fps:'+ this.scene.game.loop.actualFps);
   }
+  getWorldSize():any {
+    // @ts-ignore
+    const worldSizeX:number = parseInt(this.scene.game.config.width) * 4;
+    // @ts-ignore
+    const worldSizeY:number = parseInt(this.scene.game.config.height) * 4;
+    return {worldSizeX,worldSizeY};
+}
   updateWings():void {
     this.renderContainer.setAngle(this.plane.angle);
     this.renderContainer.setX(this.plane.x);
