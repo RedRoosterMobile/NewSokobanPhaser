@@ -78,7 +78,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzleAnimation.setScale(1.5,0.2);
     
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
-    this.muzzle.setVisible(false);
+    //this.muzzle.setVisible(false);
     
 
     
@@ -99,9 +99,25 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     
     this.createParticles()
     this.createAnims();
-    this.scene.input.keyboard.on('keyup-' + 'UP',   this.justWentOffTheGas);
+    //this.scene.input.keyboard.on('keyup-' + 'UP',   this.justWentOffTheGas);
     this.initialZoom=this.scene.cameras.main.zoom;
   }
+
+  /*
+
+  Observation:
+  ------------
+  
+  while boosting:
+  when fliying right - plane should be on the left side of the camera
+  when fliying left - plane should be on the left right of the camera
+  when fliying up - plane should be on the left bottom of the camera
+  when fliying down - plane should be on the left top of the camera
+
+  while ideling:
+  normal?
+
+  */
 
   justWentOffTheGas = (event):void => {
     console.log('UP key is UP: camera zoom tween here', event.timeStamp);
