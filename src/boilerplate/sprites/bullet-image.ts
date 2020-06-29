@@ -92,7 +92,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
     // @ts-ignore
     this.scene.physics.velocityFromRotation(shooter.rotation, 4000, this.body.acceleration);
     this.direction = Math.atan( (shooter.x) / (shooter.y));
-    this.born = 0; // Time since new bullet spawned
+    
 }
 
 fireStraight2(x,y,rotation):void {

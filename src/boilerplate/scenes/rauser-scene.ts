@@ -39,7 +39,7 @@ rotating a thumbstick left or right then jamming it straight forward."
 */
 
 var gameSettings = {
-    maxEnemies: 7
+    maxEnemies: 0
 };
 
 export class RauserScene extends Phaser.Scene {
@@ -90,7 +90,7 @@ export class RauserScene extends Phaser.Scene {
     create():void {
         const soundConfig = {
             mute: false,
-            volume: 0.5,
+            volume: 0.0,
             rate: 1,
             detune: 0,
             seek: 0,
