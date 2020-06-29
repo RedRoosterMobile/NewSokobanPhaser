@@ -29,7 +29,7 @@ export class Enemy extends Phaser.GameObjects.Image  {
     this.sound = this.scene.sound.add("sndExplosion");
   }
 
-  // TODO: somehow passing an object to the constructor 
+  // TODO: somehow passing an object to the constructor
   // to change properites of enemy: class, texture, hp, speed, ...
   playExplosionSound(loop=false) {
     const soundConfige:Phaser.Types.Sound.SoundConfig = {
@@ -69,7 +69,7 @@ export class Enemy extends Phaser.GameObjects.Image  {
 
   moveToTarget(target) {
         const {worldSizeY}=this.getWorldSize()
-        
+
         this.direction = Math.atan( (target.x-this.x) / (Phaser.Math.Clamp(target.y,0,worldSizeY-600)-this.y));
 
         //this.direction = shooter.rotation;
@@ -134,9 +134,21 @@ export class Enemy extends Phaser.GameObjects.Image  {
   update(time:number, delta:number):void {
     if (this.target) {
       // less speed on y (we are planes and have to turn..)
-      
-      //this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
-      this.moveToTarget(this.target);
+
+      this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
+      const {worldSizeY} = this.getWorldSize();
+      console.log(this);
+
+      if ( this.y > worldSizeY ) {
+        const factor = Math.abs(this.y - worldSizeY);
+
+        // @ts-ignore
+        this.body.setGravity(0 , -10 * factor);
+      }  else {
+        // @ts-ignore
+        this.body.setGravity(0 , 0);
+      }
+      //this.moveToTarget(this.target);
     }
 
     const shootInterval = 100 + Phaser.Math.Between(0,100);
@@ -144,10 +156,10 @@ export class Enemy extends Phaser.GameObjects.Image  {
       const aBullet:Bullet = this.bullets.get().setActive(true).setVisible(true);
       aBullet.fireAtTarget(this,this.target);
     }
-    
+
       this.x += this.xSpeed * delta;
       this.y += this.ySpeed * delta;
-      
+
      /*this.moveToTarget({
        x:this.x + this.xSpeed * delta,
        y:this.y += this.ySpeed * delta
