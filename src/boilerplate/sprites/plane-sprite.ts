@@ -108,19 +108,20 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     let previousZoom = 0.4;//this.scene.cameras.main.zoom;
     const targetVector:Phaser.Math.Vector2 = new Phaser.Math.Vector2(this.scene.cameras.main.scrollX,this.scene.cameras.main.scrollY);
     this.scene.physics.velocityFromRotation(this.plane.rotation, 400, targetVector);
+    const diff = event.timeStamp-this.cursors.up.timeDown;
     
     this.scene.tweens.add({
       targets: this.scene.cameras.main,
       props: {
-        zoom: previousZoom-0.01,
-        scrollX: this.scene.cameras.main.scrollX+targetVector.x/10,
-        scrollY: this.scene.cameras.main.scrollY+targetVector.y/10,
+        //zoom: previousZoom-0.01,
+        scrollX: this.scene.cameras.main.scrollX+targetVector.x*diff/10000,
+        scrollY: this.scene.cameras.main.scrollY+targetVector.y*diff/10000,
       },
       delay: 0,
       yoyo: false,
-      duration: 400,
+      duration: Phaser.Math.Clamp(diff,0,400),
       // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/tween/#ease-equations
-      ease: "Sine.easeOut",
+      ease: "Cubic.easeIn",
       easeParams: null,
       hold: 0,
       repeat: 0,
