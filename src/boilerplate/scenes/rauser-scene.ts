@@ -21,10 +21,21 @@ TODO:
 - spawn enemies OK
 - startship OK
 - battleships (drop bombs?)
-- deep techno sound that changes parts upon user interaction (timing?) 
+- deep techno sound that changes parts upon user interaction (timing?)
 - idea: fade in when sth happens and fade out after a while (sinus LFOs?)
 - yep, this is how THEY did it.. /Applications/Luftrausers.app/Contents/Resources/data/bgm/luftrauser_bass3.ogg
 - post processing: shaders https://www.shadertoy.com/view/4slGRM
+- camera: base on rotation?
+- https://unwinnable.com/2014/06/16/notes-on-luftrausers/
+
+
+"When you rotate your plane in Luftrausers, the camera swings around like it has been attached
+to the end of a morning star. You continue to move left across the screen with your last thrust,
+but as you rotate to face the right, the camera swings around, always keeping your plane’s tail
+closer to one edge of the screen or another. Thrust forward again and the plane is practically
+slammed against that edge of the screen, like the pilot’s head would be slammed against their chair.
+It’s nauseating, but it communicates an excessive amount of feedback through the simple act of
+rotating a thumbstick left or right then jamming it straight forward."
 */
 
 var gameSettings = {
@@ -55,7 +66,7 @@ export class RauserScene extends Phaser.Scene {
         this.load.image('planeBody', 'assets/rauser/plane_body-fs8.png');
         this.load.image('planePhysics', 'assets/rauser/plane_transparent-fs8.png');
         this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
-        
+
         this.load.atlas("boostSprites", 'assets/rauser/boost-fs8.png', 'assets/rauser/boost.json');
         this.load.spritesheet('debreeSprite','assets/rauser/debree_sprite.png', { frameWidth: 1, frameHeight: 1 });
 
@@ -121,7 +132,7 @@ export class RauserScene extends Phaser.Scene {
 
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
         this.text = this.add.text(10, 10, '', { font: '64px Courier', fill: '#00ff00' });
-        
+
         // Add 2 groups for Bullet objects
         this.playerBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
         this.enemyBullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
@@ -134,7 +145,7 @@ export class RauserScene extends Phaser.Scene {
         });
         // player and enemy collide
         this.physics.add.overlap(this.planeObj.plane,this.enemies,(player:any, enemy:Enemy)=>{
-            // TODO only once per 
+            // TODO only once per
             console.log('crashing..');
             enemy.decreaseHealth(0.2);
             this.planeObj.decreaseHealth(0.2);
@@ -168,7 +179,7 @@ export class RauserScene extends Phaser.Scene {
                 bullet3.fireStraight2(this.planeObj.muzzle.x,this.planeObj.muzzle.y,Phaser.Math.DegToRad(targetAngle+diff));
                 const en = this.enemies.getFirstAlive();
                 if (en) {
-                    //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});    
+                    //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
                     // somehow use world coordinates for muzzle
                     // http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
                     //bullet.fireStraight2(this.planeObj.muzzle.displayOriginX,this.planeObj.muzzle.displayOriginY,this.planeObj.plane.rotation);
@@ -185,7 +196,7 @@ export class RauserScene extends Phaser.Scene {
             playerFireCallBack();
         });
 
-        
+
 
         // use: white gray and dark pixel frame
         // explosion animation gray and white and black circles
@@ -203,11 +214,11 @@ export class RauserScene extends Phaser.Scene {
             maxParticles: 10,
             // @ts-ignore
             particleClass: DamageParticle
-            
+
         });*/
-        
-        
-        
+
+
+
 
     }
 
@@ -229,22 +240,22 @@ export class RauserScene extends Phaser.Scene {
         }
 
     }
-    
+
 
   update(time, delta):void {
     if (this.planeObj)
         this.planeObj.updatePlane();
-    
+
     if (this.planeObj.active) {
         this.spawnEnemies();
         const velocity = this.planeObj.plane.body.velocity;
         this.background.updateBackground(velocity.x,velocity.y);
     }
 
-    
+
     // @ts-ignore
     //this.text.setText('Speed: ' + this.planeObj.plane.body.speed+ ' fps:'+ this.game.loop.actualFps);
-    
+
   }
 
 }
