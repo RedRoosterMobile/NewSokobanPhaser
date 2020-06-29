@@ -28,6 +28,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   boost: Phaser.GameObjects.Sprite;
   muzzleAnimation: Phaser.GameObjects.Sprite;
   muzzle: Phaser.GameObjects.Image;
+  camMuzzle: Phaser.GameObjects.Image;
   renderContainer:   Phaser.GameObjects.Container;
   hpMax: 300;
   hp: number;
@@ -39,6 +40,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
   emitterFrame: number;
+  isCamTweening: boolean;
 
 
   constructor(scene:Phaser.Scene,x:number,y:number) {
@@ -47,6 +49,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.hp= 10;
     this.hpMax= 300;
     this.isShooting= false;
+    this.isCamTweening = false;
 
     this.emitterFrame = 1;
   
@@ -56,7 +59,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
   }
   createPlane(x:number,y:number):void {
-
     this.plane = this.scene.physics.add.image(x, y, 'planePhysics',0);
     this.plane.setInteractive(true, function(){});
     this.cursors = this.scene.input.keyboard.createCursorKeys();
@@ -77,8 +79,10 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzleAnimation.flipY= true;
     this.muzzleAnimation.setScale(1.5,0.2);
     
+    // waaay better. let camera follow muzzle. move the muzzele further when speeding and rotation is heavy left or right. come closer when 0 or 180 deg
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
-    //this.muzzle.setVisible(false);
+    this.camMuzzle = this.scene.add.image(0, 0, "car", 0)
+    this.muzzle.setVisible(false);
     
 
     
@@ -94,6 +98,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzleAnimation.x=64;
 
     this.muzzle.setOrigin(0.5,0.5);
+    this.camMuzzle.setOrigin(0.5,0.5);
     //this.muzzle.setAngle(90);
     //this.muzzle.x=64;
     
@@ -337,10 +342,53 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.renderContainer.setY(this.plane.y);
     this.updateWingsScale();
     // update muzzle
+    const rotation = this.plane.rotation;
     const thePoint = new Phaser.Geom.Point(-100000,0);
-    const newPoint = Phaser.Math.RotateAroundDistance(thePoint,this.plane.x,this.plane.y, this.plane.rotation,-100);
-    this.muzzle.x =  newPoint.x;
-    this.muzzle.y =  newPoint.y;
+    const newMuzzlePoint = Phaser.Math.RotateAroundDistance(thePoint,this.plane.x,this.plane.y, rotation,-100);
+    const thePoint2 = new Phaser.Geom.Point(-100000,0);
+
+    // TODO: try velocity
+    //const camRotation = Math.abs(Math.cos(rotation)*300)*-1;
+    const speed = Math.sqrt(Math.pow(this.plane.body.velocity.x,2)+Math.pow(this.plane.body.velocity.y,2));
+    //console.log(speed);
+    const camRotation = speed/2*-1;
+
+    const newCamPoint = Phaser.Math.RotateAroundDistance(thePoint2,this.plane.x,this.plane.y, rotation,camRotation);
+    this.muzzle.x =  newMuzzlePoint.x;
+    this.muzzle.y =  newMuzzlePoint.y;
+    
+    if (this.cursors.up.isDown) { 
+      this.camMuzzle.x = newCamPoint.x;
+      this.camMuzzle.y = newCamPoint.y;
+    } else {
+      //if (this.isCamTweening)
+      //  return;
+      // tween
+      this.scene.tweens.add({
+        onStart: ()=>{
+          this.isCamTweening = true;
+        },
+        targets: this.camMuzzle,
+        props: {
+          x:newMuzzlePoint.x,
+          y:newMuzzlePoint.y
+        },
+        delay: 0,
+        yoyo: false,
+        duration: 100,
+        // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/tween/#ease-equations
+        ease: "Linear.easeIn",
+        easeParams: null,
+        hold: 0,
+        repeat: 0,
+        onComplete: () => {
+          console.log('done cam tweening');
+          this.isCamTweening = false;
+        }
+      });
+      //this.camMuzzle.x = newPoint.x;
+      //this.camMuzzle.y = newPoint.y;
+    }
     //this.muzzle.setAngle(this.plane.angle);
     
     this.updateParticles();

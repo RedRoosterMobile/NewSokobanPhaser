@@ -128,7 +128,7 @@ export class RauserScene extends Phaser.Scene {
         );
         this.cameras.main.setZoom(0.4);
 
-        this.cameras.main.startFollow(this.planeObj.muzzle, true,  0.09, 0.09);
+        this.cameras.main.startFollow(this.planeObj.camMuzzle, true,  0.09, 0.09);
 
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
         this.text = this.add.text(10, 10, '', { font: '64px Courier', fill: '#00ff00' });
