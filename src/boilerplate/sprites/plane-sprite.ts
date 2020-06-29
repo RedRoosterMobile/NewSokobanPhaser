@@ -104,6 +104,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     
     this.createParticles()
     this.createAnims();
+    // nausea + 10000!
     //this.scene.input.keyboard.on('keyup-' + 'UP',   this.justWentOffTheGas);
     this.initialZoom=this.scene.cameras.main.zoom;
   }
@@ -343,6 +344,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.updateWingsScale();
     // update muzzle
     const rotation = this.plane.rotation;
+
     const thePoint = new Phaser.Geom.Point(-100000,0);
     const newMuzzlePoint = Phaser.Math.RotateAroundDistance(thePoint,this.plane.x,this.plane.y, rotation,-100);
     const thePoint2 = new Phaser.Geom.Point(-100000,0);
@@ -350,22 +352,48 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     // TODO: try velocity
     //const camRotation = Math.abs(Math.cos(rotation)*300)*-1;
     const speed = Math.sqrt(Math.pow(this.plane.body.velocity.x,2)+Math.pow(this.plane.body.velocity.y,2));
-    //console.log(speed);
-    const camRotation = speed/2*-1;
 
-    const newCamPoint = Phaser.Math.RotateAroundDistance(thePoint2,this.plane.x,this.plane.y, rotation,camRotation);
+
+    //console.log(speed);
+    // when going straight left/right and speeding
+    let camRotation;
+    
+    if (this.cursors.left.isDown || this.cursors.right.isDown) { 
+     //camRotation = speed/4*-1;
+     console.log(Math.sin(this.plane.angle));
+    } else {
+      //camRotation = speed/2*-1; 
+    }
+    
+    let secret = Math.abs(Math.sin(this.plane.angle));
+    secret = Math.atan( (this.camMuzzle.x) / (this.camMuzzle.y));
+    camRotation = speed/2*-1; 
+    let camRotation2 = Math.abs(Math.cos(rotation)*300)*-1;
+    const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length
+    const averageRotation = arrAvg([camRotation,camRotation2]);
+
+
+
+    // tween cam rotation on speed? the higher the speed, the longer the duration of the tween
+    // might help againt nausea while sterring at high speeds
+
+
+    //console.log(this.plane.an);
+
+    const newCamPoint = Phaser.Math.RotateAroundDistance(thePoint2,this.plane.x,this.plane.y, rotation,averageRotation);
     this.muzzle.x =  newMuzzlePoint.x;
     this.muzzle.y =  newMuzzlePoint.y;
+    
     
     if (this.cursors.up.isDown) { 
       this.camMuzzle.x = newCamPoint.x;
       this.camMuzzle.y = newCamPoint.y;
     } else {
-      //if (this.isCamTweening)
-      //  return;
+      if (this.isCamTweening)
+        return;
       // tween
       this.scene.tweens.add({
-        onStart: ()=>{
+        onStart: () => {
           this.isCamTweening = true;
         },
         targets: this.camMuzzle,
@@ -382,7 +410,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         hold: 0,
         repeat: 0,
         onComplete: () => {
-          console.log('done cam tweening');
+
           this.isCamTweening = false;
         }
       });
