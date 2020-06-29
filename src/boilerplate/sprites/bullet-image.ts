@@ -6,20 +6,20 @@ export class Bullet extends Phaser.GameObjects.Image  {
 
   // analysis: https://www.youtube.com/watch?v=3X0yxfQGABc
   // luftrauser:
-  // 
+  //
   // player bullets
   // big white dots with border in background color
   // enemy bullets (std. planes)
   // big white dots with dark border
 
   // muzzle when shooting (white long, inner color slightly different) (64px?)
-  // exhaust pipe plain white 
+  // exhaust pipe plain white
 
   // particle?
   // random smoke
   // smoke grayish dots in the same color
 
-  
+
   speed =1;
   born=0;
   xSpeed=0;
@@ -50,10 +50,9 @@ export class Bullet extends Phaser.GameObjects.Image  {
       detune: 0,
       seek: 0.40,
       loop: loop,
-      delay: 0,
-      
-
+      delay: 0
     };
+    // @ts-ignore
     this.sound.play(soundConfige);
   }
 
@@ -89,7 +88,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
   fireStraight(shooter):void {
     this.setPosition(shooter.x, shooter.y); // Initial position
     this.rotation = shooter.rotation; // angle bullet with shooters rotation
-    
+
     // @ts-ignore
     this.scene.physics.velocityFromRotation(shooter.rotation, 4000, this.body.acceleration);
     this.direction = Math.atan( (shooter.x) / (shooter.y));
@@ -100,7 +99,7 @@ fireStraight2(x,y,rotation):void {
   this.playFireSound();
   this.setPosition(x+25, y); // Initial position
   this.rotation =rotation; // angle bullet with shooters rotation
-  
+
   // @ts-ignore
   this.scene.physics.velocityFromRotation(rotation, 40000, this.body.acceleration);
   this.direction = Math.atan( (x) / (y));

@@ -137,11 +137,9 @@ export class Enemy extends Phaser.GameObjects.Image  {
 
       this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
       const {worldSizeY} = this.getWorldSize();
-      console.log(this);
 
-      if ( this.y > worldSizeY ) {
+      if ( this.y > (worldSizeY-100) ) {
         const factor = Math.abs(this.y - worldSizeY);
-
         // @ts-ignore
         this.body.setGravity(0 , -10 * factor);
       }  else {
