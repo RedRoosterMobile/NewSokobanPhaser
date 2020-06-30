@@ -38,7 +38,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.createPlane(x,y);
-    this.sound = this.scene.sound.add("sndExplosion");
+    //this.sound = this.scene.sound.add("sndExplosion");
     this.sound2 = this.scene.sound.add("sndExplosion2");
   }
 
@@ -60,7 +60,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.explosions = this.scene.add.sprite(0, 0, 'explosionsSprite',0);
     this.explosions.setScale(4);
     this.scene.anims.create({
-      key: 'explode',
+      key: 'explode1',
       frames: this.scene.anims.generateFrameNumbers('explosionsSprite',{start:1,end:6}),
       frameRate: 5,
       repeat: -1
@@ -68,6 +68,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.scene.anims.create({
       key: 'explode2',
       frames: this.scene.anims.generateFrameNumbers('explosionsSprite',{start:6,end:12}),
+      frameRate: 5,
+      repeat: -1
+    });
+    this.scene.anims.create({
+      key: 'explode3',
+      frames: this.scene.anims.generateFrameNumbers('explosionsSprite',{start:12,end:18}),
       frameRate: 5,
       repeat: -1
     });
@@ -140,11 +146,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     if ( this.hp <= 0 ) {
       // TODO: explosionz!!!!!!
       this.explosions.setVisible(true);
-      if(Phaser.Math.Between(0,1)) {
-        this.explosions.anims.play('explode2');
-      } else {
-        this.explosions.anims.play('explode');
-      }
+      this.explosions.anims.play('explode'+Phaser.Math.Between(1,3));
       this.playExplosionSound();
       console.log('AAAHHHHHHHRGHHH!!!');
       // or set inactive??? dunno...
