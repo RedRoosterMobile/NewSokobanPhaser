@@ -181,9 +181,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   }
 
   decreaseHealth(value:number) : void {
-    console.log(typeof this.hp, value);
     this.hp -= value;
-    console.log(this.hp);
     this.emitter.setQuantity(3);
     if ( this.hp <= 0 ) {
       // TODO: explosionz!!!!!!

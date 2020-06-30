@@ -152,13 +152,11 @@ export class RauserScene extends Phaser.Scene {
         // player and enemy collide
         this.physics.add.overlap(this.planeObj.plane,this.enemies,(player:any, enemy:Enemy)=>{
             // TODO only once per
-            console.log('crashing..');
             enemy.decreaseHealth(0.2);
             this.planeObj.decreaseHealth(0.2);
         });
         // enemy shoots player
         this.physics.add.overlap(this.enemyBullets,this.planeObj.plane,(enemyBullet:Bullet, player:any) => {
-            console.log('player got hit');
             // somehow this is destroying the player..
             enemyBullet.setActive(false);
             enemyBullet.setVisible(false);

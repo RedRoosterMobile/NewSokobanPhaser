@@ -145,10 +145,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.hp-=value;
     if ( this.hp <= 0 ) {
       // TODO: explosionz!!!!!!
-      this.explosions.setVisible(true);
+      this.explosions.setVisible(true).setScale(Phaser.Math.Between(4,8));
+
       this.explosions.anims.play('explode'+Phaser.Math.Between(1,3));
       this.playExplosionSound();
-      console.log('AAAHHHHHHHRGHHH!!!');
       // or set inactive??? dunno...
       this.setActive(false);
       this.setVisible(false);

@@ -1,6 +1,7 @@
 // https://github.com/photonstorm/phaser3-examples/blob/master/public/src/games/topdownShooter/topdown_combatMechanics.js
 
 import { Tilemaps } from "phaser";
+import { Plane } from "./plane-sprite";
 
 export class Bullet extends Phaser.GameObjects.Image  {
 
@@ -27,6 +28,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
   direction=0
   isLockedOnTarget = false;
   sound:Phaser.Sound.BaseSound;
+  target: Plane;
 
   constructor(scene,x=0,y=0) {
     super(scene,x,y,'bullet');
@@ -43,7 +45,9 @@ export class Bullet extends Phaser.GameObjects.Image  {
   }
 
   playFireSound(loop=false) {
-    const soundConfige:Phaser.Types.Sound.SoundConfig = {
+    // idea volume depending on distance to target
+    //this.target.plane.
+    let soundConfige:Phaser.Types.Sound.SoundConfig = {
       mute: false,
       volume: 0.5,
       rate: 0.5,
@@ -52,12 +56,23 @@ export class Bullet extends Phaser.GameObjects.Image  {
       loop: loop,
       delay: 0
     };
+    if (this.target) {
+      const distance = Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y);
+      soundConfige = {
+        ...soundConfige,
+        rate: 1,
+        volume: 1/distance*1000
+      };
+
+    }
+
     // @ts-ignore
     this.sound.play(soundConfige);
   }
 
   // works
   fireAtTarget(shooter, target):void {
+    this.target = target;
         this.isLockedOnTarget = true;
         this.playFireSound();
         this.setPosition(shooter.x, shooter.y); // Initial position
@@ -92,7 +107,7 @@ export class Bullet extends Phaser.GameObjects.Image  {
     // @ts-ignore
     this.scene.physics.velocityFromRotation(shooter.rotation, 4000, this.body.acceleration);
     this.direction = Math.atan( (shooter.x) / (shooter.y));
-    
+
 }
 
 fireStraight2(x,y,rotation):void {
