@@ -150,6 +150,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
       - tween y to bottom
       - after tween particle explosion effect
       */
+      setTimeout(()=>{
+        this.explosions.destroy();
+      },1200);
       this.renderContainer.destroy()
       this.destroy();
     }
