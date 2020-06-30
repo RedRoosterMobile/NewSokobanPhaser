@@ -77,9 +77,12 @@ export class RauserScene extends Phaser.Scene {
 
         this.load.image('bg1', 'assets/rauser/clouds_pixel_800_600-fs8.png');
 
+
         this.load.audio('sndMachineGun', 'assets/rauser/sounds/bassy_machine_gun.ogg');
         this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
         this.load.audio('sndExplosion', 'assets/rauser/sounds/explosion.mp3');
+        this.load.audio('sndExplosion2', 'assets/rauser/sounds/explosion_dj_fx_1_kg.mp3');
+
     }
 
     getWorldSize():any {

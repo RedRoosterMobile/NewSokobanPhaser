@@ -28,6 +28,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   shooterRotation: any;
   rotateTo: any;
   explosions: Phaser.GameObjects.Sprite;
+  sound2: Phaser.Sound.BaseSound;
 
   constructor(scene,x=0,y=0) {
     super(scene,x,y,'planePhysics');
@@ -38,6 +39,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.ySpeed = 0;
     this.createPlane(x,y);
     this.sound = this.scene.sound.add("sndExplosion");
+    this.sound2 = this.scene.sound.add("sndExplosion2");
   }
 
   createPlane(x:number,y:number):void {
@@ -77,14 +79,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   playExplosionSound(loop=false) {
     const soundConfige:Phaser.Types.Sound.SoundConfig = {
       mute: false,
-      volume: 0.5,
-      rate: Phaser.Math.Between(1.1,2.1),
-      detune: 0,
+      volume: 1,
+      rate: Phaser.Math.Between(150,300)/100,
+      detune: Phaser.Math.Between(100,500),
       seek: 0,
       loop: loop,
       delay: 0
     };
-    this.sound.play(soundConfige);
+
+    //if(Phaser.Math.Between(0,1)) {
+    this.sound2.play(soundConfige);
+    //} else {
+    //  this.sound2.play(soundConfige);
+    //}
   }
 
   playFireSound(loop=false) {
