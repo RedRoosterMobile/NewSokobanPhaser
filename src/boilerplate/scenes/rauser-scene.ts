@@ -39,8 +39,8 @@ rotating a thumbstick left or right then jamming it straight forward."
 */
 
 var gameSettings = {
-    maxEnemies: 1,
-    zoom: 0.3
+    maxEnemies: 12,
+    zoom: 0.4
 };
 
 export class RauserScene extends Phaser.Scene {

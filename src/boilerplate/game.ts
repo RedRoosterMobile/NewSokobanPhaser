@@ -37,6 +37,11 @@ const config: Phaser.Types.Core.GameConfig = {
       pixelArt: true,
       roundPixels: true
   },
+  plugins: {
+    global: [{
+
+    }],
+  },
   backgroundColor: 0x0000ff
 };
 

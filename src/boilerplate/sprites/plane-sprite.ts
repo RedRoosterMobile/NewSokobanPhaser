@@ -165,8 +165,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         this.scene.cameras.main.zoom=previousZoom;
       }
     });
-    //this.scene.cameras.main.zoom=previousZoom;
-
   }
 
   createParticles():void {
@@ -286,7 +284,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
         // wait until next shot
         this.scene.time.delayedCall(250,()=>{
-          //this.muzzleAnimation.p
           this.muzzleAnimation.setVisible(false);
           this.isShooting = false;
         });

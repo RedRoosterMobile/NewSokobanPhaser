@@ -3,6 +3,11 @@
 import { Bullet } from "./bullet-image";
 import { Plane } from "./plane-sprite";
 
+
+var ROTATION_SPEED = 1 * Math.PI; // 0.5 arc per sec, 2 sec per arc
+var ROTATION_SPEED_DEGREES = Phaser.Math.RadToDeg(ROTATION_SPEED);
+var TOLERANCE = 0.06 * ROTATION_SPEED;
+
 export class Enemy extends Phaser.Physics.Arcade.Sprite  {
 
   speed     = 0.01;
@@ -20,11 +25,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   wings: Phaser.GameObjects.Image;
   planeBody: Phaser.GameObjects.Image;
   renderContainer: Phaser.GameObjects.Container;
+  shooterRotation: any;
+  rotateTo: any;
 
   constructor(scene,x=0,y=0) {
-    //super(scene,x,y,'enemy');
     super(scene,x,y,'planePhysics');
-    // super.setTexture('');
     this.speed = 0.1;
     this.born = 0;
     this.direction = 0;
@@ -32,6 +37,15 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.ySpeed = 0;
     this.createPlane(x,y);
     this.sound = this.scene.sound.add("sndExplosion");
+/*
+
+https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
+    // @ts-ignore
+    this.rotateTo = this.scene.game.config.plugins.get('rexRotateTo').add(this, {
+      speed: 180
+    }).on('complete', function () {
+        console.log('Reach target');
+    });*/
   }
 
   createPlane(x:number,y:number):void {
@@ -65,6 +79,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     };
     this.sound.play(soundConfige);
   }
+
   playFireSound(loop=false) {
 
   }
@@ -81,13 +96,28 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
 
   updateRotation():void {
     if (this.target) {
-      const {worldSizeY}=this.getWorldSize()
-      const direction = Math.atan( (this.target.x-this.x) / (Phaser.Math.Clamp(this.y,0,worldSizeY-600)-this.y));
-      // radians?
-      //this.rotation = Math.sin(direction);
+      this.pointerMove(null);
     }
   }
 
+  // GOLD!!!
+  // https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
+  pointerMove(pointer):void {
+    // if (!pointer.manager.isOver) return;
+
+    // Also see alternative method in
+    // <https://codepen.io/samme/pen/gOpPLLx>
+
+    var angleToPointer = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
+    var angleDelta = Phaser.Math.Angle.Wrap(angleToPointer - this.rotation);
+
+    if (Phaser.Math.Within(angleDelta, 0, TOLERANCE)) {
+      this.rotation = angleToPointer;
+      this.setAngularVelocity(0);
+    } else {
+      this.setAngularVelocity(Math.sign(angleDelta) * ROTATION_SPEED_DEGREES);
+    }
+  }
 
   decreaseHealth(value:number) : void {
     this.hp-=value;
@@ -161,7 +191,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
             this.ySpeed = -this.speed*Math.cos(this.direction);
         }
 
-        //this.rotation = shooter.rotation; // angle bullet with shooters rotation
+        this.shooterRotation = shooter.rotation; // angle bullet with shooters rotation
         this.born = 0; // Time since new bullet spawned
   }
   setTarget(target): void {
@@ -180,7 +210,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
 
       this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
       // ummm, why does this work??
-      this.setAngularVelocity(30);
+      // this.setAngularVelocity(300);
 
       const {worldSizeY} = this.getWorldSize();
 
@@ -198,6 +228,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     const shootInterval = 100 + Phaser.Math.Between(0,100);
     if ((Math.round(time*100)%shootInterval)==0) {
       const aBullet:Bullet = this.bullets.get().setActive(true).setVisible(true);
+      aBullet.rotation = this.shooterRotation;
       aBullet.fireAtTarget(this,this.target);
     }
 
