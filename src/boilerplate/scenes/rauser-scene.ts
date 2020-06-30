@@ -39,8 +39,8 @@ rotating a thumbstick left or right then jamming it straight forward."
 */
 
 var gameSettings = {
-    maxEnemies: 12,
-    zoom: 0.4
+    maxEnemies: 5,
+    zoom: 0.2
 };
 
 export class RauserScene extends Phaser.Scene {
@@ -69,7 +69,9 @@ export class RauserScene extends Phaser.Scene {
         this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
 
         this.load.atlas("boostSprites", 'assets/rauser/boost-fs8.png', 'assets/rauser/boost.json');
+
         this.load.spritesheet('debreeSprite','assets/rauser/debree_sprite.png', { frameWidth: 1, frameHeight: 1 });
+        this.load.spritesheet('explosionsSprite','assets/rauser/explosions.png', { frameWidth: 20, frameHeight: 20 });
 
         this.load.image('dasboot', 'assets/rauser/das_boot-fs8.png');
 
@@ -81,10 +83,8 @@ export class RauserScene extends Phaser.Scene {
     }
 
     getWorldSize():any {
-        // @ts-ignore
-        const worldSizeX:number = parseInt(this.game.config.width) * 4;
-        // @ts-ignore
-        const worldSizeY:number = parseInt(this.game.config.height) * 4;
+        const worldSizeX:number = (this.game.config.width as number) * 4;
+        const worldSizeY:number = (this.game.config.height as number) * 4;
         return {worldSizeX,worldSizeY};
     }
 

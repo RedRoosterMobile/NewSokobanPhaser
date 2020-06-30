@@ -27,6 +27,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   renderContainer: Phaser.GameObjects.Container;
   shooterRotation: any;
   rotateTo: any;
+  explosions: Phaser.GameObjects.Sprite;
 
   constructor(scene,x=0,y=0) {
     super(scene,x,y,'planePhysics');
@@ -37,32 +38,38 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.ySpeed = 0;
     this.createPlane(x,y);
     this.sound = this.scene.sound.add("sndExplosion");
-/*
-
-https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
-    // @ts-ignore
-    this.rotateTo = this.scene.game.config.plugins.get('rexRotateTo').add(this, {
-      speed: 180
-    }).on('complete', function () {
-        console.log('Reach target');
-    });*/
   }
 
   createPlane(x:number,y:number):void {
-
-
-    //this.setAngle(-90);
     this.setOrigin(0,0);
-    //this.plane.setGravity(0 , 200);
+
 
     const enemyTint = 0x000000;
 
     this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
     this.planeBody.setTint(enemyTint);
 
+
     this.wings = this.scene.add.image(0,0,'planeWings');
     this.wings.setTint(enemyTint);
     this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings]);
+
+
+    this.explosions = this.scene.add.sprite(0, 0, 'explosionsSprite',0);
+    this.explosions.setScale(4);
+    this.scene.anims.create({
+      key: 'explode',
+      frames: this.scene.anims.generateFrameNumbers('explosionsSprite',{start:1,end:6}),
+      frameRate: 5,
+      repeat: -1
+    });
+    this.scene.anims.create({
+      key: 'explode2',
+      frames: this.scene.anims.generateFrameNumbers('explosionsSprite',{start:6,end:12}),
+      frameRate: 5,
+      repeat: -1
+    });
+    this.explosions.setVisible(false);
   }
 
   // TODO: somehow passing an object to the constructor
@@ -86,6 +93,9 @@ https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
 
   updateWings():void {
     this.updateRotation();
+    this.explosions.x=this.x;
+    this.explosions.y=this.y;
+
     this.renderContainer.setAngle(this.angle);
     this.renderContainer.setX(this.x);
     this.renderContainer.setY(this.y);
@@ -96,20 +106,19 @@ https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
 
   updateRotation():void {
     if (this.target) {
-      this.pointerMove(null);
+      this.rotateTowardsFlyingDirection();
     }
   }
 
   // GOLD!!!
   // https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
-  pointerMove(pointer):void {
-    // if (!pointer.manager.isOver) return;
-
+  rotateTowardsFlyingDirection():void {
     // Also see alternative method in
     // <https://codepen.io/samme/pen/gOpPLLx>
 
-    var angleToPointer = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
-    var angleDelta = Phaser.Math.Angle.Wrap(angleToPointer - this.rotation);
+    //var angleToPointer = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
+    const angleToPointer = Phaser.Math.Angle.Between(this.x, this.y,this.x+ this.body.velocity.x, this.y+this.body.velocity.y);
+    const angleDelta = Phaser.Math.Angle.Wrap(angleToPointer - this.rotation);
 
     if (Phaser.Math.Within(angleDelta, 0, TOLERANCE)) {
       this.rotation = angleToPointer;
@@ -123,11 +132,25 @@ https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
     this.hp-=value;
     if ( this.hp <= 0 ) {
       // TODO: explosionz!!!!!!
+      this.explosions.setVisible(true);
+      if(Phaser.Math.Between(0,1)) {
+        this.explosions.anims.play('explode2');
+      } else {
+        this.explosions.anims.play('explode');
+      }
       this.playExplosionSound();
       console.log('AAAHHHHHHHRGHHH!!!');
       // or set inactive??? dunno...
       this.setActive(false);
       this.setVisible(false);
+
+      // TODO: tween idea:
+      /*
+      - enable explosions sheet (BOTH RANDOMLY)
+      - tween y to bottom
+      - after tween particle explosion effect
+      */
+      this.renderContainer.destroy()
       this.destroy();
     }
   }
@@ -135,20 +158,12 @@ https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
     const worldSizeX:number = (this.scene.game.config.width as number) * 4;
     const worldSizeY:number = (this.scene.game.config.height as number) * 4;
     return {worldSizeX,worldSizeY};
-}
+  }
 
   moveToTarget(target) {
         const {worldSizeY}=this.getWorldSize();
         this.target = target;
-
         this.direction = Math.atan( (target.x-this.x) / (Phaser.Math.Clamp(target.y,0,worldSizeY-600)-this.y));
-
-        //this.direction = shooter.rotation;
-
-
-        //this.direction = Math.atan( (0-this.x) / (0-this.y));
-
-
         // Calculate X and y velocity of bullet to moves it from shooter to target
         if (target.y >= this.y)
         {
@@ -160,33 +175,20 @@ https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
             this.xSpeed = -this.speed*Math.sin(this.direction);
             this.ySpeed = -this.speed*Math.cos(this.direction);
         }
-
-
         this.born = 0; // Time since new bullet spawned
   }
 
 
-
   fireAtTarget(shooter, target):void {
-
         this.playFireSound();
         this.setPosition(shooter.x, shooter.y); // Initial position
         this.direction = Math.atan( (target.x-this.x) / (target.y-this.y));
-
-        //this.direction = shooter.rotation;
-
-        console.log(this.direction, shooter.rotation);
-        //this.direction = Math.atan( (0-this.x) / (0-this.y));
-
-
         // Calculate X and y velocity of bullet to moves it from shooter to target
-        if (target.y >= this.y)
-        {
+        if (target.y >= this.y) {
             this.xSpeed = this.speed*Math.sin(this.direction);
             this.ySpeed = this.speed*Math.cos(this.direction);
         }
-        else
-        {
+        else {
             this.xSpeed = -this.speed*Math.sin(this.direction);
             this.ySpeed = -this.speed*Math.cos(this.direction);
         }
@@ -220,7 +222,7 @@ https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
         this.body.setGravity(0 , -10 * factor);
       }  else {
         // @ts-ignore
-        this.body.setGravity(0 , 0);
+        this.body.setGravity(0 , 200);
       }
       //this.moveToTarget(this.target);
     }

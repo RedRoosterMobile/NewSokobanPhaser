@@ -55,7 +55,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   emitterFrame: number;
   isCamTweening: boolean;
 
-
   constructor(scene:Phaser.Scene,x:number,y:number) {
     super(scene,x,y,null);
 
@@ -65,7 +64,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.isCamTweening = false;
 
     this.emitterFrame = 1;
-
 
     this.setOrigin(0,0);
     this.createPlane(x,y);
@@ -96,9 +94,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
     this.camMuzzle = this.scene.add.image(0, 0, "car", 0)
     this.muzzle.setVisible(false);
-    //this.camMuzzle.setVisible(false);
-
-
+    this.camMuzzle.setVisible(false);
 
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
     // Add some sprites - positions are relative to the Container x/y
@@ -135,7 +131,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   when fliying down - plane should be on the left top of the camera
 
   while ideling:
-  normal?
+  normal? + group of bullets
 
   */
 
@@ -203,7 +199,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       this.setVisible(false);
       this.destroy();
     }
-
   }
 
   increaseHealth(value:number) : void {
@@ -216,7 +211,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   }
 
   createAnims():void{
-
     this.scene.anims.create({
       key: "boost",
       repeat: -1,
@@ -253,20 +247,17 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   }
 
   updatePlane():void {
-
     if (!this.active || !this.plane.body) {
       // console.log('probaly dead!', this.hp);
       return;
     }
     if (this.cursors.shift.isDown) {
       //this.knockback();
-
     }
     // recover health when not shooting
     if (!this.isShooting) {
       this.increaseHealth(1);
     }
-
 
     if (this.cursors.space.isDown && !this.isShooting) {
       if (this.fireCallback) {
@@ -341,12 +332,10 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     //this.scene.text.setText('Speed: ' + this.plane.body.speed + ' fps:'+ this.scene.game.loop.actualFps);
   }
   getWorldSize():any {
-    // @ts-ignore
-    const worldSizeX:number = parseInt(this.scene.game.config.width) * 4;
-    // @ts-ignore
-    const worldSizeY:number = parseInt(this.scene.game.config.height) * 4;
+    const worldSizeX:number = (this.scene.game.config.width as number) * 4;
+    const worldSizeY:number = (this.scene.game.config.height as number) * 4;
     return {worldSizeX,worldSizeY};
-}
+  }
   updateWings():void {
     this.renderContainer.setAngle(this.plane.angle);
     this.renderContainer.setX(this.plane.x);
@@ -441,7 +430,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       //this.camMuzzle.x = newPoint.x;
       //this.camMuzzle.y = newPoint.y;
     }
-    //this.muzzle.setAngle(this.plane.angle);
 
     this.updateParticles();
   }
@@ -449,18 +437,12 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
   updateParticles():void {
     this.emitter.setPosition(this.plane.x,this.plane.y);
     if (this.hp <= 299 ) {
-
       this.emitterFrame += 1;
       if (this.emitterFrame > 3) {
         this.emitterFrame = 0;
       }
-
-      //console.log('pausing emitter');
-      //this.emitter.stop();
     } else {
       this.emitterFrame = 0;
-      //console.log('resuming emitter', this.hp, this.hpMax);
-      //this.emitter.start();
     }
     this.emitter.setFrame(this.emitterFrame);
   }
