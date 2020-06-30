@@ -373,7 +373,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
     if (this.cursors.left.isDown || this.cursors.right.isDown) {
      //camRotation = speed/4*-1;
-     console.log(Math.sin(this.plane.angle));
     } else {
       //camRotation = speed/2*-1;
     }

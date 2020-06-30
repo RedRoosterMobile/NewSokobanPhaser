@@ -39,7 +39,8 @@ rotating a thumbstick left or right then jamming it straight forward."
 */
 
 var gameSettings = {
-    maxEnemies: 5
+    maxEnemies: 1,
+    zoom: 0.3
 };
 
 export class RauserScene extends Phaser.Scene {
@@ -126,11 +127,13 @@ export class RauserScene extends Phaser.Scene {
             worldSizeX/2,
             worldSizeY
         );
-        this.cameras.main.setZoom(0.4);
+        this.cameras.main.setZoom(gameSettings.zoom);
 
         this.cameras.main.startFollow(this.planeObj.camMuzzle, true,  0.09, 0.09);
 
+        // TODO: go back to normal array..
         this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
+
         this.text = this.add.text(10, 10, '', { font: '64px Courier', fill: '#00ff00' });
 
         // Add 2 groups for Bullet objects

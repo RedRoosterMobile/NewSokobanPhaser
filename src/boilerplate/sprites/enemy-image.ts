@@ -1,6 +1,7 @@
 // https://github.com/photonstorm/phaser3-examples/blob/master/public/src/games/topdownShooter/topdown_combatMechanics.js
 
 import { Bullet } from "./bullet-image";
+import { Plane } from "./plane-sprite";
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite  {
 
@@ -10,7 +11,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   ySpeed    = 0;
   direction = 0;
   hp        = 10;
-  target: Enemy;
+  target: Plane;
 
   sound:Phaser.Sound.BaseSound;
   bullets: any;
@@ -22,33 +23,32 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
 
   constructor(scene,x=0,y=0) {
     //super(scene,x,y,'enemy');
-    super(scene,x,y,null);
+    super(scene,x,y,'planePhysics');
     // super.setTexture('');
     this.speed = 0.1;
     this.born = 0;
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
-    this.setOrigin(0,0);
     this.createPlane(x,y);
     this.sound = this.scene.sound.add("sndExplosion");
   }
 
   createPlane(x:number,y:number):void {
-    this.plane = this.scene.physics.add.image(x, y, 'planePhysics',0);
-    this.plane.setBounce(1, 1);
-    //this.plane.setCollideWorldBounds(true);
-    this.plane.setDamping(true);
-    this.plane.setDrag(0.99);
-    this.plane.setMaxVelocity(600);
-    this.plane.setAngle(-90);
+
+
+    //this.setAngle(-90);
     this.setOrigin(0,0);
-    this.plane.setGravity(0 , 200);
+    //this.plane.setGravity(0 , 200);
+
+    const enemyTint = 0x000000;
+
+    this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
+    this.planeBody.setTint(enemyTint);
 
     this.wings = this.scene.add.image(0,0,'planeWings');
-    this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
+    this.wings.setTint(enemyTint);
     this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings]);
-
   }
 
   // TODO: somehow passing an object to the constructor
@@ -70,13 +70,24 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   }
 
   updateWings():void {
-    this.renderContainer.setAngle(this.plane.angle);
-    this.renderContainer.setX(this.plane.x);
-    this.renderContainer.setY(this.plane.y);
+    this.updateRotation();
+    this.renderContainer.setAngle(this.angle);
+    this.renderContainer.setX(this.x);
+    this.renderContainer.setY(this.y);
     // da orignial scale effect from luftrausers
-    const scaleFactor = Math.abs(Math.sin(this.plane.rotation))*1;
+    const scaleFactor = Math.abs(Math.sin(this.rotation))*1;
     this.wings.scaleY = Phaser.Math.Clamp(1*scaleFactor,0.1,1);
   }
+
+  updateRotation():void {
+    if (this.target) {
+      const {worldSizeY}=this.getWorldSize()
+      const direction = Math.atan( (this.target.x-this.x) / (Phaser.Math.Clamp(this.y,0,worldSizeY-600)-this.y));
+      // radians?
+      //this.rotation = Math.sin(direction);
+    }
+  }
+
 
   decreaseHealth(value:number) : void {
     this.hp-=value;
@@ -91,15 +102,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     }
   }
   getWorldSize():any {
-    // @ts-ignore
-    const worldSizeX:number = parseInt(this.scene.game.config.width) * 4;
-    // @ts-ignore
-    const worldSizeY:number = parseInt(this.scene.game.config.height) * 4;
+    const worldSizeX:number = (this.scene.game.config.width as number) * 4;
+    const worldSizeY:number = (this.scene.game.config.height as number) * 4;
     return {worldSizeX,worldSizeY};
 }
 
   moveToTarget(target) {
-        const {worldSizeY}=this.getWorldSize()
+        const {worldSizeY}=this.getWorldSize();
+        this.target = target;
 
         this.direction = Math.atan( (target.x-this.x) / (Phaser.Math.Clamp(target.y,0,worldSizeY-600)-this.y));
 
@@ -151,7 +161,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
             this.ySpeed = -this.speed*Math.cos(this.direction);
         }
 
-        this.rotation = shooter.rotation; // angle bullet with shooters rotation
+        //this.rotation = shooter.rotation; // angle bullet with shooters rotation
         this.born = 0; // Time since new bullet spawned
   }
   setTarget(target): void {
@@ -165,9 +175,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
   update(time:number, delta:number):void {
     this.updateWings();
     if (this.target) {
+
       // less speed on y (we are planes and have to turn..)
 
       this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
+      // ummm, why does this work??
+      this.setAngularVelocity(30);
+
       const {worldSizeY} = this.getWorldSize();
 
       if ( this.y > (worldSizeY-100) ) {
