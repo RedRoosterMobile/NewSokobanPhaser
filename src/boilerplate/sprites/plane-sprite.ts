@@ -15,6 +15,19 @@
 import { Tilemaps } from "phaser";
 
 
+
+const sumArrayValues = (values) => {
+  return values.reduce((p, c) => p + c, 0)
+}
+
+const arrAvg = arr => sumArrayValues(arr) / arr.length
+
+const weightedMean = (factorsArray, weightsArray) => {
+  return sumArrayValues(factorsArray.map((factor, index) => factor * weightsArray[index])) / sumArrayValues(weightsArray)
+}
+
+// weightedMean([251, 360, 210], [0.1, 0.5, 0.7]);
+
 // check this!
 // https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Container.html
 
@@ -83,6 +96,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
     this.camMuzzle = this.scene.add.image(0, 0, "car", 0)
     this.muzzle.setVisible(false);
+    //this.camMuzzle.setVisible(false);
     
 
     
@@ -367,10 +381,21 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     
     let secret = Math.abs(Math.sin(this.plane.angle));
     secret = Math.atan( (this.camMuzzle.x) / (this.camMuzzle.y));
-    camRotation = speed/2*-1; 
+    
+    //Phaser.Math.Interpolation.
+    camRotation = speed/2 * -1; 
     let camRotation2 = Math.abs(Math.cos(rotation)*300)*-1;
-    const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length
-    const averageRotation = arrAvg([camRotation,camRotation2]);
+    
+    //const averageRotation = arrAvg([camRotation,camRotation2]);
+    //const averageRotation = arrAvg([camRotation,camRotation2]);
+    
+    // change weight depending on rotation?
+    //const averageRotation = weightedMean([camRotation,camRotation2], [Math.abs(Math.cos(rotation)),Math.abs(Math.sin(rotation))]);
+
+    let averageRotation = weightedMean([camRotation,camRotation2], [0.9,0.1]);
+
+
+
 
 
 
@@ -389,8 +414,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       this.camMuzzle.x = newCamPoint.x;
       this.camMuzzle.y = newCamPoint.y;
     } else {
-      if (this.isCamTweening)
-        return;
+      //if (this.isCamTweening)
+      //  return;
       // tween
       this.scene.tweens.add({
         onStart: () => {
@@ -403,7 +428,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         },
         delay: 0,
         yoyo: false,
-        duration: 100,
+        duration: 200,
         // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/tween/#ease-equations
         ease: "Linear.easeIn",
         easeParams: null,
