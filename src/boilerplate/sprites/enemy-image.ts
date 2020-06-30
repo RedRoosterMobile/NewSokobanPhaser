@@ -2,7 +2,7 @@
 
 import { Bullet } from "./bullet-image";
 
-export class Enemy extends Phaser.GameObjects.Image  {
+export class Enemy extends Phaser.Physics.Arcade.Sprite  {
 
   speed     = 0.01;
   born      = 0;
@@ -15,18 +15,40 @@ export class Enemy extends Phaser.GameObjects.Image  {
   sound:Phaser.Sound.BaseSound;
   bullets: any;
 
+  plane:   Phaser.Physics.Arcade.Image;
+  wings: Phaser.GameObjects.Image;
+  planeBody: Phaser.GameObjects.Image;
+  renderContainer: Phaser.GameObjects.Container;
+
   constructor(scene,x=0,y=0) {
-    super(scene,x,y,'enemy');
+    //super(scene,x,y,'enemy');
+    super(scene,x,y,null);
     // super.setTexture('');
     this.speed = 0.1;
     this.born = 0;
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
-    this.setSize(12, 12);
-    this.setScale(4);
-    //this.hp = 10;
+    this.setOrigin(0,0);
+    this.createPlane(x,y);
     this.sound = this.scene.sound.add("sndExplosion");
+  }
+
+  createPlane(x:number,y:number):void {
+    this.plane = this.scene.physics.add.image(x, y, 'planePhysics',0);
+    this.plane.setBounce(1, 1);
+    //this.plane.setCollideWorldBounds(true);
+    this.plane.setDamping(true);
+    this.plane.setDrag(0.99);
+    this.plane.setMaxVelocity(600);
+    this.plane.setAngle(-90);
+    this.setOrigin(0,0);
+    this.plane.setGravity(0 , 200);
+
+    this.wings = this.scene.add.image(0,0,'planeWings');
+    this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
+    this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings]);
+
   }
 
   // TODO: somehow passing an object to the constructor
@@ -45,6 +67,15 @@ export class Enemy extends Phaser.GameObjects.Image  {
   }
   playFireSound(loop=false) {
 
+  }
+
+  updateWings():void {
+    this.renderContainer.setAngle(this.plane.angle);
+    this.renderContainer.setX(this.plane.x);
+    this.renderContainer.setY(this.plane.y);
+    // da orignial scale effect from luftrausers
+    const scaleFactor = Math.abs(Math.sin(this.plane.rotation))*1;
+    this.wings.scaleY = Phaser.Math.Clamp(1*scaleFactor,0.1,1);
   }
 
   decreaseHealth(value:number) : void {
@@ -132,6 +163,7 @@ export class Enemy extends Phaser.GameObjects.Image  {
 
   // Updates the position of the bullet each cycle
   update(time:number, delta:number):void {
+    this.updateWings();
     if (this.target) {
       // less speed on y (we are planes and have to turn..)
 

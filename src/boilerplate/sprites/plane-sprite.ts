@@ -65,7 +65,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.isCamTweening = false;
 
     this.emitterFrame = 1;
-  
+
 
     this.setOrigin(0,0);
     this.createPlane(x,y);
@@ -91,15 +91,15 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.muzzleAnimation.setVisible(false);
     this.muzzleAnimation.flipY= true;
     this.muzzleAnimation.setScale(1.5,0.2);
-    
+
     // waaay better. let camera follow muzzle. move the muzzele further when speeding and rotation is heavy left or right. come closer when 0 or 180 deg
     this.muzzle = this.scene.add.image(0, 0, "car", 0)
     this.camMuzzle = this.scene.add.image(0, 0, "car", 0)
     this.muzzle.setVisible(false);
     //this.camMuzzle.setVisible(false);
-    
 
-    
+
+
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
     // Add some sprites - positions are relative to the Container x/y
     //this.renderContainer = this.scene.add.container(0, 0, [this.planeBody, this.wings, this.boost, this.muzzle]);
@@ -115,7 +115,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.camMuzzle.setOrigin(0.5,0.5);
     //this.muzzle.setAngle(90);
     //this.muzzle.x=64;
-    
+
     this.createParticles()
     this.createAnims();
     // nausea + 10000!
@@ -127,7 +127,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
 
   Observation:
   ------------
-  
+
   while boosting:
   when fliying right - plane should be on the left side of the camera
   when fliying left - plane should be on the left right of the camera
@@ -145,7 +145,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     const targetVector:Phaser.Math.Vector2 = new Phaser.Math.Vector2(this.scene.cameras.main.scrollX,this.scene.cameras.main.scrollY);
     this.scene.physics.velocityFromRotation(this.plane.rotation, 400, targetVector);
     const diff = event.timeStamp-this.cursors.up.timeDown;
-    
+
     this.scene.tweens.add({
       targets: this.scene.cameras.main,
       props: {
@@ -181,7 +181,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       scale: { start: 5, end: 1 },
       speed: 200,
       gravityY: this.plane.body.gravity.y,
-      lifespan: { min: 1000, max: 2000 },  
+      lifespan: { min: 1000, max: 2000 },
     });
     this.emitter.setFrame(0);
   }
@@ -200,12 +200,12 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       this.plane.setGravity(0,0);
       this.plane.setActive(false);
       this.plane.destroy();
-      // explosionz, 
+      // explosionz,
       this.setActive(false);
       this.setVisible(false);
       this.destroy();
     }
-    
+
   }
 
   increaseHealth(value:number) : void {
@@ -269,7 +269,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       this.increaseHealth(1);
     }
 
-    
+
     if (this.cursors.space.isDown && !this.isShooting) {
       if (this.fireCallback) {
         this.fireCallback();
@@ -280,9 +280,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         this.muzzleAnimation.setVisible(true);
         this.animateIfNecessary('boost',this.muzzleAnimation,0);
         this.knockback(10);
-        
-        
-        this.plane.body.velocity.y 
+
+
+        this.plane.body.velocity.y
 
         // wait until next shot
         this.scene.time.delayedCall(250,()=>{
@@ -292,14 +292,14 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         });
       }
     }
-  
+
     // thrust
     if (this.cursors.up.isDown) {
         // @ts-ignore
         this.scene.physics.velocityFromRotation(this.plane.rotation, 300*2, this.plane.body.acceleration);
         this.boost.setVisible(true);
         this.animateIfNecessary('boost',this.boost,60);
-        
+
         const { worldSizeY } = this.getWorldSize();
         if ( this.plane.y > worldSizeY ) {
           const factor = Math.abs(this.plane.y - worldSizeY);
@@ -307,7 +307,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         }  else {
           this.plane.setGravity(0 , 0);
         }
-    } else {        
+    } else {
       // TODO: while x velocity is still active don't add too much gravity
       const { worldSizeY } = this.getWorldSize();
       if (this.plane.y > worldSizeY) {
@@ -315,9 +315,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         this.plane.setGravity(0 , -10*factor);
       }  else {
         this.plane.setGravity(0 , 400);
-      } 
-      
-        
+      }
+
       this.boost.setVisible(false);
       this.plane.setAcceleration(0);
     }
@@ -371,30 +370,35 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     //console.log(speed);
     // when going straight left/right and speeding
     let camRotation;
-    
-    if (this.cursors.left.isDown || this.cursors.right.isDown) { 
+
+    if (this.cursors.left.isDown || this.cursors.right.isDown) {
      //camRotation = speed/4*-1;
      console.log(Math.sin(this.plane.angle));
     } else {
-      //camRotation = speed/2*-1; 
+      //camRotation = speed/2*-1;
     }
-    
+
     let secret = Math.abs(Math.sin(this.plane.angle));
     secret = Math.atan( (this.camMuzzle.x) / (this.camMuzzle.y));
-    
+
     //Phaser.Math.Interpolation.
-    camRotation = speed/2 * -1; 
+    camRotation = speed/2 * -1;
     let camRotation2 = Math.abs(Math.cos(rotation)*300)*-1;
-    
+
     //const averageRotation = arrAvg([camRotation,camRotation2]);
     //const averageRotation = arrAvg([camRotation,camRotation2]);
-    
+
     // change weight depending on rotation?
     //const averageRotation = weightedMean([camRotation,camRotation2], [Math.abs(Math.cos(rotation)),Math.abs(Math.sin(rotation))]);
 
     let averageRotation = weightedMean([camRotation,camRotation2], [0.9,0.1]);
 
 
+    /*
+    It’s more simple than it looks. Just sum all positions of the objects you want the camera to focus on,
+    possibly with different weights (eg: player has higher weight vs bullets).
+    The average position is where the camera should focus. Apply some lerps on that and that’s it.’
+    */
 
 
 
@@ -408,14 +412,14 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     const newCamPoint = Phaser.Math.RotateAroundDistance(thePoint2,this.plane.x,this.plane.y, rotation,averageRotation);
     this.muzzle.x =  newMuzzlePoint.x;
     this.muzzle.y =  newMuzzlePoint.y;
-    
-    
-    if (this.cursors.up.isDown) { 
+
+
+    if (this.cursors.up.isDown) {
       this.camMuzzle.x = newCamPoint.x;
       this.camMuzzle.y = newCamPoint.y;
     } else {
-      //if (this.isCamTweening)
-      //  return;
+      if (this.isCamTweening)
+        return;
       // tween
       this.scene.tweens.add({
         onStart: () => {
@@ -423,8 +427,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         },
         targets: this.camMuzzle,
         props: {
-          x:newMuzzlePoint.x,
-          y:newMuzzlePoint.y
+          x: newMuzzlePoint.x,
+          y: newMuzzlePoint.y
         },
         delay: 0,
         yoyo: false,
@@ -435,7 +439,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
         hold: 0,
         repeat: 0,
         onComplete: () => {
-
           this.isCamTweening = false;
         }
       });
@@ -443,19 +446,19 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
       //this.camMuzzle.y = newPoint.y;
     }
     //this.muzzle.setAngle(this.plane.angle);
-    
+
     this.updateParticles();
   }
 
   updateParticles():void {
     this.emitter.setPosition(this.plane.x,this.plane.y);
     if (this.hp <= 299 ) {
-      
+
       this.emitterFrame += 1;
       if (this.emitterFrame > 3) {
         this.emitterFrame = 0;
       }
-    
+
       //console.log('pausing emitter');
       //this.emitter.stop();
     } else {
