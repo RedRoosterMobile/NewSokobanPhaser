@@ -145,9 +145,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
     this.hp-=value;
     if ( this.hp <= 0 ) {
       // TODO: explosionz!!!!!!
-      this.explosions.setVisible(true).setScale(Phaser.Math.Between(4,8));
+      this.explosions.setVisible(true).setScale(Phaser.Math.Between(4,8)).setTint(0xffc922).setAlpha(0.7);
 
       this.explosions.anims.play('explode'+Phaser.Math.Between(1,3));
+
       this.playExplosionSound();
       // or set inactive??? dunno...
       this.setActive(false);
@@ -159,9 +160,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite  {
       - tween y to bottom
       - after tween particle explosion effect
       */
-      setTimeout(()=>{
+      let oneShotTimer = this.scene.time.delayedCall(1200, ()=>{
         this.explosions.destroy();
-      },1200);
+      });
+
+
       this.renderContainer.destroy()
       this.destroy();
     }

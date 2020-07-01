@@ -94,7 +94,7 @@ export class RauserScene extends Phaser.Scene {
     create():void {
         const soundConfig = {
             mute: false,
-            volume: 0.0,
+            volume: 0.2,
             rate: 1,
             detune: 0,
             seek: 0,
