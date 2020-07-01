@@ -14,8 +14,6 @@
 
 import { Tilemaps } from "phaser";
 
-
-
 const sumArrayValues = (values) => {
   return values.reduce((p, c) => p + c, 0)
 }
@@ -83,7 +81,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite  {
     this.plane.setGravity(0 , 200);
 
     this.wings = this.scene.add.image(0,0,'planeWings');
-    this.planeBody = this.scene.add.image(0, 0, 'planeBody',0);
+    this.planeBody = this.scene.add.image(0, 0, 'blurred_image',0);
     this.boost = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
     this.muzzleAnimation = this.scene.add.sprite(-32-8, 0, "boostSprites", 0);
     this.muzzleAnimation.setVisible(false);

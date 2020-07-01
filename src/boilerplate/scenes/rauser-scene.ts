@@ -13,11 +13,11 @@ https://community.adobe.com/t5/air/adobe-air-error-message-macosx-catalina/td-p/
 
 TODO:
 - camera follow OK... ish
-- unlimited x tiled background (no left/right bounds!)
-- parallax - background (clouds)
+- unlimited x tiled background (no left/right bounds!) OK
+- parallax - background (clouds) OK... ish
 - pooled bullets OK
 - pooled enemies OK
-- bullet direction according to ship rotation (shoot straight!)
+- bullet direction according to ship rotation (shoot straight!) OK
 - spawn enemies OK
 - startship OK
 - battleships (drop bombs?)
@@ -27,6 +27,10 @@ TODO:
 - post processing: shaders https://www.shadertoy.com/view/4slGRM
 - camera: base on rotation?
 - https://unwinnable.com/2014/06/16/notes-on-luftrausers/
+- mirror effect? https://phaser.discourse.group/t/multiple-camera-custom-shaders/3202
+- custom popeline https://phaser.io/examples/v3/view/renderer/custom-pipeline
+- just mirror second camera?? http://labs.phaser.io/edit.html?src=src%5Ccamera%5Cignore.js
+
 
 
 "When you rotate your plane in Luftrausers, the camera swings around like it has been attached
@@ -43,6 +47,79 @@ var gameSettings = {
     zoom: 0.4
 };
 
+
+let blur = `
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+const float pi = atan(1.0) * 4.0;
+const int samples = 256;
+const float sigma = sqrt(float(samples));
+uniform float time;
+uniform vec2 resolution;
+uniform sampler2D iChannel0;
+
+varying vec2 fragCoord;
+//varying vec2 iMouse;
+
+float normpdf(in float x, in float sigma) {
+	return 0.39894*exp(-0.5*x*x/(sigma*sigma))/sigma;
+}
+
+vec4 texture(sampler2D s, vec2 c) {
+  return texture2D(s,c);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec3 c = texture(iChannel0, fragCoord.xy / resolution.xy).rgb;
+	//if (fragCoord.x < iMouse.x)
+	//{
+	//	fragColor = vec4(c, 1.0);
+	//} else {
+
+		//declare stuff
+		const int mSize = 11;
+		const int kSize = (mSize-1)/2;
+		float kernel[mSize];
+		vec3 final_colour = vec3(0.0);
+
+		//create the 1-D kernel
+		float sigma = 7.0;
+		float Z = 0.0;
+		for (int j = 0; j <= kSize; ++j)
+		{
+			kernel[kSize+j] = kernel[kSize-j] = normpdf(float(j), sigma);
+		}
+
+		//get the normalization factor (as the gaussian has been clamped)
+		for (int j = 0; j < mSize; ++j)
+		{
+			Z += kernel[j];
+		}
+
+		//read out the texels
+		for (int i=-kSize; i <= kSize; ++i)
+		{
+			for (int j=-kSize; j <= kSize; ++j)
+			{
+				final_colour += kernel[kSize+j]*kernel[kSize+i]*texture(iChannel0, (fragCoord.xy+vec2(float(i),float(j))) / resolution.xy).rgb;
+
+			}
+		}
+
+
+		fragColor = vec4(final_colour/(Z*Z), 1.0);
+	//}
+}
+
+void main(void) {
+    mainImage(gl_FragColor, fragCoord.xy);
+}
+        `;
+
+
 export class RauserScene extends Phaser.Scene {
     private phaserSprite: Phaser.GameObjects.Sprite;
     // plane: Phaser.Physics.Arcade.Image;
@@ -53,6 +130,7 @@ export class RauserScene extends Phaser.Scene {
     enemyBullets: Phaser.Physics.Arcade.Group;
     playerBullets: Phaser.Physics.Arcade.Group;
     enemies:Phaser.Physics.Arcade.Group
+    waterGraphics: Phaser.GameObjects.Graphics;
 
 
     preload(): void {
@@ -94,7 +172,7 @@ export class RauserScene extends Phaser.Scene {
     create():void {
         const soundConfig = {
             mute: false,
-            volume: 0.2,
+            volume: 0.0,
             rate: 1,
             detune: 0,
             seek: 0,
@@ -111,7 +189,13 @@ export class RauserScene extends Phaser.Scene {
         //const graphics = this.add.graphics();
         //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
         //graphics.fillRect(0, 0, worldSizeX, worldSizeY);
+        var rt = this.add.renderTexture(0, 0, 800, 600);
         this.background = new Background(this,0,0,worldSizeX,worldSizeY);
+
+
+
+
+
 
 
         /*this.sky = scene.add
@@ -125,6 +209,14 @@ export class RauserScene extends Phaser.Scene {
 
         const worldView = this.cameras.main.worldView;
 
+        let blurBaseShader = new Phaser.Display.BaseShader("blur", blur);
+
+        let blurShader = this.add.shader(blurBaseShader, 0, 0, 128, 128, [
+        //let blurShader = new Phaser.GameObjects.Shader(this, blurBaseShader, 0, 0, 2048, 2048, [
+        "planeBody"
+        ]);
+
+        blurShader.setRenderToTexture("blurred_image", true);
         this.planeObj = new Plane(
             this,
             worldSizeX/2,
@@ -223,6 +315,15 @@ export class RauserScene extends Phaser.Scene {
 
 
 
+        this.waterGraphics = this.add.graphics();
+        //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+        this.waterGraphics.fillGradientStyle(0x22e1ff, 0x22e1ff, 0x22e1aa, 0x22e199, 1);
+        //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+        this.waterGraphics.fillRect(-450, worldSizeY, worldSizeX, 400);
+
+
+
+
 
     }
 
@@ -249,6 +350,9 @@ export class RauserScene extends Phaser.Scene {
   update(time, delta):void {
     if (this.planeObj)
         this.planeObj.updatePlane();
+
+    if (this.waterGraphics)
+        this.waterGraphics.x= this.planeObj.plane.x-1200;
 
     if (this.planeObj.active) {
         this.spawnEnemies();

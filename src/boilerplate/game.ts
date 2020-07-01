@@ -1,21 +1,5 @@
-/**
- * @author       Digitsensitive <digit.sensitivee@gmail.com>
- * @copyright    2018 - 2019 digitsensitive
- * @license      {@link https://github.com/digitsensitive/phaser3-typescript/blob/master/LICENSE.md | MIT License}
- */
-
 import "phaser";
-import { MainScene } from "./scenes/main-scene";
 import { RauserScene } from "./scenes/rauser-scene";
-
-// main game configuration
-/*const config: Phaser.Types.Core.GameConfig = {
-  width: 800,
-  height: 600,
-  type: Phaser.AUTO,
-  parent: "game",
-  scene: MainScene
-};*/
 
 // rauser game configuration
 const config: Phaser.Types.Core.GameConfig = {
@@ -38,9 +22,19 @@ const config: Phaser.Types.Core.GameConfig = {
       roundPixels: true
   },
   plugins: {
-    global: [{
-
-    }],
+    /*scene: [
+      {
+        key: "LightraysPlugin",
+        plugin: LightraysPlugin,
+        mapping: "lightrays"
+      }
+    ]*/
+  },
+  callbacks: {
+    postBoot: game => {
+      // @ts-ignore
+      //game.renderer.addPipeline("Custom", new CustomPipeline(game));
+    }
   },
   backgroundColor: 0x22e1ff
 };
@@ -54,4 +48,6 @@ export class Game extends Phaser.Game {
 // when the page is loaded, create our game instance
 window.addEventListener("load", () => {
   const game = new Game(config);
+  // @ts-ignore
+  window.game = game;
 });
