@@ -102,10 +102,10 @@ export class Bullet extends Phaser.GameObjects.Image {
     this.setPosition(shooter.x, shooter.y); // Initial position
     this.rotation = shooter.rotation; // angle bullet with shooters rotation
 
-    // @ts-ignore
     this.scene.physics.velocityFromRotation(
       shooter.rotation,
       4000,
+      // @ts-ignore
       this.body.acceleration
     );
     this.direction = Math.atan(shooter.x / shooter.y);
@@ -116,10 +116,10 @@ export class Bullet extends Phaser.GameObjects.Image {
     this.setPosition(x + 25, y); // Initial position
     this.rotation = rotation; // angle bullet with shooters rotation
 
-    // @ts-ignore
     this.scene.physics.velocityFromRotation(
       rotation,
       40000,
+      // @ts-ignore
       this.body.acceleration
     );
     this.direction = Math.atan(x / y);

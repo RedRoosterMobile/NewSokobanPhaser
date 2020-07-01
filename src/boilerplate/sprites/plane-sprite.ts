@@ -251,10 +251,10 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
   };
 
   knockback(knockbackAmount = 10): void {
-    // @ts-ignore
     const vector = this.scene.physics.velocityFromAngle(
       this.plane.angle + 180,
       knockbackAmount,
+      // @ts-ignore
       this.plane.body.acceleration
     );
     this.plane.setVelocityX(this.plane.body.velocity.x + vector.x);
@@ -297,10 +297,10 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
     // thrust
     if (this.cursors.up.isDown) {
-      // @ts-ignore
       this.scene.physics.velocityFromRotation(
         this.plane.rotation,
         300 * 2,
+        // @ts-ignore
         this.plane.body.acceleration
       );
       this.boost.setVisible(true);
