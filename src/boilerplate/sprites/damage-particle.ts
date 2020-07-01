@@ -1,46 +1,48 @@
-export class DamageParticle extends Phaser.GameObjects.Particles.Particle
-{
-    t: number;
-    i: number;
-    scene: Phaser.Scene;
-    anim: Phaser.Animations.Animation;
-    constructor ( emitter: Phaser.GameObjects.Particles.ParticleEmitter, scene:Phaser.Scene) {
-        super(emitter);
-        this.scene= scene;
-        let config = {
-            key: 'walk__',
-            // @ts-ignore
-            frames: this.scene.anims.generateFrameNumbers('debreeSprite'),
-            frameRate: 2,
-            repeat: -1
-        };
-    
-        // @ts-ignore
-        this.anim = this.scene.anims.create(config);
+export class DamageParticle extends Phaser.GameObjects.Particles.Particle {
+  t: number;
+  i: number;
+  scene: Phaser.Scene;
+  anim: Phaser.Animations.Animation;
+  constructor(
+    emitter: Phaser.GameObjects.Particles.ParticleEmitter,
+    scene: Phaser.Scene
+  ) {
+    super(emitter);
+    this.scene = scene;
+    let config = {
+      key: 'walk__',
+      // @ts-ignore
+      frames: this.scene.anims.generateFrameNumbers('debreeSprite'),
+      frameRate: 2,
+      repeat: -1,
+    };
 
-        this.t = 0;
+    // @ts-ignore
+    this.anim = this.scene.anims.create(config);
+
+    this.t = 0;
+    this.i = 0;
+  }
+
+  update(delta: number, step: number, processors) {
+    let result = super.update(delta, step, processors);
+
+    this.t += delta;
+
+    if (this.t >= this.anim.msPerFrame) {
+      this.i++;
+
+      if (this.i > 17) {
         this.i = 0;
+      }
+
+      this.frame = this.anim.frames[this.i].frame;
+
+      this.t -= this.anim.msPerFrame;
     }
 
-    update (delta:number, step:number, processors) {
-        let result = super.update(delta, step, processors);
-
-        this.t += delta;
-
-        if (this.t >= this.anim.msPerFrame) {
-            this.i++;
-
-            if (this.i > 17) {
-                this.i = 0;
-            }
-
-            this.frame = this.anim.frames[this.i].frame;
-
-            this.t -= this.anim.msPerFrame;
-        }
-
-        return result;
-    }
+    return result;
+  }
 }
 
 /*
