@@ -42,7 +42,7 @@ const config: Phaser.Types.Core.GameConfig = {
 
     }],
   },
-  backgroundColor: 0x0000ff
+  backgroundColor: 0x22e1ff
 };
 
 export class Game extends Phaser.Game {

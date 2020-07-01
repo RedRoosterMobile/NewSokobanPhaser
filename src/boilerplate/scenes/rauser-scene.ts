@@ -232,7 +232,7 @@ export class RauserScene extends Phaser.Scene {
             const {worldSizeX,worldSizeY} = this.getWorldSize();
             let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
 
-            Phaser.Actions.RotateAroundDistance([anEnemy], this.planeObj, Phaser.Math.DegToRad(Phaser.Math.Between(0+180+90,180+180+90)), (this.game.config.height as number)*4 );
+            Phaser.Actions.RotateAroundDistance([anEnemy], this.planeObj.plane, Phaser.Math.DegToRad(Phaser.Math.Between(-180,0)), (this.game.config.height as number)*4 );
             //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
             //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
             anEnemy.setTarget(this.planeObj.plane);
