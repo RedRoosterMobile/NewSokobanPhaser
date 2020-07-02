@@ -27,6 +27,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   rotateTo: any;
   explosions: Phaser.GameObjects.Sprite;
   sound2: Phaser.Sound.BaseSound;
+  particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
+  emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+  emitterFrame: number;
 
   constructor(scene, x = 0, y = 0) {
     super(scene, x, y, 'planePhysics');
@@ -35,13 +38,47 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
+    
+    this.emitterFrame = 0;
+    this.createParticles();
     this.createPlane(x, y);
     //this.sound = this.scene.sound.add("sndExplosion");
     this.sound2 = this.scene.sound.add('sndExplosion2');
   }
+   updateParticles = ()=>  {
+    this.emitter.setPosition(this.x, this.y);
+    
+    this.emitterFrame += 1;
+    if (this.emitterFrame > 3) {
+      this.emitterFrame = 0;
+    }
+
+    this.emitter.setFrame(this.emitterFrame);
+  }
+
+  createParticles(): void {
+    this.particles = this.scene.add.particles('debreeSprite');
+    //const zebraTrail = ;
+    this.emitter = this.particles.createEmitter({
+      x: this.x,
+      y: this.y,
+      frame: 0,
+      quantity: 10,
+      frequency: 5,
+      angle: { min: 0, max: 360 },
+      scale: { start: 5, end: 20 },
+      speed: 20,
+      gravityY: 20,
+      lifespan: { min: 1000, max: 2000 },
+      alpha: {start: 0.81, end: 0},
+      
+      //tint: 0xff0000
+    });
+    this.emitter.setFrame(0);
+  }
 
   createPlane(x: number, y: number): void {
-    this.setOrigin(0, 0);
+    this.setOrigin(0.5, 0.5);
 
     const enemyTint = 0x000000;
 
@@ -126,6 +163,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.target) {
       this.rotateTowardsFlyingDirection();
     }
+    this.updateParticles();
   }
 
   // GOLD!!!
@@ -174,11 +212,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       - tween y to bottom
       - after tween particle explosion effect
       */
+
+      this.emitter.setGravityY(150 );
+      this.emitter.setSpeed(200 );
+      this.emitter.setFrequency(12);
+      
+      
       let oneShotTimer = this.scene.time.delayedCall(1200, () => {
         this.explosions.destroy();
+        this.particles.destroy();
       });
 
       this.renderContainer.destroy();
+      
       this.destroy();
     }
   }
@@ -259,7 +305,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         .setActive(true)
         .setVisible(true);
       aBullet.rotation = this.shooterRotation;
-      aBullet.fireAtTarget(this, this.target);
+      const { worldSizeY } = this.getWorldSize();
+      if (this.y < worldSizeY) {
+        aBullet.fireAtTarget(this, this.target);
+      }
     }
 
     this.x += this.xSpeed * delta;

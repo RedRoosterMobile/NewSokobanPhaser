@@ -12,6 +12,11 @@
 // - add more (and harder) enemies depending on score
 // - intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
 
+import { SettingsSingleton } from '../utils/settings-singleton';
+var gameSettings = {
+  ...SettingsSingleton.getInstance().settings,
+};
+console.log(gameSettings);
 import { Tilemaps } from 'phaser';
 
 const sumArrayValues = (values) => {
@@ -80,7 +85,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.plane.setMaxVelocity(600);
     this.plane.setAngle(-90);
     this.setOrigin(0, 0);
-    this.plane.setGravity(0, 200);
+    
 
     this.wings = this.scene.add.image(0, 0, 'planeWings');
     this.planeBody = this.scene.add.image(0, 0, 'planeBody', 0);
@@ -119,63 +124,14 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
     this.createParticles();
     this.createAnims();
-    // nausea + 10000!
-    //this.scene.input.keyboard.on('keyup-' + 'UP',   this.justWentOffTheGas);
-    this.initialZoom = this.scene.cameras.main.zoom;
+
+    
+    setTimeout(()=>{
+      this.plane.setVelocityY(-10800);  
+      this.plane.setGravity(0, -300);
+    },1000);
+    
   }
-
-  /*
-
-  Observation:
-  ------------
-
-  while boosting:
-  when fliying right - plane should be on the left side of the camera
-  when fliying left - plane should be on the left right of the camera
-  when fliying up - plane should be on the left bottom of the camera
-  when fliying down - plane should be on the left top of the camera
-
-  while ideling:
-  normal? + group of bullets
-
-  */
-
-  justWentOffTheGas = (event): void => {
-    console.log('UP key is UP: camera zoom tween here', event.timeStamp);
-    let previousZoom = 0.4; //this.scene.cameras.main.zoom;
-    const targetVector: Phaser.Math.Vector2 = new Phaser.Math.Vector2(
-      this.scene.cameras.main.scrollX,
-      this.scene.cameras.main.scrollY
-    );
-    this.scene.physics.velocityFromRotation(
-      this.plane.rotation,
-      400,
-      targetVector
-    );
-    const diff = event.timeStamp - this.cursors.up.timeDown;
-
-    this.scene.tweens.add({
-      targets: this.scene.cameras.main,
-      props: {
-        //zoom: previousZoom-0.01,
-        scrollX:
-          this.scene.cameras.main.scrollX + (targetVector.x * diff) / 10000,
-        scrollY:
-          this.scene.cameras.main.scrollY + (targetVector.y * diff) / 10000,
-      },
-      delay: 0,
-      yoyo: false,
-      duration: Phaser.Math.Clamp(diff, 0, 400),
-      // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/tween/#ease-equations
-      ease: 'Cubic.easeIn',
-      easeParams: null,
-      hold: 0,
-      repeat: 0,
-      onComplete: () => {
-        this.scene.cameras.main.zoom = previousZoom;
-      },
-    });
-  };
 
   createParticles(): void {
     this.particles = this.scene.add.particles('debreeSprite');

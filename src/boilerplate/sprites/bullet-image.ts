@@ -1,6 +1,5 @@
 // https://github.com/photonstorm/phaser3-examples/blob/master/public/src/games/topdownShooter/topdown_combatMechanics.js
 
-import { Tilemaps } from 'phaser';
 import { Plane } from './plane-sprite';
 
 export class Bullet extends Phaser.GameObjects.Image {
@@ -38,14 +37,12 @@ export class Bullet extends Phaser.GameObjects.Image {
     this.setOrigin(0.5, 0.5);
     this.setScale(5);
     this.setSize(12, 12);
-    //this.setScale(10);
     this.sound = this.scene.sound.add('sndMachineGun');
   }
 
   playFireSound(loop = false) {
     // idea volume depending on distance to target
-    //this.target.plane.
-    let soundConfige: Phaser.Types.Sound.SoundConfig = {
+    let soundConfig: Phaser.Types.Sound.SoundConfig = {
       mute: false,
       volume: 0.5,
       rate: 0.5,
@@ -55,21 +52,21 @@ export class Bullet extends Phaser.GameObjects.Image {
       delay: 0,
     };
     if (this.target) {
+      // enemies
       const distance = Phaser.Math.Distance.Between(
         this.x,
         this.y,
         this.target.x,
         this.target.y
       );
-      soundConfige = {
-        ...soundConfige,
+      soundConfig = {
+        ...soundConfig,
         rate: 1,
         volume: (1 / distance) * 1000,
       };
     }
 
-    // @ts-ignore
-    this.sound.play(soundConfige);
+    this.sound.play(soundConfig);
   }
 
   // works
@@ -80,11 +77,6 @@ export class Bullet extends Phaser.GameObjects.Image {
 
     this.setPosition(shooter.x, shooter.y); // Initial position
     this.direction = Math.atan((target.x - this.x) / (target.y - this.y));
-
-    //this.direction = shooter.rotation;
-
-    //this.direction = Math.atan( (0-this.x) / (0-this.y));
-
     // Calculate X and y velocity of bullet to moves it from shooter to target
     if (target.y >= this.y) {
       this.xSpeed = this.speed * Math.sin(this.direction);

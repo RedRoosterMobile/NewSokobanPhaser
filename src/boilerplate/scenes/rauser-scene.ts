@@ -37,11 +37,10 @@ slammed against that edge of the screen, like the pilot’s head would be slamme
 It’s nauseating, but it communicates an excessive amount of feedback through the simple act of
 rotating a thumbstick left or right then jamming it straight forward."
 */
+import { SettingsSingleton } from '../utils/settings-singleton';
 
 var gameSettings = {
-  maxEnemies: 0,
-  zoom: 0.4,
-  musicVolume: 0.0,
+  ...SettingsSingleton.getInstance().settings,
 };
 
 export class RauserScene extends Phaser.Scene {
@@ -152,6 +151,7 @@ export class RauserScene extends Phaser.Scene {
     const worldView = this.cameras.main.worldView;
 
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
+
     this.cameras.main.setZoom(gameSettings.zoom);
 
     this.cameras.main.startFollow(this.planeObj.camMuzzle, true, 0.09, 0.09);
@@ -290,14 +290,17 @@ export class RauserScene extends Phaser.Scene {
   // TODO: spawn closer to player (world coordinates)
   spawnEnemies(): void {
     if (this.enemies.getLength() < gameSettings.maxEnemies) {
-      const { worldSizeX, worldSizeY } = this.getWorldSize();
-      let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
+      let { x, y } = this.planeObj.plane.body;
 
+      const { worldSizeX, worldSizeY } = this.getWorldSize();
+      y = Math.min(y,-100);
+
+      let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
       Phaser.Actions.RotateAroundDistance(
         [anEnemy],
-        this.planeObj.plane,
+        { x, y },
         Phaser.Math.DegToRad(Phaser.Math.Between(-180, 0)),
-        (this.game.config.height as number) * 4
+        worldSizeY / 3
       );
       //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
       //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
@@ -315,33 +318,43 @@ export class RauserScene extends Phaser.Scene {
 
     if (this.planeObj.active) {
       this.spawnEnemies();
-      const velocity = this.planeObj.plane.body.velocity;
-      this.background.updateBackground(velocity.x, velocity.y);
-    }
+      const { x: velX, y: velY } = this.planeObj.plane.body.velocity;
 
-    // check if plane is turning
-    // green line goa
+      this.background.updateBackground(velX, velY);
+      // check if plane is turning
+      // green line goa
 
-    // idea: spawn enemies more to the left or right,
-    // depending where the player goes
-    const planeX = this.planeObj.plane.x;
-    const { x: velX, y: velY } = this.planeObj.plane.body.velocity;
-    const speed = Math.sqrt(Math.pow(velX, 2) + Math.pow(velY, 2));
-    if (Math.abs(velX) > 5) {
-      if (planeX > velX + planeX) {
-        //console.log('going left');
-        if (velX < 10 && velX > -15) {
-          console.log('turning left');
-        }
-      } else {
-        //console.log('going right');
-        if (velX < 10) {
-          console.log('turning right');
+      // idea: spawn enemies more to the left or right,
+      // depending where the player goes
+      const planeX = this.planeObj.plane.x;
+
+      this.zoomToSpeed(velX, velY);
+
+      if (Math.abs(velX) > 5) {
+        if (planeX > velX + planeX) {
+          if (velX < 10 && velX > -15) {
+            console.log('turning left');
+          }
+        } else {
+          if (velX < 10) {
+            console.log('turning right');
+          }
         }
       }
-    }
 
-    // @ts-ignore
-    //this.text.setText('Speed: ' + this.planeObj.plane.body.speed+ ' fps:'+ this.game.loop.actualFps);
+      this.text.setText(
+        'Speed: ' +
+          // @ts-ignore
+          this.planeObj.plane.body.speed +
+          ' fps:' +
+          this.game.loop.actualFps
+      );
+    }
+  }
+
+  zoomToSpeed(velX, velY): void {
+    const speed = Math.sqrt(Math.pow(velX, 2) + Math.pow(velY, 2));
+    //console.log('speed', speed); // 600 max always positive
+    this.cameras.main.zoom = Math.max(gameSettings.zoom - speed / 60000); // zom 0.1
   }
 }
