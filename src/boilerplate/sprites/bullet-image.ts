@@ -1,6 +1,11 @@
 // https://github.com/photonstorm/phaser3-examples/blob/master/public/src/games/topdownShooter/topdown_combatMechanics.js
 
 import { Plane } from './plane-sprite';
+import { SettingsSingleton } from '../utils/settings-singleton';
+
+var gameSettings = {
+  ...SettingsSingleton.getInstance().settings,
+};
 
 export class Bullet extends Phaser.GameObjects.Image {
   // analysis: https://www.youtube.com/watch?v=3X0yxfQGABc
@@ -44,7 +49,7 @@ export class Bullet extends Phaser.GameObjects.Image {
     // idea volume depending on distance to target
     let soundConfig: Phaser.Types.Sound.SoundConfig = {
       mute: false,
-      volume: 0.5,
+      volume: gameSettings.sfxVolume,
       rate: 0.5,
       detune: 0,
       seek: 0.4,
@@ -62,7 +67,7 @@ export class Bullet extends Phaser.GameObjects.Image {
       soundConfig = {
         ...soundConfig,
         rate: 1,
-        volume: (1 / distance) * 1000,
+        volume: (gameSettings.sfxVolume / distance) * 1000,
       };
     }
 

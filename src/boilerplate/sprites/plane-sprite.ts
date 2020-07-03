@@ -85,7 +85,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.plane.setMaxVelocity(600);
     this.plane.setAngle(-90);
     this.setOrigin(0, 0);
-    
 
     this.wings = this.scene.add.image(0, 0, 'planeWings');
     this.planeBody = this.scene.add.image(0, 0, 'planeBody', 0);
@@ -130,7 +129,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
       this.plane.setVelocityY(-10800);  
       this.plane.setGravity(0, -300);
     },1000);
-    
   }
 
   createParticles(): void {

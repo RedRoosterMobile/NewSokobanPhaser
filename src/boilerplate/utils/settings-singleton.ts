@@ -3,15 +3,20 @@ interface Action {
 }
 
 interface gameSettings {
-  maxEnemies: integer;
+  maxFighters: integer;
+  fighterSpawnInterval: integer,
+  maxBattleships: integer,
   zoom: number;
   musicVolume: number;
   sfxVolume: number;
 }
 let gameSettings = <gameSettings>{
-  maxEnemies: 5,
+  maxFighters: 12,
+  fighterSpawnInterval: 4000,
+  maxBattleships: 1,
   zoom: 0.4,
-  musicVolume: 0.2,
+  sfxVolume: 0.0,
+  musicVolume: 0.0,
 };
 
 export class SettingsSingleton {

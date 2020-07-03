@@ -5,6 +5,14 @@ import { Bullet } from './../sprites/bullet-image';
 import { Enemy } from './../sprites/enemy-image';
 import { Background } from './../sprites/background-sprite';
 import { DamageParticle } from './../sprites/damage-particle';
+import {
+  blur,
+  water1,
+  water2,
+  water3,
+  dunno,
+  noob,
+} from './../shaders/shader-lib';
 
 /*
 
@@ -38,14 +46,13 @@ It’s nauseating, but it communicates an excessive amount of feedback through t
 rotating a thumbstick left or right then jamming it straight forward."
 */
 import { SettingsSingleton } from '../utils/settings-singleton';
+import { Battleship } from '../sprites/battleship-sprite';
 
 var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
 };
 
 export class RauserScene extends Phaser.Scene {
-  private phaserSprite: Phaser.GameObjects.Sprite;
-  // plane: Phaser.Physics.Arcade.Image;
   planeObj: Plane;
   text: Phaser.GameObjects.Text;
   background: Background;
@@ -54,6 +61,12 @@ export class RauserScene extends Phaser.Scene {
   playerBullets: Phaser.Physics.Arcade.Group;
   enemies: Phaser.Physics.Arcade.Group;
   previousDirection: string;
+  waterGraphics: Phaser.GameObjects.Graphics;
+  battleships: Phaser.Physics.Arcade.Group;
+  hackBattleship: any;
+  buggyBattleshipAlive: true;
+  fighterSpawnTime: number;
+  battleshipSpawnTime: number;
 
   preload(): void {
     // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/bullets.png
@@ -61,6 +74,7 @@ export class RauserScene extends Phaser.Scene {
     this.load.image('bullet', 'assets/rauser/bullets.png');
     this.load.image('player', 'assets/rauser/plane1.png');
     this.load.image('bgGradient', 'assets/rauser/bg_gradient.png');
+    this.load.image('battleship', 'assets/rauser/battleship.png');
 
     this.load.image('enemy', 'assets/car90.png');
 
@@ -118,6 +132,8 @@ export class RauserScene extends Phaser.Scene {
     this.sound.play('sndGameMusic', soundConfig);
 
     const { worldSizeX, worldSizeY } = this.getWorldSize();
+    this.fighterSpawnTime = 0;
+    this.battleshipSpawnTime = 0;
 
     const waterDepth = 400;
     // the total size of the world
@@ -149,6 +165,7 @@ export class RauserScene extends Phaser.Scene {
       .setScale(10);
 
     const worldView = this.cameras.main.worldView;
+    this.shaderStuff();
 
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
 
@@ -156,9 +173,14 @@ export class RauserScene extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.planeObj.camMuzzle, true, 0.09, 0.09);
 
-    // TODO: go back to normal array..
+    // TODO: go back to normal array.. WHY?
     this.enemies = this.physics.add.group({
       classType: Enemy,
+      runChildUpdate: true,
+    });
+
+    this.battleships = this.physics.add.group({
+      classType: Battleship,
       runChildUpdate: true,
     });
 
@@ -192,8 +214,19 @@ export class RauserScene extends Phaser.Scene {
       this.planeObj.plane,
       this.enemies,
       (player: any, enemy: Enemy) => {
-        // TODO only once per
+        // TODO only once per hit?
         enemy.decreaseHealth(0.2);
+        this.planeObj.decreaseHealth(0.2);
+      }
+    );
+
+    // player and battleship collide
+    this.physics.add.overlap(
+      this.planeObj.plane,
+      this.battleships,
+      (player: any, battleship: Battleship) => {
+        // TODO only once per hit!
+        battleship.decreaseHealth(0.02);
         this.planeObj.decreaseHealth(0.2);
       }
     );
@@ -208,6 +241,16 @@ export class RauserScene extends Phaser.Scene {
         this.planeObj.decreaseHealth(5);
       }
     );
+
+    // hack! strange positioning bug for FIRST ship
+    /*this.hackBattleship = this.battleships
+      .get()
+      .setActive(false)
+      .setVisible(false);
+    setTimeout(() => {
+      console.log('getting rid of buggy battleship');
+      this.hackBattleship.destroy();
+    }, 100);*/
 
     const playerFireCallBack = () => {
       const bullet: Bullet = this.playerBullets
@@ -285,15 +328,38 @@ export class RauserScene extends Phaser.Scene {
             particleClass: DamageParticle
 
         });*/
+
+    this.waterGraphics = this.add.graphics();
+    //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+    this.waterGraphics.fillGradientStyle(
+      0x22e1ff,
+      0x22e1ff,
+      0x22e1aa,
+      0x22e199,
+      1
+    );
+    //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+    this.waterGraphics.fillRect(-450, worldSizeY, worldSizeX, 400);
+  }
+  shaderStuff(): void {
+    let blurBaseShader = new Phaser.Display.BaseShader('blur', water3);
+
+    let blurShader = this.add.shader(blurBaseShader, 0, 0, 128, 128, [
+      //let blurShader = new Phaser.GameObjects.Shader(this, blurBaseShader, 0, 0, 2048, 2048, [
+      'planeBody',
+    ]);
+
+    blurShader.setRenderToTexture('blurred_image', true);
   }
 
   // TODO: spawn closer to player (world coordinates)
-  spawnEnemies(): void {
-    if (this.enemies.getLength() < gameSettings.maxEnemies) {
+  spawnEnemies(time): void {
+    let interval = time - this.fighterSpawnTime > gameSettings.fighterSpawnInterval;
+    if (this.enemies.getLength() < gameSettings.maxFighters && interval) {
       let { x, y } = this.planeObj.plane.body;
 
       const { worldSizeX, worldSizeY } = this.getWorldSize();
-      y = Math.min(y,-100);
+      y = Math.min(y, -100);
 
       let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
       Phaser.Actions.RotateAroundDistance(
@@ -310,14 +376,38 @@ export class RauserScene extends Phaser.Scene {
       //this.planeObj.y
 
       console.log('creating enemy at ', anEnemy.x, anEnemy.y);
+      this.fighterSpawnTime = time;
+    }
+  }
+
+  spawnBattleships(time): void {
+    if (this.battleships.getLength() < gameSettings.maxBattleships) {
+      let battleship: Battleship = this.battleships
+        .get()
+        .setActive(true)
+        .setVisible(true);
+      let { x, y } = this.planeObj.plane.body;
+      const { worldSizeX, worldSizeY } = this.getWorldSize();
+      //battleship.setRandomPosition(0,worldSizeY,300,0);
+      //battleship.body.x=battleship.x=0;
+      //battleship.body.y=battleship.y=worldSizeY;
+      battleship.x = 0;
+      battleship.y = worldSizeY;
+
+      battleship.setTarget(this.planeObj.plane);
+      battleship.setBullets(this.enemyBullets);
+      //battleship.setOrigin(0.5,0.8);
+      //battleship.setOrigin(1,-1);
+      console.log('creating ship at ', battleship.x, battleship.y);
     }
   }
 
   update(time, delta): void {
     if (this.planeObj) this.planeObj.updatePlane();
 
-    if (this.planeObj.active) {
-      this.spawnEnemies();
+    if (this.planeObj.active && time > 4000) {
+      this.spawnEnemies(time);
+      this.spawnBattleships(time);
       const { x: velX, y: velY } = this.planeObj.plane.body.velocity;
 
       this.background.updateBackground(velX, velY);
@@ -350,6 +440,8 @@ export class RauserScene extends Phaser.Scene {
           this.game.loop.actualFps
       );
     }
+
+    if (this.waterGraphics) this.waterGraphics.x = this.planeObj.plane.x - 1200;
   }
 
   zoomToSpeed(velX, velY): void {

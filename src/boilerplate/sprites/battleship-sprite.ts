@@ -8,11 +8,21 @@ var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
 };
 
-var ROTATION_SPEED = 1 * Math.PI; // 0.5 arc per sec, 2 sec per arc
-var ROTATION_SPEED_DEGREES = Phaser.Math.RadToDeg(ROTATION_SPEED);
-var TOLERANCE = 0.06 * ROTATION_SPEED;
+// todo make interfaces for all enemy classes and put them in config
+const battleshipConfig = {
+  key: 'battleship', // battleshipSprite battleshipTurretSprite battleshipTurretGunSprite
+  hp: 80,
+  maxSpeed: 30,
+  // for
+  bulletImpact: 35, // ouch!
+  fireInterval: 2000, // 2 s
+  maxBullets: 30, // bullets per interval
+  bulletInterval: 16 * 2, // fire every second render, if bullets available
+  turretRotationSpeed: 1 * Math.PI, // 0.5 arc per sec, 2 sec per arc
+  gravityY: 200,
+};
 
-export class Enemy extends Phaser.Physics.Arcade.Sprite {
+export class Battleship extends Phaser.Physics.Arcade.Sprite {
   speed = 0.01;
   born = 0;
   xSpeed = 0;
@@ -37,96 +47,18 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   emitterFrame: number;
 
   constructor(scene, x = 0, y = 0) {
-    super(scene, x, y, 'planePhysics');
+    super(scene, x, y, 'battleship');
+    //this.setOrigin(0.5,1);
+    this.setScale(10);
     this.speed = 0.1;
     this.born = 0;
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
-    
+
     this.emitterFrame = 0;
-    this.createParticles();
-    this.createPlane(x, y);
     //this.sound = this.scene.sound.add("sndExplosion");
     this.sound2 = this.scene.sound.add('sndExplosion2');
-  }
-   updateParticles = ()=>  {
-    this.emitter.setPosition(this.x, this.y);
-    
-    this.emitterFrame += 1;
-    if (this.emitterFrame > 3) {
-      this.emitterFrame = 0;
-    }
-
-    this.emitter.setFrame(this.emitterFrame);
-  }
-
-  createParticles(): void {
-    this.particles = this.scene.add.particles('debreeSprite');
-    //const zebraTrail = ;
-    this.emitter = this.particles.createEmitter({
-      x: this.x,
-      y: this.y,
-      frame: 0,
-      quantity: 10,
-      frequency: 5,
-      angle: { min: 0, max: 360 },
-      scale: { start: 5, end: 20 },
-      speed: 20,
-      gravityY: 20,
-      lifespan: { min: 1000, max: 2000 },
-      alpha: {start: 0.81, end: 0},
-      
-      //tint: 0xff0000
-    });
-    this.emitter.setFrame(0);
-  }
-
-  createPlane(x: number, y: number): void {
-    this.setOrigin(0.5, 0.5);
-
-    const enemyTint = 0x000000;
-
-    this.planeBody = this.scene.add.image(0, 0, 'planeBody', 0);
-    this.planeBody.setTint(enemyTint);
-
-    this.wings = this.scene.add.image(0, 0, 'planeWings');
-    this.wings.setTint(enemyTint);
-    this.renderContainer = this.scene.add.container(0, 0, [
-      this.planeBody,
-      this.wings,
-    ]);
-
-    this.explosions = this.scene.add.sprite(0, 0, 'explosionsSprite', 0);
-    this.explosions.setScale(4);
-    this.scene.anims.create({
-      key: 'explode1',
-      frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
-        start: 1,
-        end: 6,
-      }),
-      frameRate: 5,
-      repeat: -1,
-    });
-    this.scene.anims.create({
-      key: 'explode2',
-      frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
-        start: 6,
-        end: 12,
-      }),
-      frameRate: 5,
-      repeat: -1,
-    });
-    this.scene.anims.create({
-      key: 'explode3',
-      frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
-        start: 12,
-        end: 18,
-      }),
-      frameRate: 5,
-      repeat: -1,
-    });
-    this.explosions.setVisible(false);
   }
 
   // TODO: somehow passing an object to the constructor
@@ -149,38 +81,25 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     //}
   }
 
-  updateWings(): void {
-    this.updateRotation();
-    this.explosions.x = this.x;
-    this.explosions.y = this.y;
-
-    this.renderContainer.setAngle(this.angle);
-    this.renderContainer.setX(this.x);
-    this.renderContainer.setY(this.y);
-    // da orignial scale effect from luftrausers
-    const scaleFactor = Math.abs(Math.sin(this.rotation)) * 1;
-    this.wings.scaleY = Phaser.Math.Clamp(1 * scaleFactor, 0.1, 1);
-  }
-
-  updateRotation(): void {
-    if (this.target) {
-      this.rotateTowardsFlyingDirection();
-    }
-    this.updateParticles();
-  }
-
   // GOLD!!!
   // https://phaser.discourse.group/t/rotating-a-sprite-towards-the-pointer/921/3
   rotateTowardsFlyingDirection(): void {
     // Also see alternative method in
     // <https://codepen.io/samme/pen/gOpPLLx>
 
+    const targetVelocity = { x: 100, y: 100 };
+
+    let ROTATION_SPEED_DEGREES = Phaser.Math.RadToDeg(
+      battleshipConfig.turretRotationSpeed
+    );
+    let TOLERANCE = 0.06 * battleshipConfig.turretRotationSpeed;
+
     //var angleToPointer = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
     const angleToPointer = Phaser.Math.Angle.Between(
       this.x,
       this.y,
-      this.x + this.body.velocity.x,
-      this.y + this.body.velocity.y
+      this.x + targetVelocity.x,
+      this.y + targetVelocity.y
     );
     const angleDelta = Phaser.Math.Angle.Wrap(angleToPointer - this.rotation);
 
@@ -196,6 +115,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.hp -= value;
     if (this.hp <= 0) {
       // TODO: explosionz!!!!!!
+      /*
       this.explosions
         .setVisible(true)
         .setScale(Phaser.Math.Between(4, 8))
@@ -203,20 +123,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         .setAlpha(0.7);
 
       this.explosions.anims.play('explode' + Phaser.Math.Between(1, 3));
+      */
 
       this.playExplosionSound();
       // or set inactive??? dunno...
       this.setActive(false);
       this.setVisible(false);
 
-      // TODO: tween idea:
       /*
-      - enable explosions sheet (BOTH RANDOMLY)
-      - tween y to bottom
-      - after tween particle explosion effect
-      */
-
-      this.emitter.setGravityY(150 );
       this.emitter.setSpeed(200 );
       this.emitter.setFrequency(12);
       
@@ -224,10 +138,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       let oneShotTimer = this.scene.time.delayedCall(1200, () => {
         this.explosions.destroy();
         this.particles.destroy();
-      });
+      });*/
 
-      this.renderContainer.destroy();
-      
+      //this.renderContainer.destroy();
+
       this.destroy();
     }
   }
@@ -256,7 +170,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   fireAtTarget(shooter, target): void {
-    this.setPosition(shooter.x, shooter.y); // Initial position
+    //this.setPosition(shooter.x, shooter.y); // Initial position
     this.direction = Math.atan((target.x - this.x) / (target.y - this.y));
     // Calculate X and y velocity of bullet to moves it from shooter to target
     if (target.y >= this.y) {
@@ -279,43 +193,29 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   // Updates the position of the bullet each cycle
   update(time: number, delta: number): void {
-    this.updateWings();
     if (this.target) {
       // less speed on y (we are planes and have to turn..)
 
-      this.scene.physics.accelerateToObject(this, this.target, 320, 300, 250);
+      this.scene.physics.accelerateToObject(this, this.target, 150, 50, 0);
       // ummm, why does this work??
       // this.setAngularVelocity(300);
 
-      const { worldSizeY } = this.getWorldSize();
-
-      if (this.y > worldSizeY - 100) {
-        const factor = Math.abs(this.y - worldSizeY);
-        // @ts-ignore
-        this.body.setGravity(0, -10 * factor);
-      } else {
-        // @ts-ignore
-        this.body.setGravity(0, 200);
-      }
-      //this.moveToTarget(this.target);
-    }
-
-    // random??
-    const shootInterval = 100 + Phaser.Math.Between(0, 100);
-    if (Math.round(time * 100) % shootInterval == 0) {
-      const aBullet: Bullet = this.bullets
-        .get()
-        .setActive(true)
-        .setVisible(true);
-      aBullet.rotation = this.shooterRotation;
-      const { worldSizeY } = this.getWorldSize();
-      if (this.y < worldSizeY) {
-        aBullet.fireAtTarget(this, this.target);
+      const shootInterval = 10;//Phaser.Math.Between(0, 10);
+      if (Math.round(time * 100) % shootInterval == 0) {
+        const aBullet: Bullet = this.bullets
+          .get()
+          .setActive(true)
+          .setVisible(true);
+        aBullet.rotation = this.shooterRotation;
+        const { worldSizeY } = this.getWorldSize();
+        if (this.y < worldSizeY) {
+          aBullet.fireAtTarget(this, this.target);
+        }
       }
     }
 
     this.x += this.xSpeed * delta;
-    this.y += this.ySpeed * delta;
+    //this.y += this.ySpeed * delta;
 
     /*this.moveToTarget({
        x:this.x + this.xSpeed * delta,
