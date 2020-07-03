@@ -18,7 +18,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   xSpeed = 0;
   ySpeed = 0;
   direction = 0;
-  hp = 10;
+  hp = 20;
   target: Plane;
 
   sound: Phaser.Sound.BaseSound;
@@ -43,23 +43,23 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
-    
+
     this.emitterFrame = 0;
     this.createParticles();
     this.createPlane(x, y);
     //this.sound = this.scene.sound.add("sndExplosion");
     this.sound2 = this.scene.sound.add('sndExplosion2');
   }
-   updateParticles = ()=>  {
+  updateParticles = () => {
     this.emitter.setPosition(this.x, this.y);
-    
+
     this.emitterFrame += 1;
     if (this.emitterFrame > 3) {
       this.emitterFrame = 0;
     }
 
     this.emitter.setFrame(this.emitterFrame);
-  }
+  };
 
   createParticles(): void {
     this.particles = this.scene.add.particles('debreeSprite');
@@ -75,11 +75,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       speed: 20,
       gravityY: 20,
       lifespan: { min: 1000, max: 2000 },
-      alpha: {start: 0.81, end: 0},
-      
+      alpha: { start: 0.81, end: 0 },
+
       //tint: 0xff0000
     });
     this.emitter.setFrame(0);
+    this.emitter.stop();
+    //this.emitter.setVisible(false);
   }
 
   createPlane(x: number, y: number): void {
@@ -194,6 +196,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   decreaseHealth(value: number): void {
     this.hp -= value;
+    if (this.hp <= 10) {
+      this.emitter.setVisible(true);
+      this.emitter.start();
+    }
     if (this.hp <= 0) {
       // TODO: explosionz!!!!!!
       this.explosions
@@ -216,18 +222,17 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       - after tween particle explosion effect
       */
 
-      this.emitter.setGravityY(150 );
-      this.emitter.setSpeed(200 );
+      this.emitter.setGravityY(150);
+      this.emitter.setSpeed(200);
       this.emitter.setFrequency(12);
-      
-      
+
       let oneShotTimer = this.scene.time.delayedCall(1200, () => {
         this.explosions.destroy();
         this.particles.destroy();
       });
 
       this.renderContainer.destroy();
-      
+
       this.destroy();
     }
   }
