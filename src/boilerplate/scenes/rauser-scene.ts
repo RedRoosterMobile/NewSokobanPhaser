@@ -5,6 +5,8 @@ import { Bullet } from './../sprites/bullet-image';
 import { Enemy } from './../sprites/enemy-image';
 import { Background } from './../sprites/background-sprite';
 import { DamageParticle } from './../sprites/damage-particle';
+
+import {virtualScreen, getWorldSize} from '../utils/render-constants';
 import {
   blur,
   water1,
@@ -114,9 +116,7 @@ export class RauserScene extends Phaser.Scene {
   }
 
   getWorldSize(): any {
-    const worldSizeX: number = (this.game.config.width as number) * 4;
-    const worldSizeY: number = (this.game.config.height as number) * 4;
-    return { worldSizeX, worldSizeY };
+    return getWorldSize();
   }
 
   create(): void {
@@ -169,7 +169,9 @@ export class RauserScene extends Phaser.Scene {
 
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
 
-    this.cameras.main.setZoom(gameSettings.zoom);
+    // 320/800
+    const resolutionZoomFactor = (this.game.config.width as number/virtualScreen.WIDTH);
+    this.cameras.main.setZoom(gameSettings.zoom * resolutionZoomFactor );
 
     this.cameras.main.startFollow(this.planeObj.camMuzzle, true, 0.09, 0.09);
 
@@ -446,7 +448,9 @@ export class RauserScene extends Phaser.Scene {
 
   zoomToSpeed(velX, velY): void {
     const speed = Math.sqrt(Math.pow(velX, 2) + Math.pow(velY, 2));
+
+    const resolutionZoomFactor = (this.game.config.width as number/virtualScreen.WIDTH);
     //console.log('speed', speed); // 600 max always positive
-    this.cameras.main.zoom = Math.max(gameSettings.zoom - speed / 60000); // zom 0.1
+    this.cameras.main.zoom = Math.max(gameSettings.zoom*resolutionZoomFactor - speed / 60000); // zom 0.1
   }
 }

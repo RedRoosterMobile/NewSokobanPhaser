@@ -17,6 +17,9 @@ import { RauserScene } from './scenes/rauser-scene';
   scene: MainScene
 };*/
 
+// 4/3     = 1,333
+// 320/240 = 1,333
+// 800/600 = 1,333
 // rauser game configuration
 const config: Phaser.Types.Core.GameConfig = {
   width: 800,
@@ -29,7 +32,7 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: {
       fps: 60,
       gravity: { y: 0 }, // 200
-      debug: true,
+      debug: false,
     },
   },
   render: {

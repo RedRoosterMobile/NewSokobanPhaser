@@ -13,6 +13,7 @@
 // - intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
 
 import { SettingsSingleton } from '../utils/settings-singleton';
+import {virtualScreen, getWorldSize} from '../utils/render-constants';
 var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
 };
@@ -300,9 +301,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     //this.scene.text.setText('Speed: ' + this.plane.body.speed + ' fps:'+ this.scene.game.loop.actualFps);
   }
   getWorldSize(): any {
-    const worldSizeX: number = (this.scene.game.config.width as number) * 4;
-    const worldSizeY: number = (this.scene.game.config.height as number) * 4;
-    return { worldSizeX, worldSizeY };
+    return getWorldSize();
   }
   updateWings(): void {
     this.renderContainer.setAngle(this.plane.angle);

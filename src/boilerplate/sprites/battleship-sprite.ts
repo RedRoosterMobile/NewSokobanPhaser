@@ -3,6 +3,7 @@
 import { Bullet } from './bullet-image';
 import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
+import {virtualScreen, getWorldSize} from '../utils/render-constants';
 
 var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
@@ -146,9 +147,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
     }
   }
   getWorldSize(): any {
-    const worldSizeX: number = (this.scene.game.config.width as number) * 4;
-    const worldSizeY: number = (this.scene.game.config.height as number) * 4;
-    return { worldSizeX, worldSizeY };
+    return getWorldSize();
   }
 
   moveToTarget(target) {
