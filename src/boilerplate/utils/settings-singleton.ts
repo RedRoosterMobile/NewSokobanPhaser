@@ -6,17 +6,19 @@ interface gameSettings {
   maxFighters: integer;
   fighterSpawnInterval: integer,
   maxBattleships: integer,
+  battleshipSpawnInterval: integer,
   zoom: number;
   musicVolume: number;
   sfxVolume: number;
 }
 let gameSettings = <gameSettings>{
-  maxFighters: 12,
+  maxFighters: 10,
   fighterSpawnInterval: 4000,
+  battleshipSpawnInterval: 8000,
   maxBattleships: 1,
   zoom: 0.4,
-  sfxVolume: 0.0,
-  musicVolume: 0.0,
+  sfxVolume: 0.4,
+  musicVolume: 0.2,
 };
 
 export class SettingsSingleton {

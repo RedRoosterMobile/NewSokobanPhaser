@@ -3,7 +3,7 @@
 import { Bullet } from './bullet-image';
 import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
-import {virtualScreen, getWorldSize} from '../utils/render-constants';
+import { getWorldSize } from '../utils/render-constants';
 
 var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
@@ -19,7 +19,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   xSpeed = 0;
   ySpeed = 0;
   direction = 0;
-  hp = 20;
+  hp = 15;
   target: Plane;
 
   sound: Phaser.Sound.BaseSound;
@@ -231,9 +231,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.explosions.destroy();
         this.particles.destroy();
       });
-
       this.renderContainer.destroy();
-
       this.destroy();
     }
   }

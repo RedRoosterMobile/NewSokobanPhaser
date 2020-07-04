@@ -1,11 +1,4 @@
-/**
- * @author       Digitsensitive <digit.sensitivee@gmail.com>
- * @copyright    2018 - 2019 digitsensitive
- * @license      {@link https://github.com/digitsensitive/phaser3-typescript/blob/master/LICENSE.md | MIT License}
- */
-
 import 'phaser';
-import { MainScene } from './scenes/main-scene';
 import { RauserScene } from './scenes/rauser-scene';
 
 // main game configuration
@@ -17,14 +10,15 @@ import { RauserScene } from './scenes/rauser-scene';
   scene: MainScene
 };*/
 
-// 4/3     = 1,333
-// 320/240 = 1,333
-// 800/600 = 1,333
+// 4/3      = 1,333
+// 320/240  = 1,333
+// 800/600  = 1,333
+// 1024/768 = 1,333
 // rauser game configuration
 const config: Phaser.Types.Core.GameConfig = {
   width: 800,
   height: 600,
-  type: Phaser.AUTO,
+  type: Phaser.WEBGL,
   parent: 'game',
   scene: RauserScene,
   physics: {

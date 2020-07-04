@@ -3,7 +3,7 @@
 import { Bullet } from './bullet-image';
 import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
-import {virtualScreen, getWorldSize} from '../utils/render-constants';
+import { virtualScreen, getWorldSize } from '../utils/render-constants';
 
 var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
@@ -46,6 +46,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
   particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   emitterFrame: number;
+  isSinking: boolean;
 
   constructor(scene, x = 0, y = 0) {
     super(scene, x, y, 'battleship');
@@ -56,10 +57,42 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
+    this.isSinking = false;
 
     this.emitterFrame = 0;
     //this.sound = this.scene.sound.add("sndExplosion");
     this.sound2 = this.scene.sound.add('sndExplosion2');
+
+    this.explosions = this.scene.add.sprite(0, 0, 'explosionsSprite', 0);
+    this.explosions.setScale(4);
+    this.scene.anims.create({
+      key: 'explode1',
+      frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
+        start: 1,
+        end: 6,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.scene.anims.create({
+      key: 'explode2',
+      frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
+        start: 6,
+        end: 12,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.scene.anims.create({
+      key: 'explode3',
+      frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
+        start: 12,
+        end: 18,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.explosions.setVisible(false);
   }
 
   // TODO: somehow passing an object to the constructor
@@ -68,8 +101,8 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
     const soundConfige: Phaser.Types.Sound.SoundConfig = {
       mute: false,
       volume: gameSettings.sfxVolume,
-      rate: Phaser.Math.Between(150, 300) / 100,
-      detune: Phaser.Math.Between(100, 500),
+      rate: Phaser.Math.Between(150, 200) / 100,
+      detune: Phaser.Math.Between(-100, 0),
       seek: 0,
       loop: loop,
       delay: 0,
@@ -114,36 +147,64 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
 
   decreaseHealth(value: number): void {
     this.hp -= value;
-    if (this.hp <= 0) {
-      // TODO: explosionz!!!!!!
-      /*
+
+    if (this.hp <= 0 && !this.isSinking) {
+      this.isSinking = true;
+      // TODO:
+      // random explosionz along the full width of the battleship
       this.explosions
+        .setPosition(this.x, this.y)
         .setVisible(true)
-        .setScale(Phaser.Math.Between(4, 8))
+        .setScale(Phaser.Math.Between(8, 16))
         .setTint(0xffc922)
         .setAlpha(0.7);
 
       this.explosions.anims.play('explode' + Phaser.Math.Between(1, 3));
-      */
 
       this.playExplosionSound();
       // or set inactive??? dunno...
-      this.setActive(false);
-      this.setVisible(false);
 
       /*
       this.emitter.setSpeed(200 );
       this.emitter.setFrequency(12);
       
-      
-      let oneShotTimer = this.scene.time.delayedCall(1200, () => {
+      */
+      let oneShotTimer = this.scene.time.delayedCall(5000, () => {
         this.explosions.destroy();
-        this.particles.destroy();
-      });*/
+        console.log(this.body.velocity);
+        //this.particles.destroy();
+        this.setActive(false);
+        this.setVisible(false);
+        this.destroy();
+      });
+      /*
+      this.scene.tweens.add({
+        onStart: () => {
+          //this.isCamTweening = true;
+        },
+        targets: this.body,
+        props: {
+          gravityY: 300,
+        },
+        delay: 0,
+        yoyo: false,
+        duration: 3000,
+        // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/tween/#ease-equations
+        ease: 'Linear.easeIn',
+        easeParams: null,
+        hold: 0,
+        repeat: 0,
+        onComplete: () => {
+          console.log('ship sunk');
+          
+        },
+      });
+      */
+      this.body.velocity.y = 60;
+      console.log(this.body.velocity);
+
 
       //this.renderContainer.destroy();
-
-      this.destroy();
     }
   }
   getWorldSize(): any {
@@ -155,15 +216,13 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
     this.target = target;
     this.direction = Math.atan(
       (target.x - this.x) /
-        (Phaser.Math.Clamp(target.y, 0, worldSizeY - 600) - this.y)
+        (Phaser.Math.Clamp(target.y, 0, worldSizeY) - this.y)
     );
     // Calculate X and y velocity of bullet to moves it from shooter to target
     if (target.y >= this.y) {
       this.xSpeed = this.speed * Math.sin(this.direction);
-      this.ySpeed = this.speed * Math.cos(this.direction);
     } else {
       this.xSpeed = -this.speed * Math.sin(this.direction);
-      this.ySpeed = -this.speed * Math.cos(this.direction);
     }
     this.born = 0; // Time since new bullet spawned
   }
@@ -192,14 +251,17 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
 
   // Updates the position of the bullet each cycle
   update(time: number, delta: number): void {
-    if (this.target) {
+    if (this.target && !this.isSinking) {
+        console.log('updating battleship', this.isSinking);
       // less speed on y (we are planes and have to turn..)
 
-      this.scene.physics.accelerateToObject(this, this.target, 150, 50, 0);
+      //this.scene.physics.accelerateToObject(this, this.target, 150, 50, 0);
+      this.moveToTarget(this.target);
+
       // ummm, why does this work??
       // this.setAngularVelocity(300);
 
-      const shootInterval = 10;//Phaser.Math.Between(0, 10);
+      const shootInterval = 10; //Phaser.Math.Between(0, 10);
       if (Math.round(time * 100) % shootInterval == 0) {
         const aBullet: Bullet = this.bullets
           .get()

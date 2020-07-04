@@ -232,6 +232,16 @@ export class RauserScene extends Phaser.Scene {
         this.planeObj.decreaseHealth(0.2);
       }
     );
+    // player shoots enemy
+    this.physics.add.overlap(
+        this.playerBullets,
+        this.battleships,
+        (playerBullet: Bullet, battleship: Battleship) => {
+          playerBullet.setActive(false);
+          playerBullet.setVisible(false);
+          battleship.decreaseHealth(2);
+        }
+      );
     // enemy shoots player
     this.physics.add.overlap(
       this.enemyBullets,
@@ -383,7 +393,8 @@ export class RauserScene extends Phaser.Scene {
   }
 
   spawnBattleships(time): void {
-    if (this.battleships.getLength() < gameSettings.maxBattleships) {
+    let interval = time - this.battleshipSpawnTime > gameSettings.battleshipSpawnInterval;
+    if (this.battleships.getLength() < gameSettings.maxBattleships && interval) {
       let battleship: Battleship = this.battleships
         .get()
         .setActive(true)
@@ -401,6 +412,7 @@ export class RauserScene extends Phaser.Scene {
       //battleship.setOrigin(0.5,0.8);
       //battleship.setOrigin(1,-1);
       console.log('creating ship at ', battleship.x, battleship.y);
+      this.battleshipSpawnTime = time;
     }
   }
 
