@@ -256,7 +256,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     if (this.cursors.up.isDown) {
       this.scene.physics.velocityFromRotation(
         this.plane.rotation,
-        300 * 2,
+        300 * 5,
         // @ts-ignore
         this.plane.body.acceleration
       );
@@ -265,10 +265,11 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
       const { worldSizeY } = this.getWorldSize();
       if (this.plane.y > worldSizeY) {
+        // water buoyancy
         const factor = Math.abs(this.plane.y - worldSizeY);
         this.plane.setGravity(0, -10 * factor);
       } else {
-        this.plane.setGravity(0, 0);
+        //this.plane.setGravity(0, 0);
       }
     } else {
       // TODO: while x velocity is still active don't add too much gravity

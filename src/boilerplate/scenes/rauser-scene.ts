@@ -6,7 +6,7 @@ import { Enemy } from './../sprites/enemy-image';
 import { Background } from './../sprites/background-sprite';
 import { DamageParticle } from './../sprites/damage-particle';
 
-import {virtualScreen, getWorldSize} from '../utils/render-constants';
+import { virtualScreen, getWorldSize } from '../utils/render-constants';
 import {
   blur,
   water1,
@@ -83,7 +83,6 @@ export class RauserScene extends Phaser.Scene {
     this.load.image('planeBody', 'assets/rauser/plane_body-fs8.png');
     this.load.image('planePhysics', 'assets/rauser/plane_transparent-fs8.png');
     this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
-    
 
     this.load.atlas(
       'boostSprites',
@@ -171,8 +170,9 @@ export class RauserScene extends Phaser.Scene {
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
 
     // 320/800
-    const resolutionZoomFactor = (this.game.config.width as number/virtualScreen.WIDTH);
-    this.cameras.main.setZoom(gameSettings.zoom * resolutionZoomFactor );
+    const resolutionZoomFactor =
+      (this.game.config.width as number) / virtualScreen.WIDTH;
+    this.cameras.main.setZoom(gameSettings.zoom * resolutionZoomFactor);
 
     this.cameras.main.startFollow(this.planeObj.camMuzzle, true, 0.09, 0.09);
 
@@ -180,19 +180,18 @@ export class RauserScene extends Phaser.Scene {
     this.enemies = this.physics.add.group({
       classType: Enemy,
       runChildUpdate: true,
-      createCallback: (enemy:Enemy)=>{
-        enemy.body.setCircle(64,0,0);
-      }
+      createCallback: (enemy: Enemy) => {
+        enemy.body.setCircle(64, 0, 0);
+      },
     });
 
     this.battleships = this.physics.add.group({
       classType: Battleship,
       runChildUpdate: true,
-      createCallback: (battleship:Battleship)=>{
-        
-        battleship.body.setSize(247, 43-16);
+      createCallback: (battleship: Battleship) => {
+        battleship.body.setSize(247, 43 - 16);
         battleship.body.setOffset(0, 20);
-      }
+      },
     });
 
     this.text = this.add.text(10, 10, '', {
@@ -243,14 +242,14 @@ export class RauserScene extends Phaser.Scene {
     );
     // player shoots enemy
     this.physics.add.overlap(
-        this.playerBullets,
-        this.battleships,
-        (playerBullet: Bullet, battleship: Battleship) => {
-          playerBullet.setActive(false);
-          playerBullet.setVisible(false);
-          battleship.decreaseHealth(2);
-        }
-      );
+      this.playerBullets,
+      this.battleships,
+      (playerBullet: Bullet, battleship: Battleship) => {
+        playerBullet.setActive(false);
+        playerBullet.setVisible(false);
+        battleship.decreaseHealth(2);
+      }
+    );
     // enemy shoots player
     this.physics.add.overlap(
       this.enemyBullets,
@@ -375,19 +374,20 @@ export class RauserScene extends Phaser.Scene {
 
   // TODO: spawn closer to player (world coordinates)
   spawnEnemies(time): void {
-    let interval = time - this.fighterSpawnTime > gameSettings.fighterSpawnInterval;
+    let interval =
+      time - this.fighterSpawnTime > gameSettings.fighterSpawnInterval;
     if (this.enemies.getLength() < gameSettings.maxFighters && interval) {
-      let { x, y } = this.planeObj.plane.body;
+      const { x, y } = this.planeObj.plane;
 
       const { worldSizeX, worldSizeY } = this.getWorldSize();
-      y = Math.min(y, -100);
+      //y = Math.min(y, -100);
 
       let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
       Phaser.Actions.RotateAroundDistance(
         [anEnemy],
         { x, y },
-        Phaser.Math.DegToRad(Phaser.Math.Between(-180, 0)),
-        worldSizeY / 3
+        Phaser.Math.DegToRad(Phaser.Math.Between(180, 0)),
+        worldSizeY
       );
       //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
       //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
@@ -398,12 +398,19 @@ export class RauserScene extends Phaser.Scene {
 
       console.log('creating enemy at ', anEnemy.x, anEnemy.y);
       this.fighterSpawnTime = time;
+    } else if (this.fighterSpawnTime !=0 && interval) {
+        // enough fighters exist..
+        this.fighterSpawnTime = time;
     }
   }
 
   spawnBattleships(time): void {
-    let interval = time - this.battleshipSpawnTime > gameSettings.battleshipSpawnInterval;
-    if (this.battleships.getLength() < gameSettings.maxBattleships && interval) {
+    let interval =
+      time - this.battleshipSpawnTime > gameSettings.battleshipSpawnInterval;
+    if (
+      this.battleships.getLength() < gameSettings.maxBattleships &&
+      interval
+    ) {
       let battleship: Battleship = this.battleships
         .get()
         .setActive(true)
@@ -413,15 +420,21 @@ export class RauserScene extends Phaser.Scene {
       //battleship.setRandomPosition(0,worldSizeY,300,0);
       //battleship.body.x=battleship.x=0;
       //battleship.body.y=battleship.y=worldSizeY;
-      battleship.x = 0;
-      battleship.y = worldSizeY;
+
+      const spawnLeftOfPlayer = !!Phaser.Math.Between(0,1);
+
+      battleship.x = spawnLeftOfPlayer ? this.planeObj.plane.x - worldSizeY : this.planeObj.plane.x + worldSizeY*2;
+      battleship.y = worldSizeY+16;
 
       battleship.setTarget(this.planeObj.plane);
       battleship.setBullets(this.enemyBullets);
       //battleship.setOrigin(0.5,0.8);
       //battleship.setOrigin(1,-1);
-      console.log('creating ship at ', battleship.x, battleship.y);
+      console.log(`creating ship ${spawnLeftOfPlayer ? 'left' : 'right'} of player `, battleship.x, battleship.y);
       this.battleshipSpawnTime = time;
+    } else if (this.battleshipSpawnTime !=0 && interval) {
+        // enough fighters exist..
+        this.battleshipSpawnTime = time;
     }
   }
 
@@ -470,8 +483,11 @@ export class RauserScene extends Phaser.Scene {
   zoomToSpeed(velX, velY): void {
     const speed = Math.sqrt(Math.pow(velX, 2) + Math.pow(velY, 2));
 
-    const resolutionZoomFactor = (this.game.config.width as number/virtualScreen.WIDTH);
+    const resolutionZoomFactor =
+      (this.game.config.width as number) / virtualScreen.WIDTH;
     //console.log('speed', speed); // 600 max always positive
-    this.cameras.main.zoom = Math.max(gameSettings.zoom*resolutionZoomFactor - speed / 60000); // zom 0.1
+    this.cameras.main.zoom = Math.max(
+      gameSettings.zoom * resolutionZoomFactor - speed / 60000
+    );
   }
 }

@@ -91,7 +91,8 @@ export class Bullet extends Phaser.GameObjects.Image {
       this.ySpeed = -this.speed * Math.cos(this.direction);
     }
 
-    this.rotation = shooter.rotation; // angle bullet with shooters rotation
+    //this.rotation = shooter.rotation; // angle bullet with shooters rotation
+    this.rotation = Phaser.Math.DegToRad(this.direction);
     this.born = 0; // Time since new bullet spawned
   }
 

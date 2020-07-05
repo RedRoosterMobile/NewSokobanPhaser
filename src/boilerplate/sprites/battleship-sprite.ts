@@ -12,7 +12,7 @@ var gameSettings = {
 // todo make interfaces for all enemy classes and put them in config
 const battleshipConfig = {
   key: 'battleship', // battleshipSprite battleshipTurretSprite battleshipTurretGunSprite
-  hp: 80,
+  hp: 400,
   maxSpeed: 30,
   // for
   bulletImpact: 35, // ouch!
@@ -29,7 +29,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
   xSpeed = 0;
   ySpeed = 0;
   direction = 0;
-  hp = 10;
+  hp = battleshipConfig.hp;
   target: Plane;
 
   sound: Phaser.Sound.BaseSound;
@@ -239,7 +239,8 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
       this.ySpeed = -this.speed * Math.cos(this.direction);
     }
 
-    this.shooterRotation = shooter.rotation; // angle bullet with shooters rotation
+    //this.shooterRotation = shooter.rotation; // angle bullet with shooters rotation
+    this.shooterRotation = this.direction;
     this.born = 0; // Time since new bullet spawned
   }
   setTarget(target): void {
@@ -252,9 +253,9 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
   // Updates the position of the bullet each cycle
   update(time: number, delta: number): void {
     if (this.target && !this.isSinking) {
-        console.log('updating battleship', this.isSinking);
       // less speed on y (we are planes and have to turn..)
 
+      // how to stop this when sinking?
       //this.scene.physics.accelerateToObject(this, this.target, 150, 50, 0);
       this.moveToTarget(this.target);
 
@@ -269,9 +270,9 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
           .setVisible(true);
         aBullet.rotation = this.shooterRotation;
         const { worldSizeY } = this.getWorldSize();
-        if (this.y < worldSizeY) {
-          aBullet.fireAtTarget(this, this.target);
-        }
+        //if (this.y < worldSizeY) {
+        aBullet.fireAtTarget(this, this.target);
+        //}
       }
     }
 

@@ -14,7 +14,7 @@ interface gameSettings {
 let gameSettings = <gameSettings>{
   maxFighters: 10,
   fighterSpawnInterval: 4000,
-  battleshipSpawnInterval: 8000,
+  battleshipSpawnInterval: 16000,
   maxBattleships: 1,
   zoom: 0.4,
   sfxVolume: 0.0,
