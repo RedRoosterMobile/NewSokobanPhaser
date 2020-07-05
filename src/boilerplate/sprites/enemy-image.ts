@@ -132,6 +132,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.explosions.setVisible(false);
   }
 
+  create() {
+    console.log('creating enemy plane');
+    if (this.body)
+      this.body.setCircle(64,0,0);
+  }
+
   // TODO: somehow passing an object to the constructor
   // to change properites of enemy: class, texture, hp, speed, ...
   playExplosionSound(loop = false) {

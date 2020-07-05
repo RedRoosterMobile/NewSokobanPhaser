@@ -124,7 +124,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
     this.createParticles();
     this.createAnims();
-
+    this.plane.body.setCircle(64,0,0);
+    //this.plane.body.setSize(64+32, 64+32);
+    //mySprite.body.setOffset(12, 5);
     
     setTimeout(()=>{
       this.plane.setVelocityY(-10800);  

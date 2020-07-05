@@ -83,6 +83,7 @@ export class RauserScene extends Phaser.Scene {
     this.load.image('planeBody', 'assets/rauser/plane_body-fs8.png');
     this.load.image('planePhysics', 'assets/rauser/plane_transparent-fs8.png');
     this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
+    
 
     this.load.atlas(
       'boostSprites',
@@ -179,11 +180,19 @@ export class RauserScene extends Phaser.Scene {
     this.enemies = this.physics.add.group({
       classType: Enemy,
       runChildUpdate: true,
+      createCallback: (enemy:Enemy)=>{
+        enemy.body.setCircle(64,0,0);
+      }
     });
 
     this.battleships = this.physics.add.group({
       classType: Battleship,
       runChildUpdate: true,
+      createCallback: (battleship:Battleship)=>{
+        
+        battleship.body.setSize(247, 43-16);
+        battleship.body.setOffset(0, 20);
+      }
     });
 
     this.text = this.add.text(10, 10, '', {
