@@ -17,8 +17,8 @@ let gameSettings = <gameSettings>{
   battleshipSpawnInterval: 16000,
   maxBattleships: 1,
   zoom: 0.4,
-  sfxVolume: 0.0,
-  musicVolume: 0.0,
+  sfxVolume: 0.4,
+  musicVolume: 0.2,
 };
 
 export class SettingsSingleton {
