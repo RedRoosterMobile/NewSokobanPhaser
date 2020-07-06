@@ -127,9 +127,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.plane.body.setCircle(64,0,0);
     //this.plane.body.setSize(64+32, 64+32);
     //mySprite.body.setOffset(12, 5);
-    
+
     setTimeout(()=>{
-      this.plane.setVelocityY(-10800);  
+      this.plane.setVelocityY(-10800);
       this.plane.setGravity(0, -300);
     },1000);
   }
@@ -283,6 +283,9 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
       this.boost.setVisible(false);
       this.plane.setAcceleration(0);
+      // @ts-ignore
+      //this.plane.setAcceleration(this.plane.body.acceleration.x*0.1,this.plane.body.acceleration.y*0.1);
+
     }
 
     // steer

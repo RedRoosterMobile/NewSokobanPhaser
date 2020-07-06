@@ -107,7 +107,7 @@ export class RauserScene extends Phaser.Scene {
       'sndMachineGun',
       'assets/rauser/sounds/bassy_machine_gun.ogg'
     );
-    this.load.audio('sndGameMusic', 'assets/rauser/sounds/loop.ogg');
+    this.load.audio('sndGameMusic', 'assets/rauser/sounds/rauser_bounce.mp3');
     this.load.audio('sndExplosion', 'assets/rauser/sounds/explosion.mp3');
     this.load.audio(
       'sndExplosion2',

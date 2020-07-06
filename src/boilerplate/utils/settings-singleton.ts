@@ -18,7 +18,7 @@ let gameSettings = <gameSettings>{
   maxBattleships: 1,
   zoom: 0.4,
   sfxVolume: 0.4,
-  musicVolume: 0.2,
+  musicVolume: 0.4,
 };
 
 export class SettingsSingleton {
