@@ -1,4 +1,5 @@
-// Phaser.GameObjects.TileSprite
+// better backround colors
+// https://www.google.com/search?q=sunset+indonesia&tbm=isch&ved=2ahUKEwj--teky67qAhWXt6QKHW5GD5MQ2-cCegQIABAA&oq=sunset+indonesia&gs_lcp=CgNpbWcQAzICCAAyBggAEAUQHjIGCAAQBRAeMgYIABAIEB4yBggAEAgQHjIGCAAQCBAeMgYIABAIEB4yBggAEAgQHjIGCAAQCBAeMgYIABAIEB46BAgAEEM6BQgAELEDOgcIABCxAxBDUJt5WNCVAWCTlwFoAHAAeAGAAcoCiAHKCpIBCDE0LjEuMC4xmAEAoAEBqgELZ3dzLXdpei1pbWc&sclient=img&ei=mtX9Xv7FI5fvkgXujL2YCQ&bih=660&biw=1440#imgrc=g3oLo6HeP3UXcM
 export class Background extends Phaser.Physics.Arcade.Sprite {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   bg1: Phaser.GameObjects.TileSprite;
