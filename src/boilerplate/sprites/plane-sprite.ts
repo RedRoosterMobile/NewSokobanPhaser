@@ -100,7 +100,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     // waaay better. let camera follow muzzle. move the muzzele further when speeding and rotation is heavy left or right. come closer when 0 or 180 deg
     this.muzzle = this.scene.add.image(0, 0, 'car', 0);
     this.camMuzzle = this.scene.add.image(0, 0, 'car', 0);
-    this.muzzle.setVisible(true);
+    this.muzzle.setVisible(false);
     this.camMuzzle.setVisible(false);
 
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
