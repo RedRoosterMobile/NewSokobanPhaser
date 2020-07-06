@@ -13,12 +13,13 @@
 // - intro music? https://www.remix64.com/track/mano/wings-of-fury-orchestral-remix/
 
 import { SettingsSingleton } from '../utils/settings-singleton';
-import {virtualScreen, getWorldSize} from '../utils/render-constants';
+import { virtualScreen, getWorldSize } from '../utils/render-constants';
 var gameSettings = {
   ...SettingsSingleton.getInstance().settings,
 };
 console.log(gameSettings);
 import { Tilemaps } from 'phaser';
+import { Bullet } from './bullet-image';
 
 const sumArrayValues = (values) => {
   return values.reduce((p, c) => p + c, 0);
@@ -57,6 +58,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   initialZoom: integer;
 
+  playerBullets: Phaser.Physics.Arcade.Group;
+
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
   emitterFrame: number;
@@ -77,7 +80,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
   }
   createPlane(x: number, y: number): void {
     this.plane = this.scene.physics.add.image(x, y, 'planePhysics', 0);
-    this.plane.setInteractive(true, function () {});
+    this.plane.setInteractive(true, function () { });
     this.cursors = this.scene.input.keyboard.createCursorKeys();
     this.plane.setBounce(1, 1);
     this.plane.setCollideWorldBounds(true);
@@ -124,14 +127,14 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
     this.createParticles();
     this.createAnims();
-    this.plane.body.setCircle(64,0,0);
+    this.plane.body.setCircle(64, 0, 0);
     //this.plane.body.setSize(64+32, 64+32);
     //mySprite.body.setOffset(12, 5);
 
-    setTimeout(()=>{
+    setTimeout(() => {
       this.plane.setVelocityY(-10800);
       this.plane.setGravity(0, -300);
-    },1000);
+    }, 1000);
   }
 
   createParticles(): void {
@@ -218,6 +221,42 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.plane.setVelocityY(this.plane.body.velocity.y + vector.y);
   }
 
+  setBullets(bullets: Phaser.Physics.Arcade.Group): void {
+    this.playerBullets = bullets;
+  }
+
+  // fixme, that only works when NOT accellerating
+  fire = () => {
+    // body rotation is in DEGREES!!
+    // @ts-ignore
+    //const targetRotation = (Phaser.Math.DegToRad(this.plane.body.rotation) + this.plane.rotation) / 2;
+    const targetRotation = Phaser.Math.DegToRad(this.plane.body.rotation) ;
+    const targetAngle = Phaser.Math.RadToDeg(targetRotation);
+    const diffDegree = 10;
+    this.playerBullets
+      .get(this.muzzle.x, this.muzzle.y)
+      .setActive(true)
+      .setVisible(true)
+      .fireStraight2(
+        targetRotation
+      );
+
+    this.playerBullets
+      .get(this.muzzle.x, this.muzzle.y)
+      .setActive(true)
+      .setVisible(true)
+      .fireStraight2(
+        Phaser.Math.DegToRad(targetAngle - diffDegree)
+      );
+    this.playerBullets
+      .get(this.muzzle.x, this.muzzle.y)
+      .setActive(true)
+      .setVisible(true)
+      .fireStraight2(
+        Phaser.Math.DegToRad(targetAngle + diffDegree)
+      );
+  };
+
   updatePlane(): void {
     if (!this.active || !this.plane.body) {
       // console.log('probaly dead!', this.hp);
@@ -232,24 +271,22 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     }
 
     if (this.cursors.space.isDown && !this.isShooting) {
-      if (this.fireCallback) {
-        this.fireCallback();
-        this.isShooting = true;
-        // TODO
-        // - play only once per shot..
-        // - hide after shot
-        this.muzzleAnimation.setVisible(true);
-        this.animateIfNecessary('boost', this.muzzleAnimation, 0);
-        this.knockback(10);
+      this.fire();
+      this.isShooting = true;
+      // TODO
+      // - play only once per shot..
+      // - hide after shot
+      this.muzzleAnimation.setVisible(true);
+      this.animateIfNecessary('boost', this.muzzleAnimation, 0);
+      this.knockback(10);
 
-        this.plane.body.velocity.y;
+      this.plane.body.velocity.y;
 
-        // wait until next shot
-        this.scene.time.delayedCall(250, () => {
-          this.muzzleAnimation.setVisible(false);
-          this.isShooting = false;
-        });
-      }
+      // wait until next shot
+      this.scene.time.delayedCall(250, () => {
+        this.muzzleAnimation.setVisible(false);
+        this.isShooting = false;
+      });
     }
 
     // thrust
@@ -331,7 +368,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     //const camRotation = Math.abs(Math.cos(rotation)*300)*-1;
     const speed = Math.sqrt(
       Math.pow(this.plane.body.velocity.x, 2) +
-        Math.pow(this.plane.body.velocity.y, 2)
+      Math.pow(this.plane.body.velocity.y, 2)
     );
 
     //console.log(speed);

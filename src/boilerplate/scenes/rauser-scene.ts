@@ -65,8 +65,6 @@ export class RauserScene extends Phaser.Scene {
   previousDirection: string;
   waterGraphics: Phaser.GameObjects.Graphics;
   battleships: Phaser.Physics.Arcade.Group;
-  hackBattleship: any;
-  buggyBattleshipAlive: true;
   fighterSpawnTime: number;
   battleshipSpawnTime: number;
 
@@ -262,92 +260,16 @@ export class RauserScene extends Phaser.Scene {
       }
     );
 
-    // hack! strange positioning bug for FIRST ship
-    /*this.hackBattleship = this.battleships
-      .get()
-      .setActive(false)
-      .setVisible(false);
-    setTimeout(() => {
-      console.log('getting rid of buggy battleship');
-      this.hackBattleship.destroy();
-    }, 100);*/
 
-    const playerFireCallBack = () => {
-      const bullet: Bullet = this.playerBullets
-        .get()
-        .setActive(true)
-        .setVisible(true);
-      const bullet2: Bullet = this.playerBullets
-        .get()
-        .setActive(true)
-        .setVisible(true);
-      const bullet3: Bullet = this.playerBullets
-        .get()
-        .setActive(true)
-        .setVisible(true);
-      if (bullet) {
-        //  d.translateX
-        //bullet.fireStraight(this.planeObj.plane);
-        //http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
-        // https://phaser.discourse.group/t/translate-inner-position-of-rotating-container-into-absolute-position/1762
-        //https://phaser.discourse.group/t/object-position-to-canvas-pixel-position/1099/6
-        // @ts-ignore
-
-        const targetRotation = this.planeObj.plane.rotation;
-        const targetAngle = Phaser.Math.RadToDeg(targetRotation);
-        const diff = 10;
-        bullet.fireStraight2(
-          this.planeObj.muzzle.x,
-          this.planeObj.muzzle.y,
-          targetRotation
-        );
-        bullet2.fireStraight2(
-          this.planeObj.muzzle.x,
-          this.planeObj.muzzle.y,
-          Phaser.Math.DegToRad(targetAngle - diff)
-        );
-        bullet3.fireStraight2(
-          this.planeObj.muzzle.x,
-          this.planeObj.muzzle.y,
-          Phaser.Math.DegToRad(targetAngle + diff)
-        );
-        const en = this.enemies.getFirstAlive();
-        if (en) {
-          //bullet3.fireAtTarget(this.planeObj.plane, {x:en.x,y:en.y});
-          // somehow use world coordinates for muzzle
-          // http://labs.phaser.io/edit.html?src=src\game%20objects\container\parent%20matrix.js
-          //bullet.fireStraight2(this.planeObj.muzzle.displayOriginX,this.planeObj.muzzle.displayOriginY,this.planeObj.plane.rotation);
-        }
-      }
-    };
     // todo: heatseaking missle fireAtTarget (get closetst enemy?)
-    this.planeObj.setFireCallback(playerFireCallBack);
+    this.planeObj.setBullets(this.playerBullets);
 
     // Fires bullet from player on left click of mouse
     this.input.on('pointerdown', (pointer, time, lastFired) => {
       // Get bullet from bullets group
       // TODO: move into player class
-      playerFireCallBack();
+      this.planeObj.fire();
     });
-
-    // use: white gray and dark pixel frame
-    // explosion animation gray and white and black circles
-    /*let emitter = particles.createEmitter({
-            alpha: { start: 1, end: 0 },
-            scale: { start: 0.5, end: 2.5 },
-            //tint: { start: 0xff945e, end: 0xff945e },
-            speed: 20,
-            accelerationY: -300,
-            angle: { min: -85, max: -95 },
-            rotate: { min: -180, max: 180 },
-            lifespan: { min: 1000, max: 1100 },
-            blendMode: 'ADD',
-            frequency: 110,
-            maxParticles: 10,
-            // @ts-ignore
-            particleClass: DamageParticle
-
-        });*/
 
     this.waterGraphics = this.add.graphics();
     //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);

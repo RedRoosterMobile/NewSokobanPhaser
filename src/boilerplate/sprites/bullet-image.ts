@@ -109,18 +109,28 @@ export class Bullet extends Phaser.GameObjects.Image {
     this.direction = Math.atan(shooter.x / shooter.y);
   }
 
-  fireStraight2(x, y, rotation): void {
+  fireStraight2(rotation): void {
     this.playFireSound();
-    this.setPosition(x + 25, y); // Initial position
+    //this.setPosition(x, y); // Initial position
+    /*// @ts-ignore
+    this.body.x=x;
+    // @ts-ignore
+    this.body.y=y;*/
     this.rotation = rotation; // angle bullet with shooters rotation
 
+
+    const vec2:Phaser.Math.Vector2 = new Phaser.Math.Vector2(128,0);
     this.scene.physics.velocityFromRotation(
       rotation,
       40000,
       // @ts-ignore
-      this.body.acceleration
+      vec2
     );
-    this.direction = Math.atan(x / y);
+    // @ts-ignore
+    this.body.acceleration.x=this.body.velocity.x+vec2.x;
+    // @ts-ignore
+    this.body.acceleration.y=this.body.velocity.y+vec2.y;
+
     this.born = 0; // Time since new bullet spawned
   }
   // Updates the position of the bullet each cycle
