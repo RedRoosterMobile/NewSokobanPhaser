@@ -160,6 +160,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
         .setAlpha(0.7);
 
       this.explosions.anims.play('explode' + Phaser.Math.Between(1, 3));
+      this.scene.cameras.main.shake(350,0.03)
 
       this.playExplosionSound();
       // or set inactive??? dunno...

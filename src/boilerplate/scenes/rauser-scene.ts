@@ -380,27 +380,21 @@ export class RauserScene extends Phaser.Scene {
       const { x, y } = this.planeObj.plane;
 
       const { worldSizeX, worldSizeY } = this.getWorldSize();
-      //y = Math.min(y, -100);
-
       let anEnemy: Enemy = this.enemies.get().setActive(true).setVisible(true);
-      Phaser.Actions.RotateAroundDistance(
+      const circleAroundPlayer = new Phaser.Geom.Circle(x, y, worldSizeY);
+      Phaser.Actions.PlaceOnCircle(
         [anEnemy],
-        { x, y },
-        Phaser.Math.DegToRad(Phaser.Math.Between(180, 0)),
-        worldSizeY
+        circleAroundPlayer,
+        Phaser.Math.DegToRad(Phaser.Math.Between(-180,0))
       );
-      //anEnemy.x = Phaser.Math.Between(0,worldSizeX);
-      //anEnemy.y = Phaser.Math.Between(0,worldSizeY);
       anEnemy.setTarget(this.planeObj.plane);
       anEnemy.setBullets(this.enemyBullets);
-      //this.planeObj.x
-      //this.planeObj.y
 
       console.log('creating enemy at ', anEnemy.x, anEnemy.y);
       this.fighterSpawnTime = time;
-    } else if (this.fighterSpawnTime !=0 && interval) {
-        // enough fighters exist..
-        this.fighterSpawnTime = time;
+    } else if (this.fighterSpawnTime != 0 && interval) {
+      // enough fighters exist..
+      this.fighterSpawnTime = time;
     }
   }
 
@@ -421,20 +415,26 @@ export class RauserScene extends Phaser.Scene {
       //battleship.body.x=battleship.x=0;
       //battleship.body.y=battleship.y=worldSizeY;
 
-      const spawnLeftOfPlayer = !!Phaser.Math.Between(0,1);
+      const spawnLeftOfPlayer = !!Phaser.Math.Between(0, 1);
 
-      battleship.x = spawnLeftOfPlayer ? this.planeObj.plane.x - worldSizeY : this.planeObj.plane.x + worldSizeY*2;
-      battleship.y = worldSizeY+16;
+      battleship.x = spawnLeftOfPlayer
+        ? this.planeObj.plane.x - worldSizeY
+        : this.planeObj.plane.x + worldSizeY * 2;
+      battleship.y = worldSizeY + 16;
 
       battleship.setTarget(this.planeObj.plane);
       battleship.setBullets(this.enemyBullets);
       //battleship.setOrigin(0.5,0.8);
       //battleship.setOrigin(1,-1);
-      console.log(`creating ship ${spawnLeftOfPlayer ? 'left' : 'right'} of player `, battleship.x, battleship.y);
+      console.log(
+        `creating ship ${spawnLeftOfPlayer ? 'left' : 'right'} of player `,
+        battleship.x,
+        battleship.y
+      );
       this.battleshipSpawnTime = time;
-    } else if (this.battleshipSpawnTime !=0 && interval) {
-        // enough fighters exist..
-        this.battleshipSpawnTime = time;
+    } else if (this.battleshipSpawnTime != 0 && interval) {
+      // enough fighters exist..
+      this.battleshipSpawnTime = time;
     }
   }
 
