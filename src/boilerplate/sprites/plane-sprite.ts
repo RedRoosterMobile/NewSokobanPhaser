@@ -53,7 +53,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
   renderContainer: Phaser.GameObjects.Container;
   hpMax: 300;
   hp: number;
-  fireCallback: Function;
   isShooting: boolean;
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   initialZoom: integer;
@@ -101,7 +100,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     // waaay better. let camera follow muzzle. move the muzzele further when speeding and rotation is heavy left or right. come closer when 0 or 180 deg
     this.muzzle = this.scene.add.image(0, 0, 'car', 0);
     this.camMuzzle = this.scene.add.image(0, 0, 'car', 0);
-    this.muzzle.setVisible(false);
+    this.muzzle.setVisible(true);
     this.camMuzzle.setVisible(false);
 
     // https://phaser.io/examples/v3/view/game-objects/container/add-array-of-sprites-to-container
@@ -123,7 +122,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.muzzle.setOrigin(0.5, 0.5);
     this.camMuzzle.setOrigin(0.5, 0.5);
     //this.muzzle.setAngle(90);
-    //this.muzzle.x=64;
 
     this.createParticles();
     this.createAnims();
@@ -177,10 +175,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     if (this.hp < this.hpMax) this.hp += value;
   }
 
-  setFireCallback(callback: Function) {
-    this.fireCallback = callback;
-  }
-
   createAnims(): void {
     this.scene.anims.create({
       key: 'boost',
@@ -230,11 +224,15 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     // body rotation is in DEGREES!!
     // @ts-ignore
     //const targetRotation = (Phaser.Math.DegToRad(this.plane.body.rotation) + this.plane.rotation) / 2;
-    const targetRotation = Phaser.Math.DegToRad(this.plane.body.rotation) ;
+    //const targetRotation = Phaser.Math.DegToRad(this.plane.body.rotation) ;
+    const targetRotation = this.plane.rotation;
     const targetAngle = Phaser.Math.RadToDeg(targetRotation);
     const diffDegree = 10;
+    // somehow a sine function has to fix this
+    const x = this.muzzle.x+15;
+    const y = this.muzzle.y;
     this.playerBullets
-      .get(this.muzzle.x, this.muzzle.y)
+      .get(x, y)
       .setActive(true)
       .setVisible(true)
       .fireStraight2(
@@ -242,14 +240,14 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
       );
 
     this.playerBullets
-      .get(this.muzzle.x, this.muzzle.y)
+      .get(x, y)
       .setActive(true)
       .setVisible(true)
       .fireStraight2(
         Phaser.Math.DegToRad(targetAngle - diffDegree)
       );
     this.playerBullets
-      .get(this.muzzle.x, this.muzzle.y)
+      .get(x, y)
       .setActive(true)
       .setVisible(true)
       .fireStraight2(
@@ -270,24 +268,7 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
       this.increaseHealth(1);
     }
 
-    if (this.cursors.space.isDown && !this.isShooting) {
-      this.fire();
-      this.isShooting = true;
-      // TODO
-      // - play only once per shot..
-      // - hide after shot
-      this.muzzleAnimation.setVisible(true);
-      this.animateIfNecessary('boost', this.muzzleAnimation, 0);
-      this.knockback(10);
 
-      this.plane.body.velocity.y;
-
-      // wait until next shot
-      this.scene.time.delayedCall(250, () => {
-        this.muzzleAnimation.setVisible(false);
-        this.isShooting = false;
-      });
-    }
 
     // thrust
     if (this.cursors.up.isDown) {
@@ -325,6 +306,8 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
 
     }
 
+
+
     // steer
     if (this.cursors.left.isDown && !this.cursors.up.isDown) {
       this.plane.setAngularVelocity(-300);
@@ -340,6 +323,25 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
       this.plane.setAngularVelocity(0);
     }
     this.updateWings();
+
+    if (this.cursors.space.isDown && !this.isShooting) {
+      this.fire();
+      this.isShooting = true;
+      // TODO
+      // - play only once per shot..
+      // - hide after shot
+      this.muzzleAnimation.setVisible(true);
+      this.animateIfNecessary('boost', this.muzzleAnimation, 0);
+      this.knockback(10);
+
+      this.plane.body.velocity.y;
+
+      // wait until next shot
+      this.scene.time.delayedCall(250, () => {
+        this.muzzleAnimation.setVisible(false);
+        this.isShooting = false;
+      });
+    }
     // @ts-ignore
     //this.scene.text.setText('Speed: ' + this.plane.body.speed + ' fps:'+ this.scene.game.loop.actualFps);
   }
@@ -351,7 +353,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.renderContainer.setX(this.plane.x);
     this.renderContainer.setY(this.plane.y);
     this.updateWingsScale();
-    // update muzzle
     const rotation = this.plane.rotation;
 
     const thePoint = new Phaser.Geom.Point(-100000, 0);
@@ -364,23 +365,13 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     );
     const thePoint2 = new Phaser.Geom.Point(-100000, 0);
 
-    // TODO: try velocity
     //const camRotation = Math.abs(Math.cos(rotation)*300)*-1;
     const speed = Math.sqrt(
       Math.pow(this.plane.body.velocity.x, 2) +
       Math.pow(this.plane.body.velocity.y, 2)
     );
 
-    //console.log(speed);
-    // when going straight left/right and speeding
     let camRotation;
-
-    if (this.cursors.left.isDown || this.cursors.right.isDown) {
-      //camRotation = speed/4*-1;
-    } else {
-      //camRotation = speed/2*-1;
-    }
-
     let secret = Math.abs(Math.sin(this.plane.angle));
     secret = Math.atan(this.camMuzzle.x / this.camMuzzle.y);
 

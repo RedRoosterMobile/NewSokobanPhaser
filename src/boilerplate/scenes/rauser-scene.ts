@@ -71,7 +71,8 @@ export class RauserScene extends Phaser.Scene {
   preload(): void {
     // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/bullets.png
     // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/ship.png
-    this.load.image('bullet', 'assets/rauser/bullets.png');
+    //this.load.image('bullet', 'assets/rauser/bullets.png');
+    this.load.image('bullet', 'assets/rauser/single_bullet.png');
     this.load.image('player', 'assets/rauser/plane1.png');
     this.load.image('bgGradient', 'assets/rauser/bg_gradient.png');
     this.load.image('battleship', 'assets/rauser/battleship.png');
