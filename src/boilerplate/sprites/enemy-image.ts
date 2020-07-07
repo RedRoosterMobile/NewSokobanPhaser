@@ -5,9 +5,7 @@ import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
 import { getWorldSize } from '../utils/render-constants';
 
-var gameSettings = {
-  ...SettingsSingleton.getInstance().settings,
-};
+const gameSettings = SettingsSingleton.getInstance().settings;
 
 var ROTATION_SPEED = 1 * Math.PI; // 0.5 arc per sec, 2 sec per arc
 var ROTATION_SPEED_DEGREES = Phaser.Math.RadToDeg(ROTATION_SPEED);

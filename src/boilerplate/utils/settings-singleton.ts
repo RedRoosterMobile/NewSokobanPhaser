@@ -4,12 +4,16 @@ interface Action {
 
 interface gameSettings {
   maxFighters: integer;
-  fighterSpawnInterval: integer,
-  maxBattleships: integer,
-  battleshipSpawnInterval: integer,
+  fighterSpawnInterval: integer;
+  maxBattleships: integer;
+  battleshipSpawnInterval: integer;
   zoom: number;
   musicVolume: number;
   sfxVolume: number;
+  // game values
+  score: integer;
+  currentStreak: integer;
+  streakLevels: Array<integer>;
 }
 let gameSettings = <gameSettings>{
   maxFighters: 12,
@@ -19,6 +23,11 @@ let gameSettings = <gameSettings>{
   zoom: 0.4,
   sfxVolume: 0.0,
   musicVolume: 0.0,
+
+  // game values
+  score: 0,
+  currentStreak: 0,
+  streakLevels: [3, 8, 13, 21],
 };
 
 export class SettingsSingleton {

@@ -14,9 +14,7 @@
 
 import { SettingsSingleton } from '../utils/settings-singleton';
 import { virtualScreen, getWorldSize } from '../utils/render-constants';
-var gameSettings = {
-  ...SettingsSingleton.getInstance().settings,
-};
+const gameSettings = SettingsSingleton.getInstance().settings;
 console.log(gameSettings);
 import { Tilemaps } from 'phaser';
 import { Bullet } from './bullet-image';

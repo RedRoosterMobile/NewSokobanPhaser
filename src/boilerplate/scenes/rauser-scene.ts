@@ -6,6 +6,9 @@ import { Enemy } from './../sprites/enemy-image';
 import { Background } from './../sprites/background-sprite';
 import { DamageParticle } from './../sprites/damage-particle';
 
+import HUD from './hud-scene'
+
+
 import { virtualScreen, getWorldSize } from '../utils/render-constants';
 import {
   blur,
@@ -50,9 +53,7 @@ rotating a thumbstick left or right then jamming it straight forward."
 import { SettingsSingleton } from '../utils/settings-singleton';
 import { Battleship } from '../sprites/battleship-sprite';
 
-var gameSettings = {
-  ...SettingsSingleton.getInstance().settings,
-};
+const gameSettings = SettingsSingleton.getInstance().settings;
 
 export class RauserScene extends Phaser.Scene {
   planeObj: Plane;
@@ -78,7 +79,7 @@ export class RauserScene extends Phaser.Scene {
     this.load.image('bgGradient', 'assets/rauser/bg_gradient.png');
     this.load.image('battleship', 'assets/rauser/battleship.png');
 
-    this.load.image('enemy', 'assets/car90.png');
+    this.load.image('car', 'assets/car90.png');
 
     this.load.image('planeBody', 'assets/rauser/plane_body-fs8.png');
     this.load.image('planePhysics', 'assets/rauser/plane_transparent-fs8.png');
@@ -120,6 +121,10 @@ export class RauserScene extends Phaser.Scene {
   }
 
   create(): void {
+      
+    
+    this.scene.add('hud-scene', HUD, true)
+    //this.scene.run('hud-scene')
     const soundConfig = {
       mute: false,
       volume: gameSettings.musicVolume,
@@ -398,13 +403,14 @@ export class RauserScene extends Phaser.Scene {
         }
       }
 
+      /*
       this.text.setText(
         'Speed: ' +
           // @ts-ignore
           this.planeObj.plane.body.speed +
           ' fps:' +
           this.game.loop.actualFps
-      );
+      );*/
     }
 
     if (this.waterGraphics) this.waterGraphics.x = this.planeObj.plane.x - 1200;

@@ -5,9 +5,7 @@ import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
 import { virtualScreen, getWorldSize } from '../utils/render-constants';
 
-var gameSettings = {
-  ...SettingsSingleton.getInstance().settings,
-};
+const gameSettings = SettingsSingleton.getInstance().settings;
 
 // todo make interfaces for all enemy classes and put them in config
 const battleshipConfig = {

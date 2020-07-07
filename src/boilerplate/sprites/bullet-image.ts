@@ -3,7 +3,7 @@
 import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
 
-var gameSettings = SettingsSingleton.getInstance().settings;
+const gameSettings = SettingsSingleton.getInstance().settings;
 
 export class Bullet extends Phaser.GameObjects.Image {
   // analysis: https://www.youtube.com/watch?v=3X0yxfQGABc
