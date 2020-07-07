@@ -33,6 +33,7 @@ export class Bullet extends Phaser.GameObjects.Image {
   target: Plane;
 
   constructor(scene, x = 0, y = 0) {
+    // how to add scpecific bullet classes? inheritance? make this abstract class
     super(scene, x, y, 'bullet');
     this.speed = 1;
     this.born = 0;
@@ -40,8 +41,9 @@ export class Bullet extends Phaser.GameObjects.Image {
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.setOrigin(0.5, 0.5);
-    this.setScale(5);
-    this.setSize(12, 12);
+    this.setScale(2);
+    //this.setSize(12, 12); // ?
+    this.setTint(0xee9900);
     this.sound = this.scene.sound.add('sndMachineGun');
   }
 
@@ -92,7 +94,10 @@ export class Bullet extends Phaser.GameObjects.Image {
     }
 
     //this.rotation = shooter.rotation; // angle bullet with shooters rotation
-    this.rotation = Phaser.Math.DegToRad(this.direction);
+    this.rotation = Phaser.Math.Angle.BetweenPoints(shooter, target);
+
+
+    //this.rotation = shooter.rotation + Phaser.Math.DegToRad(-90);
     this.born = 0; // Time since new bullet spawned
   }
 

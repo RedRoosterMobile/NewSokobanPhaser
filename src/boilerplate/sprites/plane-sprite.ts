@@ -219,6 +219,20 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     this.playerBullets = bullets;
   }
 
+  fireStraight2(bullet:Bullet,rotation): void {
+    bullet.playFireSound();
+    bullet.rotation = rotation; // angle bullet with shooters rotation
+    const vec2:Phaser.Math.Vector2 = new Phaser.Math.Vector2(128,0);
+    this.scene.physics.velocityFromRotation(
+      rotation,
+      6000,
+      // @ts-ignore
+      bullet.body.velocity
+    );
+
+    bullet.born = 0; // Time since new bullet spawned
+  }
+
   // fixme, that only works when NOT accellerating
   fire = () => {
     // body rotation is in DEGREES!!
@@ -231,13 +245,11 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
     // somehow a sine function has to fix this
     const x = this.muzzle.x+15;
     const y = this.muzzle.y;
-    this.playerBullets
+    const bullet1 = this.playerBullets
       .get(x, y)
       .setActive(true)
       .setVisible(true)
-      .fireStraight2(
-        targetRotation
-      );
+    this.fireStraight2(bullet1,targetRotation);
 
     this.playerBullets
       .get(x, y)
