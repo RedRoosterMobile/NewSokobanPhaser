@@ -148,6 +148,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
 
     if (this.hp <= 0 && !this.isSinking) {
       this.isSinking = true;
+      gameSettings.score += 5;
       // TODO:
       // random explosionz along the full width of the battleship
       this.explosions

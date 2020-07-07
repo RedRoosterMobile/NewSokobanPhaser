@@ -207,6 +207,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
     if (this.hp <= 0) {
       // TODO: explosionz!!!!!!
+      gameSettings.score += 1;
       this.explosions
         .setVisible(true)
         .setScale(Phaser.Math.Between(4, 8))
