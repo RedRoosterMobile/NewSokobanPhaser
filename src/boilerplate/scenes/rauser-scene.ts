@@ -73,6 +73,7 @@ export class RauserScene extends Phaser.Scene {
     // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/ship.png
     //this.load.image('bullet', 'assets/rauser/bullets.png');
     this.load.image('bullet', 'assets/rauser/bullet_gray.png');
+    this.load.image('bullets', 'assets/rauser/bullets.png');
     this.load.image('player', 'assets/rauser/plane1.png');
     this.load.image('bgGradient', 'assets/rauser/bg_gradient.png');
     this.load.image('battleship', 'assets/rauser/battleship.png');
@@ -201,11 +202,17 @@ export class RauserScene extends Phaser.Scene {
     // Add 2 groups for Bullet objects
     this.playerBullets = this.physics.add.group({
       classType: Bullet,
+      createCallback: (bullet: Bullet) => {
+        bullet.createForPlayer();
+      },
       runChildUpdate: true,
     });
     this.enemyBullets = this.physics.add.group({
       classType: Bullet,
       runChildUpdate: true,
+      createCallback: (bullet: Bullet) => {
+        bullet.createForEnemyPlane();
+      },
     });
 
     // player shoots enemy

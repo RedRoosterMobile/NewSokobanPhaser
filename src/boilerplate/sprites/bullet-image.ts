@@ -3,9 +3,7 @@
 import { Plane } from './plane-sprite';
 import { SettingsSingleton } from '../utils/settings-singleton';
 
-var gameSettings = {
-  ...SettingsSingleton.getInstance().settings,
-};
+var gameSettings = SettingsSingleton.getInstance().settings;
 
 export class Bullet extends Phaser.GameObjects.Image {
   // analysis: https://www.youtube.com/watch?v=3X0yxfQGABc
@@ -40,11 +38,25 @@ export class Bullet extends Phaser.GameObjects.Image {
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
-    this.setOrigin(0.5, 0.5);
-    this.setScale(2);
     //this.setSize(12, 12); // ?
-    this.setTint(0xee9900);
+    //this.setTint(0xee9900);
     this.sound = this.scene.sound.add('sndMachineGun');
+  }
+  
+  createForPlayer():void {
+    this.setTexture('bullets');
+    this.setOrigin(0.5, 0.5);
+    this.setScale(8);
+  }
+
+  createForEnemyPlane():void {
+    this.setOrigin(0.5, 0.5);
+    this.setScale(2,2);
+  }
+
+  createForBattleship():void {
+    this.setOrigin(0.5, 0.5);
+    this.setScale(2,3);
   }
 
   playFireSound(loop = false) {
