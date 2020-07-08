@@ -9,6 +9,7 @@ const gameSettings = SettingsSingleton.getInstance().settings;
 export default class HUDScene extends Phaser.Scene {
   text: Phaser.GameObjects.Text;
   gui: any;
+  music: Phaser.Sound.BaseSound;
   constructor() {
     super('hud-scene');
     this.gui = new dat.GUI();
@@ -16,9 +17,22 @@ export default class HUDScene extends Phaser.Scene {
 
   preload(): void {
     // load bitmap font
+    this.load.audio('sndGameMusic', 'assets/rauser/sounds/rauser_bounce.mp3');
   }
 
   create(): void {
+    const soundConfig = {
+      mute: false,
+      volume: 0.1,
+      rate: 1,
+      detune: 0,
+      seek: 0,
+      loop: true,
+      delay: 0,
+    };
+    this.sound.play('sndGameMusic', soundConfig);
+    this.music = this.sound.get('sndGameMusic');
+
     console.log('preloading HUDDDDDDD scene.........!!!!!');
     // create hud
     const test = this.add
@@ -34,19 +48,21 @@ export default class HUDScene extends Phaser.Scene {
     this.gui.add(gameSettings, 'maxFighters', 0, 100, 1);
     this.gui.add(gameSettings, 'fighterSpawnInterval', 1000, 12000, 1000);
     this.gui.add(gameSettings, 'maxBattleships', 0, 100, 1);
-    this.gui.add(
-      gameSettings,
-      'battleshipSpawnInterval',
-      1000,
-      32000,
-      1000
-    );
+    this.gui.add(gameSettings, 'battleshipSpawnInterval', 1000, 32000, 1000);
     this.gui.add(gameSettings, 'zoom', 0.1, 0.5, 0.1);
     this.gui.add(gameSettings, 'sfxVolume', 0.0, 1.0, 0.01);
     this.gui.add(gameSettings, 'musicVolume', 0.0, 1.0, 0.01);
   }
 
   update(time: number, delta: number): void {
+      /*
+    if (!this.music.isPlaying) {
+        this.music.play('sndGameMusic');
+
+    }*/
+    // @ts-ignore
+    this.music.setVolume(gameSettings.musicVolume);
+    
     // update HUD
     gameSettings.score;
     gameSettings.currentStreak;

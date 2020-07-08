@@ -108,7 +108,6 @@ export class RauserScene extends Phaser.Scene {
       'sndMachineGun',
       'assets/rauser/sounds/bassy_machine_gun.ogg'
     );
-    this.load.audio('sndGameMusic', 'assets/rauser/sounds/rauser_bounce.mp3');
     this.load.audio('sndExplosion', 'assets/rauser/sounds/explosion.mp3');
     this.load.audio(
       'sndExplosion2',
@@ -125,16 +124,7 @@ export class RauserScene extends Phaser.Scene {
     
     this.scene.add('hud-scene', HUD, true)
     //this.scene.run('hud-scene')
-    const soundConfig = {
-      mute: false,
-      volume: gameSettings.musicVolume,
-      rate: 1,
-      detune: 0,
-      seek: 0,
-      loop: true,
-      delay: 0,
-    };
-    this.sound.play('sndGameMusic', soundConfig);
+   
 
     const { worldSizeX, worldSizeY } = this.getWorldSize();
     this.fighterSpawnTime = 0;
