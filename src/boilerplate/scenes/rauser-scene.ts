@@ -374,6 +374,7 @@ export class RauserScene extends Phaser.Scene {
   }
 
   update(time, delta): void {
+    //this.sound.play('sndGameMusic', soundConfig);
     if (this.planeObj) this.planeObj.updatePlane();
 
     if (this.planeObj.active && time > 4000) {
