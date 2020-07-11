@@ -9,25 +9,31 @@ const gameSettings = SettingsSingleton.getInstance().settings;
 export default class HUDScene extends Phaser.Scene {
   text: Phaser.GameObjects.Text;
   gui: any;
-  t: number;
+  shaderTime: number;
   music: Phaser.Sound.BaseSound;
+  waterCam: Phaser.Cameras.Scene2D.Camera;
   constructor() {
     super('hud-scene');
     this.gui = new dat.GUI();
   }
 
   preload(): void {
-    this.t=0.0;
+    this.shaderTime=0.0;
     console.log('preloading HUDDDDDDD scene.........!!!!!');
     // load bitmap font
     this.load.audio('sndGameMusic', 'assets/rauser/sounds/rauser_bounce.mp3');
     //var customPipeline = this.game.renderer.addPipeline('Custom', new CustomPipeline2(game));
     //customPipeline.setFloat2('resolution', game.config.width, game.config.height);
+    // https://phaser.discourse.group/t/multiple-camera-custom-shaders/3202
   }
 
   create(): void {
     
-    this.cameras.main.setRenderToTexture('Custom');
+    //this.cameras.main.setRenderToTexture('Custom');
+
+
+    
+
     const soundConfig = {
       mute: false,
       volume: 0.0,
@@ -52,6 +58,14 @@ export default class HUDScene extends Phaser.Scene {
       fill: '#22e1ff',
     });
 
+
+    this.waterCam = this.cameras.add(800-test.width+10, -20, 200, 200);
+    this.waterCam.centerOn(test.x,test.y);
+    this.waterCam.setRenderToTexture('Custom');
+    this.waterCam.setFlipY(true);
+    
+    //this.waterCam.ignore(this.text1)
+
     this.gui.add(gameSettings, 'maxFighters', 0, 100, 1);
     this.gui.add(gameSettings, 'fighterSpawnInterval', 1000, 12000, 1000);
     this.gui.add(gameSettings, 'maxBattleships', 0, 100, 1);
@@ -63,8 +77,8 @@ export default class HUDScene extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     // @ts-ignore
-    window.customPipeline.setFloat1('time', this.t);
-    this.t += 0.005;
+    window.customPipeline.setFloat1('time', this.shaderTime);
+    this.shaderTime += 0.005;
     
       /*
     if (!this.music.isPlaying) {
