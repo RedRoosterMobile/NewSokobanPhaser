@@ -1,5 +1,6 @@
 import 'phaser';
 import { RauserScene } from './scenes/rauser-scene';
+import CustomPipeline from './rendering-pipelines/custom-pipeline';
 
 // main game configuration
 /*const config: Phaser.Types.Core.GameConfig = {
@@ -37,6 +38,17 @@ const config: Phaser.Types.Core.GameConfig = {
   plugins: {
     global: [{}],
   },
+  callbacks: {
+    postBoot: game => {
+      console.log('post boot: loading custom pipeline');
+      // @ts-ignore
+      var customPipeline = game.renderer.addPipeline('Custom', new CustomPipeline(game));
+
+      customPipeline.setFloat2('resolution', game.config.width, game.config.height);
+      // @ts-ignore
+      window.customPipeline = customPipeline; 
+    }
+  },
   backgroundColor: 0x22e1ff,
 };
 
@@ -49,4 +61,6 @@ export class Game extends Phaser.Game {
 // when the page is loaded, create our game instance
 window.addEventListener('load', () => {
   const game = new Game(config);
+  // @ts-ignore
+  window.game = game;
 });

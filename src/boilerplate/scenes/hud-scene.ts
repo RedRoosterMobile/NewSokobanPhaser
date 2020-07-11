@@ -9,6 +9,7 @@ const gameSettings = SettingsSingleton.getInstance().settings;
 export default class HUDScene extends Phaser.Scene {
   text: Phaser.GameObjects.Text;
   gui: any;
+  t: number;
   music: Phaser.Sound.BaseSound;
   constructor() {
     super('hud-scene');
@@ -16,14 +17,20 @@ export default class HUDScene extends Phaser.Scene {
   }
 
   preload(): void {
+    this.t=0.0;
+    console.log('preloading HUDDDDDDD scene.........!!!!!');
     // load bitmap font
     this.load.audio('sndGameMusic', 'assets/rauser/sounds/rauser_bounce.mp3');
+    //var customPipeline = this.game.renderer.addPipeline('Custom', new CustomPipeline2(game));
+    //customPipeline.setFloat2('resolution', game.config.width, game.config.height);
   }
 
   create(): void {
+    
+    this.cameras.main.setRenderToTexture('Custom');
     const soundConfig = {
       mute: false,
-      volume: 0.1,
+      volume: 0.0,
       rate: 1,
       detune: 0,
       seek: 0,
@@ -33,7 +40,7 @@ export default class HUDScene extends Phaser.Scene {
     this.sound.play('sndGameMusic', soundConfig);
     this.music = this.sound.get('sndGameMusic');
 
-    console.log('preloading HUDDDDDDD scene.........!!!!!');
+
     // create hud
     const test = this.add
       .image(this.game.config.width as number, 0, 'dasboot')
@@ -55,6 +62,10 @@ export default class HUDScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
+    // @ts-ignore
+    window.customPipeline.setFloat1('time', this.t);
+    this.t += 0.005;
+    
       /*
     if (!this.music.isPlaying) {
         this.music.play('sndGameMusic');

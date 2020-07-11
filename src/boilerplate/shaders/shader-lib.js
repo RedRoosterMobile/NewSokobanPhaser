@@ -1,3 +1,9 @@
+// check these
+// https://github.com/photonstorm/phaser3-examples/blob/master/public/assets/shaders/bundle.glsl.js
+// https://labs.phaser.io/edit.html?src=src/display/shaders/shader%20test%206.js&v=3.23.0
+
+// http://glslsandbox.com/
+
 export const blur = `
 #ifdef GL_ES
 precision mediump float;
@@ -373,5 +379,111 @@ void main( void ) {
     col.z *= 2.5*abs(cos(t));
     col = mix(col, vec3(0.2,0.75,0.75), 1.-exp(-0.80*fd*fd));
     gl_FragColor = vec4( col, 1.0 );
+}
+`;
+
+// Tileable Water Caustic
+// https://www.shadertoy.com/view/MdlXz8
+const water5 = `
+#ifdef GL_ES
+precision mediump float;
+#endif
+#define TAU 6.28318530718
+#define MAX_ITER 5
+
+uniform vec3      iResolution;           // viewport resolution (in pixels)
+uniform float     iTime;                 // shader playback time (in seconds)
+varying vec2 fragCoord;
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) 
+{
+	float time = iTime * .5+23.0;
+    // uv should be the 0-1 uv of texture...
+	vec2 uv = fragCoord.xy / iResolution.xy;
+    
+    #ifdef SHOW_TILING
+	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
+    #else
+    vec2 p = mod(uv*TAU, TAU)-250.0;
+    #endif
+	vec2 i = vec2(p);
+	float c = 1.0;
+	float inten = .005;
+
+	for (int n = 0; n < MAX_ITER; n++) 
+	{
+		float t = time * (1.0 - (3.5 / float(n+1)));
+		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
+	}
+	c /= float(MAX_ITER);
+	c = 1.17-pow(c, 1.4);
+	vec3 colour = vec3(pow(abs(c), 8.0));
+    colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);
+    
+
+	#ifdef SHOW_TILING
+	// Flash tile borders...
+	vec2 pixel = 2.0 / iResolution.xy;
+	uv *= 2.0;
+
+	float f = floor(mod(iTime*.5, 2.0)); 	// Flash value.
+	vec2 first = step(pixel, uv) * f;		   	// Rule out first screen pixels and flash.
+	uv  = step(fract(uv), pixel);				// Add one line of pixels per tile.
+	colour = mix(colour, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line
+	
+	#endif
+	fragColor = vec4(colour, 1.0);
+}
+
+void main(void)
+{
+    mainImage(gl_FragColor, fragCoord.xy);
+}
+`;
+
+const plasm=`
+
+precision highp float;
+
+uniform float time;
+uniform vec2 resolution;
+
+varying vec2 fragCoord;
+
+void main( void ) {
+
+    vec2 position = ( fragCoord.xy / resolution.xy );
+
+    float color = 0.0;
+    color += sin( position.x * cos( time / 15.0 ) * 80.0 ) + cos( position.y * cos( time / 15.0 ) * 10.0 );
+    color += sin( position.y * sin( time / 10.0 ) * 40.0 ) + cos( position.x * sin( time / 25.0 ) * 40.0 );
+    color += sin( position.x * sin( time / 5.0 ) * 10.0 ) + sin( position.y * sin( time / 35.0 ) * 80.0 );
+    color *= sin( time / 10.0 ) * 0.5;
+
+    
+    gl_FragColor = vec4( vec3( sin( color + time / 3.0 ) * 0.75, cos( color + time / 3.0 ) * 0.75, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
+
+}
+`;
+
+var tunnel = `
+precision mediump float;
+
+uniform float time;
+uniform vec2 resolution;
+uniform sampler2D iChannel0;
+uniform float alpha;
+uniform float origin;
+
+varying vec2 fragCoord;
+
+#define S 0.79577471545 // Precalculated 2.5 / PI
+#define E 0.0001
+
+void main(void) {
+    vec2 p = (origin * fragCoord.xy / resolution.xy - 1.0) * vec2(resolution.x / resolution.y, 1.0);
+    vec2 t = vec2(S * atan(p.x, p.y), 1.0 / max(length(p), E));
+    vec3 c = texture2D(iChannel0, t + vec2(time * 0.1, time)).xyz;
+    gl_FragColor = vec4(c / (t.y + 0.5), alpha);
 }
 `;

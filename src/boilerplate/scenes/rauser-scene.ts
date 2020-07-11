@@ -6,8 +6,7 @@ import { Enemy } from './../sprites/enemy-image';
 import { Background } from './../sprites/background-sprite';
 import { DamageParticle } from './../sprites/damage-particle';
 
-import HUD from './hud-scene'
-
+import HUD from './hud-scene';
 
 import { virtualScreen, getWorldSize } from '../utils/render-constants';
 import {
@@ -15,6 +14,7 @@ import {
   water1,
   water2,
   water3,
+  water5,
   dunno,
   noob,
 } from './../shaders/shader-lib';
@@ -85,6 +85,8 @@ export class RauserScene extends Phaser.Scene {
     this.load.image('planePhysics', 'assets/rauser/plane_transparent-fs8.png');
     this.load.image('planeWings', 'assets/rauser/plane_wings-fs8.png');
 
+    this.load.glsl('bundle', 'assets/shaders/bundle.glsl.js');
+
     this.load.atlas(
       'boostSprites',
       'assets/rauser/boost-fs8.png',
@@ -120,11 +122,8 @@ export class RauserScene extends Phaser.Scene {
   }
 
   create(): void {
-      
-    
-    this.scene.add('hud-scene', HUD, true)
+    this.scene.add('hud-scene', HUD, true);
     //this.scene.run('hud-scene')
-   
 
     const { worldSizeX, worldSizeY } = this.getWorldSize();
     this.fighterSpawnTime = 0;
@@ -263,7 +262,6 @@ export class RauserScene extends Phaser.Scene {
       }
     );
 
-
     // todo: heatseaking missle fireAtTarget (get closetst enemy?)
     this.planeObj.setBullets(this.playerBullets);
 
@@ -287,14 +285,23 @@ export class RauserScene extends Phaser.Scene {
     this.waterGraphics.fillRect(-450, worldSizeY, worldSizeX, 400);
   }
   shaderStuff(): void {
-    let blurBaseShader = new Phaser.Display.BaseShader('blur', water3);
+    /*let blurBaseShader = new Phaser.Display.BaseShader('blur', water5);
 
     let blurShader = this.add.shader(blurBaseShader, 0, 0, 128, 128, [
-      //let blurShader = new Phaser.GameObjects.Shader(this, blurBaseShader, 0, 0, 2048, 2048, [
       'planeBody',
     ]);
 
-    blurShader.setRenderToTexture('blurred_image', true);
+    blurShader.setRenderToTexture('blurred_image', true);*/
+    this.shaderStuff2();
+  }
+
+  shaderStuff2(): void {
+    let someShader = this.add.shader('Tunnel', 400, 300, 512, 512, [
+      'planeBody',
+    ]);
+    //someShader.setRenderToTexture('shaded', true);
+    //this.add.image(0, 0, 'shaded');
+    console.log(someShader);
   }
 
   // TODO: spawn closer to player (world coordinates)
@@ -310,7 +317,7 @@ export class RauserScene extends Phaser.Scene {
       Phaser.Actions.PlaceOnCircle(
         [anEnemy],
         circleAroundPlayer,
-        Phaser.Math.DegToRad(Phaser.Math.Between(-180,0))
+        Phaser.Math.DegToRad(Phaser.Math.Between(-180, 0))
       );
       anEnemy.setTarget(this.planeObj.plane);
       anEnemy.setBullets(this.enemyBullets);
