@@ -68,6 +68,8 @@ export class RauserScene extends Phaser.Scene {
   battleships: Phaser.Physics.Arcade.Group;
   fighterSpawnTime: number;
   battleshipSpawnTime: number;
+  waterCam: Phaser.Cameras.Scene2D.Camera;
+  shaderTime: number;
 
   preload(): void {
     // https://raw.githubusercontent.com/photonstorm/phaser3-examples/master/public/assets/games/asteroids/bullets.png
@@ -122,6 +124,7 @@ export class RauserScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.shaderTime = 0.0;
     this.scene.add('hud-scene', HUD, true);
     //this.scene.run('hud-scene')
 
@@ -159,7 +162,7 @@ export class RauserScene extends Phaser.Scene {
       .setScale(10);
 
     const worldView = this.cameras.main.worldView;
-    this.shaderStuff();
+    //this.shaderStuff();
 
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
 
@@ -283,6 +286,11 @@ export class RauserScene extends Phaser.Scene {
     );
     //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
     this.waterGraphics.fillRect(-450, worldSizeY, worldSizeX, 400);
+    this.waterGraphics.setVisible(false);
+
+    this.waterCam = this.cameras.add(0, 600-100, 128, 128);
+    this.waterCam.setRenderToTexture('Custom');
+    this.waterCam.setFlipY(true);
   }
   shaderStuff(): void {
     /*let blurBaseShader = new Phaser.Display.BaseShader('blur', water5);
@@ -371,6 +379,9 @@ export class RauserScene extends Phaser.Scene {
   }
 
   update(time, delta): void {
+    // @ts-ignore
+    window.customPipeline.setFloat1('time', this.shaderTime);
+    this.shaderTime += 0.005;
     //this.sound.play('sndGameMusic', soundConfig);
     if (this.planeObj) this.planeObj.updatePlane();
 
@@ -411,7 +422,12 @@ export class RauserScene extends Phaser.Scene {
       );*/
     }
 
-    if (this.waterGraphics) this.waterGraphics.x = this.planeObj.plane.x - 1200;
+    if (this.waterGraphics) {
+      this.waterGraphics.x = this.planeObj.plane.x - 1200;
+      const {worldSizeX,worldSizeY}=getWorldSize();
+      this.waterCam.setZoom(1-gameSettings.zoom);
+      this.waterCam.centerOn(worldSizeX / 2, worldSizeY-100);
+    }
   }
 
   zoomToSpeed(velX, velY): void {

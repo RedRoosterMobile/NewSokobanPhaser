@@ -18,21 +18,18 @@ export default class HUDScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.shaderTime=0.0;
+    this.shaderTime = 0.0;
     console.log('preloading HUDDDDDDD scene.........!!!!!');
     // load bitmap font
     this.load.audio('sndGameMusic', 'assets/rauser/sounds/rauser_bounce.mp3');
+    this.load.image('shaderTestImage', 'assets/rauser/bg_palette.png');
     //var customPipeline = this.game.renderer.addPipeline('Custom', new CustomPipeline2(game));
     //customPipeline.setFloat2('resolution', game.config.width, game.config.height);
     // https://phaser.discourse.group/t/multiple-camera-custom-shaders/3202
   }
 
   create(): void {
-    
     //this.cameras.main.setRenderToTexture('Custom');
-
-
-    
 
     const soundConfig = {
       mute: false,
@@ -46,9 +43,8 @@ export default class HUDScene extends Phaser.Scene {
     this.sound.play('sndGameMusic', soundConfig);
     this.music = this.sound.get('sndGameMusic');
 
-
     // create hud
-    const test = this.add
+    const testBoat = this.add
       .image(this.game.config.width as number, 0, 'dasboot')
       .setOrigin(1, 0)
       .setScale(1);
@@ -58,12 +54,24 @@ export default class HUDScene extends Phaser.Scene {
       fill: '#22e1ff',
     });
 
+    /*const shaderTestImageTarget = this.add.image(0, 0, 'shaderTestImage').setOrigin(0, 0);
 
-    this.waterCam = this.cameras.add(800-test.width+10, -20, 200, 200);
-    this.waterCam.centerOn(test.x,test.y);
+    this.waterCam = this.cameras.add(
+      0,
+      shaderTestImageTarget.height,
+      shaderTestImageTarget.width,
+      shaderTestImageTarget.height
+    );
+    //this.waterCam.centerOn(test2.x,test2.y);
+    this.waterCam.setRenderToTexture('Custom');
+    this.waterCam.setFlipY(true);*/
+
+    /*this.waterCam = this.cameras.add(800-test2.width+10, -20, 200, 200);
+    this.waterCam.centerOn(test2.x,test2.y);
     this.waterCam.setRenderToTexture('Custom');
     this.waterCam.setFlipY(true);
-    
+    */
+
     //this.waterCam.ignore(this.text1)
 
     this.gui.add(gameSettings, 'maxFighters', 0, 100, 1);
@@ -77,17 +85,17 @@ export default class HUDScene extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     // @ts-ignore
-    window.customPipeline.setFloat1('time', this.shaderTime);
-    this.shaderTime += 0.005;
-    
-      /*
+    //window.customPipeline.setFloat1('time', this.shaderTime);
+    //this.shaderTime += 0.005;
+
+    /*
     if (!this.music.isPlaying) {
         this.music.play('sndGameMusic');
 
     }*/
     // @ts-ignore
     this.music.setVolume(gameSettings.musicVolume);
-    
+
     // update HUD
     gameSettings.score;
     gameSettings.currentStreak;
