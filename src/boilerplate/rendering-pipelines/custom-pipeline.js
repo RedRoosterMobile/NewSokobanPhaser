@@ -9,6 +9,10 @@ import Phaser from "phaser";
 // why shaders?
 // https://www.dynetisgames.com/2018/12/09/shaders-phaser-3/#Distortion_shader
 
+
+
+// https://gamedevelopment.tutsplus.com/tutorials/using-displacement-shaders-to-create-an-underwater-effect--cms-27191
+
 const CustomPipeline = new Phaser.Class({
   Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
   initialize: function CustomPipeline(game) {
@@ -21,6 +25,7 @@ const CustomPipeline = new Phaser.Class({
         "precision mediump float;",
         "#define amp 0.02",
         "#define tint_color vec4(0.45, 0.89,0.99, 1)",
+        "#define tint_color2 vec4(0.066, 0.4377,0.4961, 1)",
 
         "uniform float     time;",
         "uniform vec2      resolution;",

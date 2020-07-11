@@ -1,6 +1,11 @@
 precision mediump float;
+
+// #22E1FF
+// (34,225,255)
 #define amp .02
 #define tint_color vec4(.45,.89,.99,1)
+#define tint_color2 vec4(0.066, 0.4377,0.4961, 1) // percetages
+#define tint_color2 vec4(0.52, 1.0,0.57 , 1) // hsl
 
 uniform float time;
 uniform vec2 resolution;

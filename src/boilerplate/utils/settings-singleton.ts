@@ -16,10 +16,10 @@ interface gameSettings {
   streakLevels: Array<integer>;
 }
 let gameSettings = <gameSettings>{
-  maxFighters: 12,
+  maxFighters: 0,
   fighterSpawnInterval: 4000,
   battleshipSpawnInterval: 16000,
-  maxBattleships: 1,
+  maxBattleships: 0,
   zoom: 0.4,
   sfxVolume: 0.0,
   musicVolume: 0.0,

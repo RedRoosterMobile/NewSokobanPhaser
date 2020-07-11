@@ -288,9 +288,15 @@ export class RauserScene extends Phaser.Scene {
     this.waterGraphics.fillRect(-450, worldSizeY, worldSizeX, 400);
     this.waterGraphics.setVisible(false);
 
-    this.waterCam = this.cameras.add(0, 600-100, 128, 128);
+    this.waterCam = this.cameras.add(0, 600-100, 800, 400);
     this.waterCam.setRenderToTexture('Custom');
     this.waterCam.setFlipY(true);
+    
+    // this.waterCam.glTexture
+    // this.add.image(0,0,this.waterCam.glTexture);
+    // this.add.renderTexture(0,0,800,600,this.waterCam.glTexture);
+
+    //this.waterCam.getWorldPoint
   }
   shaderStuff(): void {
     /*let blurBaseShader = new Phaser.Display.BaseShader('blur', water5);
@@ -423,10 +429,30 @@ export class RauserScene extends Phaser.Scene {
     }
 
     if (this.waterGraphics) {
+      
+      // camera basics
+      // https://labs.phaser.io/edit.html?src=src/camera/basics.js&v=3.23.0
+      
       this.waterGraphics.x = this.planeObj.plane.x - 1200;
       const {worldSizeX,worldSizeY}=getWorldSize();
-      this.waterCam.setZoom(1-gameSettings.zoom);
-      this.waterCam.centerOn(worldSizeX / 2, worldSizeY-100);
+      this.waterCam.setZoom(1-gameSettings.zoom); // visual size
+      //this.waterCam.setZoom(1); // size of the camera output
+      //this.waterCam.centerOn(worldSizeX / 2, worldSizeY);
+      this.waterCam.centerOn(this.planeObj.plane.x, worldSizeY-325);
+
+      const mainCam = this.cameras.main;
+
+      // position of the camera in canvas coordinates..(camera is always canvas coordinates..)
+      this.waterCam.x = mainCam.centerX-400+25;
+      this.waterCam.y = mainCam.centerY;
+      // interesting world scroll zoom shit
+      const scrollVec2 = mainCam.getScroll(worldSizeX/2,worldSizeY);
+      //this.waterCam.setScroll(scrollVec2.x,scrollVec2.y);
+      //this.waterCam.setPosition(mainCam.centerX+scrollVec2.x,mainCam.centerY+scrollVec2.y);
+      
+      const worldView = this.cameras.main.worldView;
+      // world coordinates / canvas coodinates
+      //console.log(worldView.centerX, mainCam.centerX);
     }
   }
 
