@@ -289,11 +289,12 @@ export class RauserScene extends Phaser.Scene {
     this.waterGraphics.setVisible(false);
 
     this.waterCam = this.cameras.add(0, 600-100, 800, 400);
-    this.waterCam.setRenderToTexture('Custom');
-    this.waterCam.setFlipY(true);
-    
+    this.waterCam.setRenderToTexture('Custom',true);
+    //this.waterCam.setFlipY(true);
+
     // this.waterCam.glTexture
-    // this.add.image(0,0,this.waterCam.glTexture);
+    //const mirror = this.add.image(0,0,'Custom');
+    
     // this.add.renderTexture(0,0,800,600,this.waterCam.glTexture);
 
     //this.waterCam.getWorldPoint
@@ -441,6 +442,10 @@ export class RauserScene extends Phaser.Scene {
       this.waterCam.centerOn(this.planeObj.plane.x, worldSizeY-325);
 
       const mainCam = this.cameras.main;
+      var p = mainCam.getWorldPoint(mainCam.x, mainCam.y);
+      //this.waterCam.x = p.x;
+      //this.waterCam.y = p.y;
+
 
       // position of the camera in canvas coordinates..(camera is always canvas coordinates..)
       this.waterCam.x = mainCam.centerX-400+25;
