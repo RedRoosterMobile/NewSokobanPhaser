@@ -352,8 +352,6 @@ export class Plane extends Phaser.Physics.Arcade.Sprite {
         this.isShooting = false;
       });
     }
-    // @ts-ignore
-    //this.scene.text.setText('Speed: ' + this.plane.body.speed + ' fps:'+ this.scene.game.loop.actualFps);
   }
   getWorldSize(): any {
     return getWorldSize();

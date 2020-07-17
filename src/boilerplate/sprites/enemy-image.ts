@@ -7,6 +7,18 @@ import { getWorldSize } from '../utils/render-constants';
 
 const gameSettings = SettingsSingleton.getInstance().settings;
 
+const fighterConfig = {
+  key: 'fighter', // battleshipSprite battleshipTurretSprite battleshipTurretGunSprite
+  hp: 15,
+  maxSpeed: 30,
+  // for
+  bulletImpact: 15, 
+  fireInterval: 2000, // 2 s
+  maxBullets: 30, // bullets per interval
+  bulletInterval: 16 * 2, // fire every second render, if bullets available
+  gravityY: 150,
+};
+
 var ROTATION_SPEED = 1 * Math.PI; // 0.5 arc per sec, 2 sec per arc
 var ROTATION_SPEED_DEGREES = Phaser.Math.RadToDeg(ROTATION_SPEED);
 var TOLERANCE = 0.06 * ROTATION_SPEED;
@@ -17,7 +29,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   xSpeed = 0;
   ySpeed = 0;
   direction = 0;
-  hp = 15;
+  hp:number;
   target: Plane;
 
   sound: Phaser.Sound.BaseSound;
@@ -42,6 +54,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.direction = 0;
     this.xSpeed = 0;
     this.ySpeed = 0;
+    this.hp=fighterConfig.hp;
 
     this.emitterFrame = 0;
     this.createParticles();
@@ -228,7 +241,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       - after tween particle explosion effect
       */
 
-      this.emitter.setGravityY(150);
+      this.emitter.setGravityY(fighterConfig.gravityY);
       this.emitter.setSpeed(200);
       this.emitter.setFrequency(12);
 
@@ -315,6 +328,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         .setActive(true)
         .setVisible(true);
       aBullet.rotation = this.shooterRotation;
+      aBullet.setImpact(fighterConfig.bulletImpact);
       const { worldSizeY } = this.getWorldSize();
       if (this.y < worldSizeY) {
         aBullet.fireAtTarget(this, this.target);

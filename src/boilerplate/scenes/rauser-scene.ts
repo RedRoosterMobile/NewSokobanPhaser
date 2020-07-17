@@ -187,15 +187,16 @@ export class RauserScene extends Phaser.Scene {
       classType: Battleship,
       runChildUpdate: true,
       createCallback: (battleship: Battleship) => {
+        // hit box
         battleship.body.setSize(247, 43 - 16);
         battleship.body.setOffset(0, 20);
       },
     });
 
-    this.text = this.add.text(10, 10, '', {
+    /*this.text = this.add.text(10, 10, '', {
       font: '64px Courier',
       fill: '#00ff00',
-    });
+    });*/
 
     // Add 2 groups for Bullet objects
     this.playerBullets = this.physics.add.group({
@@ -262,7 +263,7 @@ export class RauserScene extends Phaser.Scene {
         // somehow this is destroying the player..
         enemyBullet.setActive(false);
         enemyBullet.setVisible(false);
-        this.planeObj.decreaseHealth(5);
+        this.planeObj.decreaseHealth(enemyBullet.impact || 5);
       }
     );
 

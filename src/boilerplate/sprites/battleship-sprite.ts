@@ -48,7 +48,6 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene, x = 0, y = 0) {
     super(scene, x, y, 'battleship');
-    //this.setOrigin(0.5,1);
     this.setScale(10);
     this.speed = 0.1;
     this.born = 0;
@@ -63,6 +62,11 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
 
     this.explosions = this.scene.add.sprite(0, 0, 'explosionsSprite', 0);
     this.explosions.setScale(4);
+    this.explosions.setVisible(false);
+    this.createAnims();
+  }
+
+  createAnims(): void {
     this.scene.anims.create({
       key: 'explode1',
       frames: this.scene.anims.generateFrameNumbers('explosionsSprite', {
@@ -90,7 +94,6 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
       frameRate: 5,
       repeat: -1,
     });
-    this.explosions.setVisible(false);
   }
 
   // TODO: somehow passing an object to the constructor
@@ -159,7 +162,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
         .setAlpha(0.7);
 
       this.explosions.anims.play('explode' + Phaser.Math.Between(1, 3));
-      this.scene.cameras.main.shake(350,0.03)
+      this.scene.cameras.main.shake(350, 0.03);
 
       this.playExplosionSound();
       // or set inactive??? dunno...
@@ -202,7 +205,6 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
       */
       this.body.velocity.y = 60;
       console.log(this.body.velocity);
-
 
       //this.renderContainer.destroy();
     }
@@ -269,6 +271,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
           .setActive(true)
           .setVisible(true);
         aBullet.rotation = this.shooterRotation;
+        aBullet.setImpact(battleshipConfig.bulletImpact);
         const { worldSizeY } = this.getWorldSize();
         //if (this.y < worldSizeY) {
         aBullet.fireAtTarget(this, this.target);

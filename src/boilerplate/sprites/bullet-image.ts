@@ -29,6 +29,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
   isLockedOnTarget = false;
   sound: Phaser.Sound.BaseSound;
   target: Plane;
+  impact: number;
 
   constructor(scene, x = 0, y = 0) {
     // how to add scpecific bullet classes? inheritance? make this abstract class
@@ -86,6 +87,10 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.sound.play(soundConfig);
+  }
+
+  setImpact(impact:number):void {
+    this.impact = impact;
   }
 
   // works
