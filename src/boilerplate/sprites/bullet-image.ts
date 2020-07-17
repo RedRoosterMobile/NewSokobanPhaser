@@ -5,7 +5,7 @@ import { SettingsSingleton } from '../utils/settings-singleton';
 
 const gameSettings = SettingsSingleton.getInstance().settings;
 
-export class Bullet extends Phaser.GameObjects.Image {
+export class Bullet extends Phaser.Physics.Arcade.Sprite {
   // analysis: https://www.youtube.com/watch?v=3X0yxfQGABc
   // luftrauser:
   //

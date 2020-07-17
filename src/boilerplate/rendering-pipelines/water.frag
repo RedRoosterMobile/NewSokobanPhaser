@@ -1,7 +1,7 @@
 precision mediump float;
 
 //
-
+// https://www.shadertoy.com/view/MdlXz8
 // run shaders in the browser
 // https://thebookofshaders.com/04/
 // sin and cosine, easing functions, gold!

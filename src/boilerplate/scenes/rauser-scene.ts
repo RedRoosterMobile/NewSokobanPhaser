@@ -162,7 +162,7 @@ export class RauserScene extends Phaser.Scene {
       .setScale(10);
 
     const worldView = this.cameras.main.worldView;
-    //this.shaderStuff();
+    this.shaderStuff();
 
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
 
@@ -170,6 +170,7 @@ export class RauserScene extends Phaser.Scene {
     const resolutionZoomFactor =
       (this.game.config.width as number) / virtualScreen.WIDTH;
     this.cameras.main.setZoom(gameSettings.zoom * resolutionZoomFactor);
+    //this.cameras.main.setZoom(1.0);
 
     this.cameras.main.startFollow(this.planeObj.camMuzzle, true, 0.09, 0.09);
 
@@ -270,13 +271,10 @@ export class RauserScene extends Phaser.Scene {
 
     // Fires bullet from player on left click of mouse
     this.input.on('pointerdown', (pointer, time, lastFired) => {
-      // Get bullet from bullets group
-      // TODO: move into player class
       this.planeObj.fire();
     });
 
     this.waterGraphics = this.add.graphics();
-    //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
     this.waterGraphics.fillGradientStyle(
       0x22e1ff,
       0x22e1ff,
@@ -284,20 +282,8 @@ export class RauserScene extends Phaser.Scene {
       0x22e199,
       1
     );
-    //graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
     this.waterGraphics.fillRect(-450, worldSizeY, worldSizeX, 400);
-    this.waterGraphics.setVisible(false);
-
-    this.waterCam = this.cameras.add(0, 600-100, 800, 400);
-    this.waterCam.setRenderToTexture('Custom',true);
-    //this.waterCam.setFlipY(true);
-
-    // this.waterCam.glTexture
-    //const mirror = this.add.image(0,0,'Custom');
-    
-    // this.add.renderTexture(0,0,800,600,this.waterCam.glTexture);
-
-    //this.waterCam.getWorldPoint
+    this.waterGraphics.setVisible(true);
   }
   shaderStuff(): void {
     /*let blurBaseShader = new Phaser.Display.BaseShader('blur', water5);
@@ -307,19 +293,18 @@ export class RauserScene extends Phaser.Scene {
     ]);
 
     blurShader.setRenderToTexture('blurred_image', true);*/
-    this.shaderStuff2();
+    //this.shaderStuff2();
   }
 
   shaderStuff2(): void {
-    let someShader = this.add.shader('Tunnel', 400, 300, 512, 512, [
+    let someShader = this.add.shader('Custom', 400, 300, 512, 512, [
       'planeBody',
     ]);
-    //someShader.setRenderToTexture('shaded', true);
+    someShader.setRenderToTexture('shaded', true);
     //this.add.image(0, 0, 'shaded');
     console.log(someShader);
   }
 
-  // TODO: spawn closer to player (world coordinates)
   spawnEnemies(time): void {
     let interval =
       time - this.fighterSpawnTime > gameSettings.fighterSpawnInterval;
@@ -358,9 +343,6 @@ export class RauserScene extends Phaser.Scene {
         .setVisible(true);
       let { x, y } = this.planeObj.plane.body;
       const { worldSizeX, worldSizeY } = this.getWorldSize();
-      //battleship.setRandomPosition(0,worldSizeY,300,0);
-      //battleship.body.x=battleship.x=0;
-      //battleship.body.y=battleship.y=worldSizeY;
 
       const spawnLeftOfPlayer = !!Phaser.Math.Between(0, 1);
 
@@ -371,8 +353,6 @@ export class RauserScene extends Phaser.Scene {
 
       battleship.setTarget(this.planeObj.plane);
       battleship.setBullets(this.enemyBullets);
-      //battleship.setOrigin(0.5,0.8);
-      //battleship.setOrigin(1,-1);
       console.log(
         `creating ship ${spawnLeftOfPlayer ? 'left' : 'right'} of player `,
         battleship.x,
@@ -388,11 +368,12 @@ export class RauserScene extends Phaser.Scene {
   update(time, delta): void {
     // @ts-ignore
     window.customPipeline.setFloat1('time', this.shaderTime);
+    
     this.shaderTime += 0.005;
-    //this.sound.play('sndGameMusic', soundConfig);
     if (this.planeObj) this.planeObj.updatePlane();
 
-    if (this.planeObj.active && time > 4000) {
+    const startupPauseTime = 4000;
+    if (this.planeObj.active && time > startupPauseTime) {
       this.spawnEnemies(time);
       this.spawnBattleships(time);
       const { x: velX, y: velY } = this.planeObj.plane.body.velocity;
@@ -418,15 +399,6 @@ export class RauserScene extends Phaser.Scene {
           }
         }
       }
-
-      /*
-      this.text.setText(
-        'Speed: ' +
-          // @ts-ignore
-          this.planeObj.plane.body.speed +
-          ' fps:' +
-          this.game.loop.actualFps
-      );*/
     }
 
     if (this.waterGraphics) {
@@ -435,23 +407,28 @@ export class RauserScene extends Phaser.Scene {
       // https://labs.phaser.io/edit.html?src=src/camera/basics.js&v=3.23.0
       
       this.waterGraphics.x = this.planeObj.plane.x - 1200;
+      const mainCam = this.cameras.main;
       const {worldSizeX,worldSizeY}=getWorldSize();
-      this.waterCam.setZoom(1-gameSettings.zoom); // visual size
+      //this.waterCam.setZoom(1-gameSettings.zoom); // visual size
+      //this.waterCam.setZoom(gameSettings.zoom); // visual size
       //this.waterCam.setZoom(1); // size of the camera output
       //this.waterCam.centerOn(worldSizeX / 2, worldSizeY);
-      this.waterCam.centerOn(this.planeObj.plane.x, worldSizeY-325);
+      //this.waterCam.centerOn(this.planeObj.plane.x, worldSizeY-325);
+      //this.waterCam.centerOn(mainCam.centerX, mainCam.centerY);
+      //this.waterCam.x=mainCam.centerX-400;
+      //this.waterCam.y=mainCam.centerY-300;
 
-      const mainCam = this.cameras.main;
-      var p = mainCam.getWorldPoint(mainCam.x, mainCam.y);
+      
+      //var p = mainCam.getWorldPoint(mainCam.x, mainCam.y);
       //this.waterCam.x = p.x;
       //this.waterCam.y = p.y;
 
 
       // position of the camera in canvas coordinates..(camera is always canvas coordinates..)
-      this.waterCam.x = mainCam.centerX-400+25;
-      this.waterCam.y = mainCam.centerY;
+      //this.waterCam.x = mainCam.centerX-400+25;
+      //this.waterCam.y = mainCam.centerY;
       // interesting world scroll zoom shit
-      const scrollVec2 = mainCam.getScroll(worldSizeX/2,worldSizeY);
+      //const scrollVec2 = mainCam.getScroll(worldSizeX/2,worldSizeY);
       //this.waterCam.setScroll(scrollVec2.x,scrollVec2.y);
       //this.waterCam.setPosition(mainCam.centerX+scrollVec2.x,mainCam.centerY+scrollVec2.y);
       

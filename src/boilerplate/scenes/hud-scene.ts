@@ -78,7 +78,7 @@ export default class HUDScene extends Phaser.Scene {
     this.gui.add(gameSettings, 'fighterSpawnInterval', 1000, 12000, 1000);
     this.gui.add(gameSettings, 'maxBattleships', 0, 100, 1);
     this.gui.add(gameSettings, 'battleshipSpawnInterval', 1000, 32000, 1000);
-    this.gui.add(gameSettings, 'zoom', 0.1, 0.5, 0.1);
+    this.gui.add(gameSettings, 'zoom', 0.1, 2.0, 0.1);
     this.gui.add(gameSettings, 'sfxVolume', 0.0, 1.0, 0.01);
     this.gui.add(gameSettings, 'musicVolume', 0.0, 1.0, 0.01);
   }
