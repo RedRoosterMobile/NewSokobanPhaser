@@ -162,9 +162,10 @@ export class RauserScene extends Phaser.Scene {
       .setScale(10);
 
     const worldView = this.cameras.main.worldView;
-    this.shaderStuff();
+    
 
     this.planeObj = new Plane(this, worldSizeX / 2, worldSizeY);
+    this.shaderStuff();
 
     // 320/800
     const resolutionZoomFactor =
@@ -294,16 +295,20 @@ export class RauserScene extends Phaser.Scene {
     ]);
 
     blurShader.setRenderToTexture('blurred_image', true);*/
-    //this.shaderStuff2();
+    this.shaderStuff2();
   }
 
   shaderStuff2(): void {
-    let someShader = this.add.shader('Custom', 400, 300, 512, 512, [
+    /*let someShader = this.add.shader('Custom', 400, 300, 512, 512, [
       'planeBody',
-    ]);
-    someShader.setRenderToTexture('shaded', true);
+    ]);*/
+    const sprite = this.dasBoot;
+    sprite.setPipeline('Custom');
+    sprite.pipeline.setFloat2('uTextureSize', sprite.texture.getSourceImage().width, sprite.texture.getSourceImage().height);
+    // sprite.pipeline.setFloat2('uTextureSize', sprite.texture.getSourceImage().width, sprite.texture.getSourceImage().height);
+    //someShader.setRenderToTexture('shaded', true);
     //this.add.image(0, 0, 'shaded');
-    console.log(someShader);
+    //console.log(someShader);
   }
 
   spawnEnemies(time): void {
