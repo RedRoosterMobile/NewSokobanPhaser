@@ -108,10 +108,10 @@ export class RauserScene extends Phaser.Scene {
 
     this.load.image('bg1', 'assets/rauser/clouds_pixel_800_600-fs8.png');
 
-    this.load.audio(
-      'sndMachineGun',
-      'assets/rauser/sounds/bassy_machine_gun.ogg'
-    );
+    this.load.audio('sndMachineGun', [
+      'assets/rauser/sounds/bassy_machine_gun.ogg',
+      'assets/rauser/sounds/bassy_machine_gun.mp3',
+    ]);
     this.load.audio('sndExplosion', 'assets/rauser/sounds/explosion.mp3');
     this.load.audio(
       'sndExplosion2',
@@ -369,7 +369,7 @@ export class RauserScene extends Phaser.Scene {
   update(time, delta): void {
     // @ts-ignore
     window.customPipeline.setFloat1('time', this.shaderTime);
-    
+
     this.shaderTime += 0.005;
     if (this.planeObj) this.planeObj.updatePlane();
 
@@ -403,13 +403,12 @@ export class RauserScene extends Phaser.Scene {
     }
 
     if (this.waterGraphics) {
-      
       // camera basics
       // https://labs.phaser.io/edit.html?src=src/camera/basics.js&v=3.23.0
-      
+
       this.waterGraphics.x = this.planeObj.plane.x - 1200;
       const mainCam = this.cameras.main;
-      const {worldSizeX,worldSizeY}=getWorldSize();
+      const { worldSizeX, worldSizeY } = getWorldSize();
       //this.waterCam.setZoom(1-gameSettings.zoom); // visual size
       //this.waterCam.setZoom(gameSettings.zoom); // visual size
       //this.waterCam.setZoom(1); // size of the camera output
@@ -419,11 +418,9 @@ export class RauserScene extends Phaser.Scene {
       //this.waterCam.x=mainCam.centerX-400;
       //this.waterCam.y=mainCam.centerY-300;
 
-      
       //var p = mainCam.getWorldPoint(mainCam.x, mainCam.y);
       //this.waterCam.x = p.x;
       //this.waterCam.y = p.y;
-
 
       // position of the camera in canvas coordinates..(camera is always canvas coordinates..)
       //this.waterCam.x = mainCam.centerX-400+25;
@@ -432,7 +429,7 @@ export class RauserScene extends Phaser.Scene {
       //const scrollVec2 = mainCam.getScroll(worldSizeX/2,worldSizeY);
       //this.waterCam.setScroll(scrollVec2.x,scrollVec2.y);
       //this.waterCam.setPosition(mainCam.centerX+scrollVec2.x,mainCam.centerY+scrollVec2.y);
-      
+
       const worldView = this.cameras.main.worldView;
       // world coordinates / canvas coodinates
       //console.log(worldView.centerX, mainCam.centerX);

@@ -170,7 +170,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
       /*
       this.emitter.setSpeed(200 );
       this.emitter.setFrequency(12);
-      
+
       */
       let oneShotTimer = this.scene.time.delayedCall(5000, () => {
         this.explosions.destroy();
@@ -199,7 +199,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
         repeat: 0,
         onComplete: () => {
           console.log('ship sunk');
-          
+
         },
       });
       */
@@ -264,7 +264,7 @@ export class Battleship extends Phaser.Physics.Arcade.Sprite {
       // ummm, why does this work??
       // this.setAngularVelocity(300);
 
-      const shootInterval = 10; //Phaser.Math.Between(0, 10);
+      const shootInterval = Phaser.Math.Between(0, 100);
       if (Math.round(time * 100) % shootInterval == 0) {
         const aBullet: Bullet = this.bullets
           .get()
